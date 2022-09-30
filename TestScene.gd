@@ -24,7 +24,7 @@ func client_connect(id):
 	peer_id = id
 	
 	var player = preload("res://PlayerPrefab.tscn").instance()
-	player.set_name("str(id)")
+	player.set_name("player_",str(id))
 	player.set_network_master(id) # Each other connected peer has authority over their own player.
 	get_parent().add_child(player)
 	
@@ -39,12 +39,16 @@ func _on_Client_pressed():
 		peer.create_client("192.168.43.116", 7777)
 		get_tree().network_peer = peer
 		print(get_tree().network_peer)
+		is_connected = true
 	
 func connection_failed():
 	print("FAIL")
 
 remote func test():
 	print("BigBoiiiiiiii")
+	
+master func move(id, w, a, s, d):
+	get_parent().get_node("player_" + str(id)).move(w,a,s,d)
 
 func _on_Host_pressed():
 	print("Host")
@@ -56,6 +60,9 @@ func _on_Host_pressed():
 	get_tree().connect("network_peer_connected", self, "client_connect")
 	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
 
+func _physics_process(delta):
+	if is_connected:
+		rpc_id(1, "move", Input.is_key_pressed(KEY_W), Input.is_key_pressed(KEY_A), Input.is_key_pressed(KEY_S), Input.is_key_pressed(KEY_D))
 
 func _on_PRESS_pressed():
 	rpc_id(peer_id, "test")
