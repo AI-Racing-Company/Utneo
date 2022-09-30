@@ -18,10 +18,13 @@ func _ready():
 
 func _on_Client_pressed():
 	print("Client")
-	NetworkedMultiplayerENet.new()
-	peer.create_client("0.0.0.0", 7777)
+	peer = NetworkedMultiplayerENet.new()
+	peer.create_client("192.168.43.116", 7777)
 	get_tree().network_peer = peer
 	print(get_tree().network_peer)
+	
+func connection_failed():
+	print("FAIL")
 
 
 func _on_Host_pressed():
