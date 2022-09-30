@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://Scripts/TestSceneScript.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/TestScene.gd" type="Script" id=1]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
@@ -28,3 +28,8 @@ margin_left = 80.0
 margin_right = 170.0
 margin_bottom = 20.0
 text = "Disconnect"
+
+[connection signal="pressed" from="Client" to="." method="_on_Client_pressed"]
+[connection signal="pressed" from="Host" to="." method="_on_Host_pressed"]
+[connection signal="pressed" from="PRESS" to="." method="_on_PRESS_pressed"]
+[connection signal="pressed" from="Disconnect" to="." method="_on_Disconnect_pressed"]
