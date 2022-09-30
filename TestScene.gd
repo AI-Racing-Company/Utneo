@@ -7,7 +7,7 @@ extends Node2D
 var peer = null
 var peer_id = 0
 var is_connected = false
-var my_id = 0
+puppet var my_id = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -63,7 +63,8 @@ func _on_Host_pressed():
 
 func _physics_process(delta):
 	if is_connected:
-		rpc_id(1, "move", my_id, Input.is_key_pressed(KEY_W), Input.is_key_pressed(KEY_A), Input.is_key_pressed(KEY_S), Input.is_key_pressed(KEY_D))
+		if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_D):
+			rpc_id(1, "move", my_id, Input.is_key_pressed(KEY_W), Input.is_key_pressed(KEY_A), Input.is_key_pressed(KEY_S), Input.is_key_pressed(KEY_D))
 
 func _on_PRESS_pressed():
 	rpc_id(peer_id, "test")
