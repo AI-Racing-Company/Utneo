@@ -15,15 +15,16 @@ func _ready():
 
 func connected_to_server():
 	print("am connected")
+	var player = preload("res://PlayerPrefab.tscn").instance()
+	player.set_name("player")
+	get_parent().add_child(player)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+
 func client_connect(id):
 	print("conn")
 	print("fresh id:",id)
 	peer_id = id
-	rset("my_id", id)
+	rset_id(id, "my_id", id)
 	var player = preload("res://PlayerPrefab.tscn").instance()
 	player.set_name("player_"+str(id))
 	player.set_network_master(id) # Each other connected peer has authority over their own player.
@@ -41,6 +42,8 @@ func _on_Client_pressed():
 		get_tree().network_peer = peer
 		print(get_tree().network_peer)
 		is_connected = true
+		get_tree().connect("connected_to_server", self, "connected_to_server")
+		get_tree().connect("connection_failed", self, "connection_failed")
 	
 func connection_failed():
 	print("FAIL")
@@ -49,7 +52,7 @@ remote func test():
 	print("BigBoiiiiiiii")
 	
 master func move(id, w, a, s, d):
-	get_parent().get_node("player_" + str(id)).move(w,a,s,d)
+	get_parent().get_node("player_" + str(id)).get_node("player").move(w,a,s,d)
 
 func _on_Host_pressed():
 	print("Host")
@@ -63,8 +66,13 @@ func _on_Host_pressed():
 
 func _physics_process(delta):
 	if is_connected:
-		if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_D):
-			rpc_id(1, "move", my_id, Input.is_key_pressed(KEY_W), Input.is_key_pressed(KEY_A), Input.is_key_pressed(KEY_S), Input.is_key_pressed(KEY_D))
+		var w = Input.is_key_pressed(KEY_W)
+		var a = Input.is_key_pressed(KEY_A)
+		var s = Input.is_key_pressed(KEY_S)
+		var d = Input.is_key_pressed(KEY_D)
+		if w or a or s or d:
+			get_parent().get_node("player").get_node("player").move(w,a,s,d)
+			rpc_id(1, "move", my_id, w, a, s, d)
 
 func _on_PRESS_pressed():
 	rpc_id(peer_id, "test")

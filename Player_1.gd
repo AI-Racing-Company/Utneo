@@ -13,15 +13,15 @@ func _ready():
 
 
 func move(w,a,s,d):
-	if Input.is_action_pressed(a):
+	if a:
 		vel.x = -10
-	elif Input.is_action_pressed(d):
+	elif d:
 		vel.x =  10
 	else:
 		vel.x = 0
-	if Input.is_action_pressed(w):
+	if w:
 		vel.y = -10
-	elif Input.is_action_pressed(s):
+	elif s:
 		vel.y =  10
 	else:
 		vel.y = 0
