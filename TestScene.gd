@@ -6,6 +6,7 @@ extends Node2D
 # var b = "text"
 var peer = null
 var peer_id = 0
+var is_connected = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -19,20 +20,30 @@ func connected_to_server():
 #	pass
 func client_connect(id):
 	print("conn")
-	print("fresh id:" + id)
+	print("fresh id:",id)
 	peer_id = id
+	
+	var player = preload("res://PlayerPrefab.tscn").instance()
+	player.set_name("str(id)")
+	player.set_network_master(id) # Each other connected peer has authority over their own player.
+	get_parent().add_child(player)
+	
+func client_disconnect(id):
+	print("conn")
+	print("gone id:",id)
 
 func _on_Client_pressed():
-	print("Client")
-	peer = NetworkedMultiplayerENet.new()
-	peer.create_client("192.168.43.116", 7777)
-	get_tree().network_peer = peer
-	print(get_tree().network_peer)
+	if not is_connected:
+		print("Client")
+		peer = NetworkedMultiplayerENet.new()
+		peer.create_client("192.168.43.116", 7777)
+		get_tree().network_peer = peer
+		print(get_tree().network_peer)
 	
 func connection_failed():
 	print("FAIL")
 
-func test():
+remote func test():
 	print("BigBoiiiiiiii")
 
 func _on_Host_pressed():
@@ -43,6 +54,7 @@ func _on_Host_pressed():
 	print(get_tree().get_network_peer())
 	print(get_tree().is_network_server())
 	get_tree().connect("network_peer_connected", self, "client_connect")
+	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
 
 
 func _on_PRESS_pressed():
