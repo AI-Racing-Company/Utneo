@@ -26,6 +26,8 @@ func _on_Client_pressed():
 func connection_failed():
 	print("FAIL")
 
+func test():
+	print("BigBoiiiiiiii")
 
 func _on_Host_pressed():
 	print("Host")
@@ -34,3 +36,7 @@ func _on_Host_pressed():
 	get_tree().network_peer = peer
 	print(get_tree().get_network_peer())
 	print(get_tree().is_network_server())
+
+
+func _on_PRESS_pressed():
+	rpc("test")
