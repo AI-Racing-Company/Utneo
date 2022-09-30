@@ -7,6 +7,7 @@ extends Node2D
 var peer = null
 var peer_id = 0
 var is_connected = false
+var my_id = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -22,9 +23,9 @@ func client_connect(id):
 	print("conn")
 	print("fresh id:",id)
 	peer_id = id
-	
+	rset("my_id", id)
 	var player = preload("res://PlayerPrefab.tscn").instance()
-	player.set_name("player_",str(id))
+	player.set_name("player_"+str(id))
 	player.set_network_master(id) # Each other connected peer has authority over their own player.
 	get_parent().add_child(player)
 	
@@ -62,7 +63,7 @@ func _on_Host_pressed():
 
 func _physics_process(delta):
 	if is_connected:
-		rpc_id(1, "move", Input.is_key_pressed(KEY_W), Input.is_key_pressed(KEY_A), Input.is_key_pressed(KEY_S), Input.is_key_pressed(KEY_D))
+		rpc_id(1, "move", my_id, Input.is_key_pressed(KEY_W), Input.is_key_pressed(KEY_A), Input.is_key_pressed(KEY_S), Input.is_key_pressed(KEY_D))
 
 func _on_PRESS_pressed():
 	rpc_id(peer_id, "test")
