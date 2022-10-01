@@ -39,6 +39,18 @@ func _physics_process(delta):
 			rpc_id(1, "move", my_id, w, a, s, d)
 	
 	rpc_id(1,"getPos")
+	
+	for i in playerPos:
+		print(i)
+
+puppet func client_connect(id):
+	var player = preload("res://Prefabs/PlayerPrefab.tscn").instance()
+	player.set_name("player_"+str(id))
+	get_parent().add_child(player)
+
+puppet func client_disconnect(id):
+	var player = get_parent().get_node("player_"+str(id))
+	get_parent().remove_child(player)
 
 
 func _on_PRESS_pressed():

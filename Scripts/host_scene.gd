@@ -30,11 +30,13 @@ func client_connect(id):
 	player.set_name("player_"+str(id))
 	player.set_network_master(id) # Each other connected peer has authority over their own player.
 	get_parent().add_child(player)
+	rpc("client_connect")
 
 func client_disconnect(id):
 	print("disconnected player ID: ",id)
 	var player = get_parent().get_node("player_"+str(id))
 	get_parent().remove_child(player)
+	rpc("client_disconnect")
 
 master func move(id, w, a, s, d):
 	var player = get_parent().get_node("player_" + str(id)).get_node("player")
