@@ -7,14 +7,15 @@ func _ready():
 	global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	peer = NetworkedMultiplayerENet.new()
-	peer.create_server(7777, 5)
+	peer.create_server(global.port, 5)
 	get_tree().network_peer = peer
 	print(get_tree().get_network_peer())
 	print(get_tree().is_network_server())
 	get_tree().connect("network_peer_connected", self, "client_connect")
 	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
 
-
+master func connection_established():
+	return true
 
 func client_connect(id):
 	print("connected player ID: ",id)

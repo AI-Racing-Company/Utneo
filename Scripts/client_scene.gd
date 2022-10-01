@@ -10,6 +10,7 @@ func _ready():
 	peer.create_client(global.ip, global.port)
 	get_tree().network_peer = peer
 	print(get_tree().network_peer)
+	print(rpc_id(1, "connection_established"))
 	is_connected = true
 	get_tree().connect("connected_to_server", self, "connected_to_server")
 	get_tree().connect("connection_failed", self, "connection_failed")
