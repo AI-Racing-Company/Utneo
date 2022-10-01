@@ -5,6 +5,8 @@ var peer = null
 var is_connected = false
 puppet var my_id = 0
 
+var playerPos = {}
+
 func _ready():
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_client(global.ip, global.port)
@@ -32,6 +34,9 @@ func _physics_process(delta):
 		if w or a or s or d:
 			get_parent().get_node("player").get_node("player").move(w,a,s,d)
 			rpc_id(1, "move", my_id, w, a, s, d)
+	
+	rpc_id(1,"getPos")
+
 
 func _on_PRESS_pressed():
 	rpc_id(1, "test")

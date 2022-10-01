@@ -2,6 +2,7 @@ extends Node2D
 
 var peer = null
 var peer_id = 0
+var playerPos = {}
 
 func _ready():
 	global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
@@ -28,6 +29,13 @@ func client_connect(id):
 
 func client_disconnect(id):
 	print("disconnected player ID: ",id)
+	var player = get_parent().get_node("player_"+str(id))
+	get_parent().remove_child(player)
 
 master func move(id, w, a, s, d):
-	get_parent().get_node("player_" + str(id)).get_node("player").move(w,a,s,d)
+	var player = get_parent().get_node("player_" + str(id)).get_node("player")
+	player.move(w,a,s,d)
+	playerPos[str(id)] = player.get_global_position()
+	
+master func getPos(id):
+	rset_id(id,"playerPos",playerPos)
