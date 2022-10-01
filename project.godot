@@ -17,6 +17,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Player1="*res://Scripts/Player_1.gd"
+global="*res://Scripts/global.gd"
 
 [gui]
 

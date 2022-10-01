@@ -4,11 +4,8 @@ var peer = null
 var peer_id = 0
 
 func _ready():
-	pass # Replace with function body.
-
-
-func _on_Host_pressed():
-	print("Host")
+	global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
+	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_server(7777, 5)
 	get_tree().network_peer = peer
@@ -16,6 +13,8 @@ func _on_Host_pressed():
 	print(get_tree().is_network_server())
 	get_tree().connect("network_peer_connected", self, "client_connect")
 	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
+
+
 
 func client_connect(id):
 	print("connected player ID: ",id)
