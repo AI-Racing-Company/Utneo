@@ -1,13 +1,17 @@
 extends Node2D
 
+
 var peer = null
 var peer_id = 0
+
+#test
 
 func _ready():
 	global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_server(global.port, 5)
+	peer.COMPRESS_ZLIB
 	get_tree().network_peer = peer
 	print(get_tree().get_network_peer())
 	print(get_tree().is_network_server())
@@ -28,6 +32,8 @@ func client_connect(id):
 
 func client_disconnect(id):
 	print("disconnected player ID: ",id)
+	var player = get_parent().getnode("player"+str(id))
+	get_parent().remove_child(player)
 
 master func move(id, w, a, s, d):
 	get_parent().get_node("player_" + str(id)).get_node("player").move(w,a,s,d)

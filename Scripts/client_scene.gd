@@ -1,5 +1,6 @@
 extends Node2D
 
+
 var peer = null
 
 var is_connected = false
@@ -8,8 +9,10 @@ puppet var my_id = 0
 func _ready():
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_client(global.ip, global.port)
+	peer.COMPRESS_ZLIB
 	get_tree().network_peer = peer
 	print(get_tree().network_peer)
+	
 	is_connected = true
 	get_tree().connect("connected_to_server", self, "connected_to_server")
 	get_tree().connect("connection_failed", self, "connection_failed")
