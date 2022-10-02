@@ -12,7 +12,7 @@ func _ready():
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_server(global.port, 5)
-	peer.COMPRESS_ZLIB
+	peer.COMPRESS_FASTLZ
 	get_tree().network_peer = peer
 	print(get_tree().get_network_peer())
 	print(get_tree().is_network_server())
@@ -30,18 +30,20 @@ func client_connect(id):
 	player.set_name("player_"+str(id))
 	player.set_network_master(id) # Each other connected peer has authority over their own player.
 	get_parent().add_child(player)
-	rpc("client_connect")
+	rpc("client_connect", id)
 
 func client_disconnect(id):
 	print("disconnected player ID: ",id)
 	var player = get_parent().get_node("player_"+str(id))
 	get_parent().remove_child(player)
-	rpc("client_disconnect")
+	rpc("client_disconnect", id)
 
 master func move(id, w, a, s, d):
 	var player = get_parent().get_node("player_" + str(id)).get_node("player")
 	player.move(w,a,s,d)
 	playerPos[str(id)] = player.get_global_position()
+	rpc("player_pos_change", id, playerPos[str(id)])
+	
 
 master func getPos(id):
 	rset_id(id,"playerPos",playerPos)
