@@ -53,12 +53,10 @@ puppet func client_disconnect(id):
 	var player = get_parent().get_node("player_"+str(id))
 	get_parent().remove_child(player)
 
-
-func _on_PRESS_pressed():
-	rpc_id(1, "test")
-
 func _on_Disconnect_pressed():
 	get_tree().network_peer = null
+	peer.close_connection()
+	get_tree().change_scene("res://Scenes/TestScene.tscn")
 
 func connection_failed():
 	print("Failed to connect to server...")

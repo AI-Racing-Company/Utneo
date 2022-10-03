@@ -47,3 +47,10 @@ master func move(id, w, a, s, d):
 
 master func getPos(id):
 	rset_id(id,"playerPos",playerPos)
+
+
+func _on_Disconnect_pressed():
+	get_tree().network_peer = null
+	peer.close_connection()
+	get_tree().change_scene("res://Scenes/TestScene.tscn")
+	
