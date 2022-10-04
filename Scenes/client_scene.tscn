@@ -19,9 +19,9 @@ rect_pivot_offset = Vector2( -928, 63 )
 custom_fonts/font = SubResource( 1 )
 
 [node name="Disconnect" type="Button" parent="."]
-margin_left = 1185.0
+margin_left = 800.0
 margin_top = 5.0
-margin_right = 1275.0
+margin_right = 890.0
 margin_bottom = 30.0
 text = "Disconnect"
 
