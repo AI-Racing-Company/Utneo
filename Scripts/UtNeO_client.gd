@@ -19,11 +19,7 @@ func resized():
 		my_card_nodes[i].set_global_position(vec)
 	
 func add_card():
-	var player = null
-	var rand = rnd.randi_range(0,9)
-	match rand:
-		0:
-			player = preload("res://Prefabs/Cards/card_0_dev.tscn").instance()
+	var player = preload("res://Prefabs/Cards/card_1_dev.tscn").instance()
 			
 	player.set_name("player_"+str(1))
 	card_drawn(player)
@@ -33,9 +29,14 @@ func card_drawn(card):
 
 	card.set_size(Vector2(75,100))
 	get_node("Cards").call_deferred("add_child", card)
+	
 	my_card_nodes.append(card)
 	resized()
 	
 func card_removed(card):
 	my_card_nodes.erase(card)
 	my_card_num -= 1
+	
+func hand_card_pressed(card_id):
+	print("I've been pressed")
+
