@@ -62,6 +62,9 @@ func card_removed(card):
 
 func hand_card_pressed(card_id):
 	print("I've been pressed")
+	
+func button_pressed(switch):
+	print(switch)
 
 
 func _physics_process(delta):
