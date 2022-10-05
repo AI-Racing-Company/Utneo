@@ -7,7 +7,7 @@ var rnd = RandomNumberGenerator.new()
 
 func _ready():
 	get_viewport().connect("size_changed", self, "resized")
-	card_drawn(1)
+	
 
 
 func resized():
@@ -18,17 +18,22 @@ func resized():
 		var vec = Vector2((i+1)*add - 75/2,height-100)
 		my_card_nodes[i].set_global_position(vec)
 	
+func add_card():
+	var player = null
+	var rand = rnd.randi_range(0,9)
+	match rand:
+		0:
+			player = preload("res://Prefabs/Cards/card_0_dev.tscn").instance()
+			
+	player.set_name("player_"+str(1))
+	card_drawn(player)
 
 func card_drawn(card):
 	my_card_num += 1
-	
-	var tcard = preload("res://Prefabs/Cards/Card_0_dev.tscn").instance()
-	tcard.set_name("player_"+str(1))
 
-
-	tcard.set_size(Vector2(75,100))
-	get_node("Cards").call_deferred("add_child", tcard)
-	my_card_nodes.append(tcard)
+	card.set_size(Vector2(75,100))
+	get_node("Cards").call_deferred("add_child", card)
+	my_card_nodes.append(card)
 	resized()
 	
 func card_removed(card):

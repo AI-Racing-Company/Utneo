@@ -16,3 +16,7 @@ func resized():
 		get_node("SelectActionButtons/"+str(btns[i])).set_global_position(Vector2(i*offset,y-140))
 		get_node("SelectActionButtons/"+str(btns[i])).set_size(Vector2(offset,40))
 	
+
+
+func _on_addCard_pressed():
+	get_parent().add_card()
