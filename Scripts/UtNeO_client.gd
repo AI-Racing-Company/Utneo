@@ -4,7 +4,7 @@ var my_id = 0
 var my_card_num = 0
 var my_cards = []
 var my_card_nodes = []
-var operation_value0_value1 = ["",0,0]
+var operation_value0_value1_cname0_cname1 = ["",0,0, "", ""]
 var selected_card = 0
 
 var peer = null
@@ -70,22 +70,27 @@ puppet func master_add_card(rand):
 	my_card_nodes.append(card)
 	resized()
 
-func card_removed(card):
-	my_card_nodes.erase(card)
-	my_card_num -= 1
+func card_removed():
+	my_card_nodes.erase(get_node(operation_value0_value1_cname0_cname1[3]))
+	my_card_nodes.erase(get_node(operation_value0_value1_cname0_cname1[4]))
+	get_parent().remove_child(get_node(operation_value0_value1_cname0_cname1[3]))
+	get_parent().remove_child(get_node(operation_value0_value1_cname0_cname1[4]))
+	my_card_num -= 2
 
 func hand_card_pressed(card):
 	var value = card.name.split("_")
 	if(!selected_card):
-		operation_value0_value1[1] = value[1]
+		operation_value0_value1_cname0_cname1[1] = value[1]
+		operation_value0_value1_cname0_cname1[3] = card.name
 		selected_card = 1
 	else:
-		operation_value0_value1[2] = value[1]
+		operation_value0_value1_cname0_cname1[2] = value[1]
+		operation_value0_value1_cname0_cname1[4] = card.name
 		selected_card = 0
 
 func button_pressed(operation):
 
 	if(operation != "Pus"):
-		operation_value0_value1[0] = operation
+		operation_value0_value1_cname0_cname1[0] = operation
 	elif(operation == "Pus"):
-		rpc_id(1,"cards_pushed",my_id,operation_value0_value1)
+		rpc_id(1,"cards_pushed",my_id,operation_value0_value1_cname0_cname1)

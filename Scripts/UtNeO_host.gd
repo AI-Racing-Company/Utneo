@@ -47,21 +47,22 @@ master func add_card(id):
 	
 	all_cards.append(rnd)
 	var player_id = player_IDs.find(id,0)
-	player_cards[player_id].append(rnd)
-	print(id)
+	print("player in array ID:" + str(player_id))
+	player_cards[player_id].append(rand)
+	print("Array: " + str(player_cards[0]))
 	
 	rpc_id(id, "master_add_card", rand)
 	
 
 	
 master func cards_pushed(id, ops):
-	print(id)
+	print("Player-ID: " + str(id))
 	var player_id = player_IDs.find(id)
-	print(player_id)
+	print("player in array ID:" + str(player_id))
 	var op = ops[0]
-	var c1 = ops[1]
-	var c2 = ops[2]
-	print(player_cards[player_id].find(c1))
+	var c1 = int(ops[1])
+	var c2 = int(ops[2])
+	print("Card in array: " + str(player_cards[player_id].find(c1)))
 	if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= 0:
 		print("move possible")
 		match op:
@@ -75,6 +76,7 @@ master func cards_pushed(id, ops):
 				print(int(c1)/int(c2))
 			"Pot":
 				print(pow(c1,c2))
+		rpc_id(id, "card_removed")
 	else:
 		print("clientside cards don't match serverside cards")
 	
