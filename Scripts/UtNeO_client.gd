@@ -43,8 +43,8 @@ func add_card():
 			card = preload("res://Prefabs/Cards/card_8_dev.tscn").instance()
 		9:
 			card = preload("res://Prefabs/Cards/card_9_dev.tscn").instance()
-
-	card.set_name("card_"+str(rand))
+	
+	card.set_name("card_"+str(rand)+"_"+str(my_card_num))
 	card_drawn(card)
 
 func card_drawn(card):
@@ -65,7 +65,6 @@ func button_pressed(switch):
 	print(switch)
 
 func hand_card_pressed(card):
-	print(card.name)
 	var value = card.name.split("_")
 	print(int(value[1]))
 
