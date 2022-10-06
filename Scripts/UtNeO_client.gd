@@ -19,7 +19,7 @@ func _ready():
 	get_node("ClientText").text = "Connected To " + global.ip + ":" + str(global.port)
 	#get_tree().connect("connected_to_server", self, "connected_to_server")
 	#get_tree().connect("connection_failed", self, "connection_failed")
-	#get_tree().connect("server_disconnected", self, "serversided_disconnect")
+	get_tree().connect("server_disconnected", self, "serversided_disconnect")
 
 puppet func connection_established(id):
 	my_id = id
@@ -89,6 +89,15 @@ func hand_card_pressed(card):
 		operation_value0_value1_cname0_cname1[2] = value[1]
 		operation_value0_value1_cname0_cname1[4] = card.name
 		selected_card = 0
+
+func serversided_disconnect():
+	print("Server disconnected")
+	get_tree().network_peer = null
+	peer.close_connection()
+	for i in my_card_nodes:
+		get_node("Cards").remove_child(i)
+	my_card_nodes.clear()
+	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 
 func button_pressed(operation):
 
