@@ -79,21 +79,36 @@ master func cards_pushed(id, ops):
 		print("Card 2 in array: " + str(player_cards[player_id].find(c2)))
 		if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= -10:
 			print("move possible")
+			var res = -1
 			match op:
 				"Add":
-					print(int(c1)+int(c2))
+					res = str(int(c1 + c2))
+					res = res[res.length()-1]
+					print(res)
 				"Sub":
-					print(int(c1)-int(c2))
+					res = c1-c2
+					print(res)
 				"Mul":
-					print(int(c1)*int(c2))
+					res = str(int(c1)*int(c2))
+					res = res[res.length()-1]
+					print(res)
 				"Div":
-					print(int(c1)/int(c2))
+					res = str(int(float(c1)/c2))
+					print(res)
 				"Pot":
-					print(pow(c1,c2))
+					res = str(pow(c1,c2))
+					res = res[res.length()-1]
+					print(res)
 				"Sqr":
-					print(str(c2) + "root of " + str(c1))
-					print(pow(c2,float(1)/c1))
-			rpc_id(id, "card_removed")
+					res = pow(c2,float(1)/c1)
+					print(res)
+			if int(res) == current_card:
+				rpc_id(id, "card_removed")
+				current_card = rnd.randi_range(0,9)
+				rset("current_card", current_card)
+				
+				current_player = player_IDs[(player_id+1)%player_IDs.size()]
+				
 		else:
 			print("clientside cards don't match serverside cards")
 	else:
@@ -108,6 +123,7 @@ func _physics_process(delta):
 func _on_Button_pressed():
 	if not game_started:
 		current_card = rnd.randi_range(0,9)
+		rset("current_card", current_card)
 		current_player = player_IDs[rnd.randi_range(0, player_IDs.size()-1)]
 		timer.start(r_t)
 		rpc_id(current_player, "startGame")

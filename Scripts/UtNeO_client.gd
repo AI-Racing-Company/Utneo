@@ -6,9 +6,10 @@ var my_cards = []
 var my_card_nodes = []
 var operation_value0_value1_cname0_cname1 = ["",0,0, "", ""]
 var selected_card = 0
+puppet var current_card = -1
 
 onready var timerRect = get_node("Timer/ColorRect")
-onready var timer = get_node("Timer") 
+onready var timer = get_node("Timer")
 var r = 0    # value of red
 var g = 1    # value of green
 var r_t = 60 # round time
@@ -113,10 +114,11 @@ func button_pressed(operation):
 		rpc_id(1,"cards_pushed",my_id,operation_value0_value1_cname0_cname1)
 
 func _physics_process(delta):
+	get_node("ClientText").text = str(current_card)
 	timerRect.set_size(Vector2(30,2*timer.time_left))
 	timerRect.set_global_position(Vector2(0,320-2*timer.time_left))
 	timerRect.color = Color(r,g,0,1)
-	
+
 	r = r + float(1) / (r_t*60)
 	g = g - float(1) / (r_t*60)
 
