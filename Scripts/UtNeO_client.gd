@@ -8,6 +8,12 @@ var operation_value0_value1_cname0_cname1 = ["",0,0, "", ""]
 var selected_card = 0
 puppet var current_card = -1
 
+onready var timerRect = get_node("Timer/ColorRect")
+onready var timer = get_node("Timer")
+var r = 0    # value of red
+var g = 1    # value of green
+var r_t = 60 # round time
+
 var peer = null
 
 func _ready():
@@ -21,6 +27,7 @@ func _ready():
 	#get_tree().connect("connected_to_server", self, "connected_to_server")
 	#get_tree().connect("connection_failed", self, "connection_failed")
 	get_tree().connect("server_disconnected", self, "serversided_disconnect")
+	get_node("Timer").start(r_t)
 
 puppet func connection_established(id):
 	my_id = id
@@ -107,5 +114,16 @@ func button_pressed(operation):
 	elif(operation == "Pus"):
 		rpc_id(1,"cards_pushed",my_id,operation_value0_value1_cname0_cname1)
 
+
+func _on_Timer_timeout():
+	r = 0
+	g = 1
+
 func _physics_process(delta):
 	get_node("ClientText").text = str(current_card)
+	timerRect.set_size(Vector2(30,2*timer.time_left))
+	timerRect.set_global_position(Vector2(0,320-2*timer.time_left))
+	timerRect.color = Color(r,g,0,1)
+
+	r = r + float(1) / (r_t*60)
+	g = g - float(1) / (r_t*60)
