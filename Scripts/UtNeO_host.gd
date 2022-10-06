@@ -7,6 +7,7 @@ var player_IDs = []
 
 var current_card = 0
 var game_started = false
+var current_player = 0
 
 var peer = null
 
@@ -48,54 +49,52 @@ func client_disconnect(id):
 
 
 master func add_card(id):
-	rand = rnd.randi_range(0,9)
-	
-	all_cards.append(rnd)
-	var player_id = player_IDs.find(id,0)
-	print("player in array ID:" + str(player_id))
-	player_cards[player_id].append(rand)
-	print("Array: " + str(player_cards))
-	
-	rpc_id(id, "master_add_card", rand)
-	
+	if current_player == id:
+		rand = rnd.randi_range(0,9)
+		
+		all_cards.append(rnd)
+		var player_id = player_IDs.find(id,0)
+		print("player in array ID:" + str(player_id))
+		player_cards[player_id].append(rand)
+		print("Array: " + str(player_cards))
+		
+		rpc_id(id, "master_add_card", rand)
+	else:
+		print("not your turn")
 
 	
 master func cards_pushed(id, ops):
-	print("Player-ID: " + str(id))
-	var player_id = player_IDs.find(id)
-	print("player in array ID:" + str(player_id))
-	var op = ops[0]
-	var c1 = int(ops[1])
-	var c2 = int(ops[2])
-	print("Card 1 in array: " + str(player_cards[player_id].find(c1)))
-	print("Card 2 in array: " + str(player_cards[player_id].find(c2)))
-	if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= -10:
-		print("move possible")
-		match op:
-			"Add":
-				print(int(c1)+int(c2))
-			"Sub":
-				print(int(c1)-int(c2))
-			"Mul":
-				print(int(c1)*int(c2))
-			"Div":
-				print(int(c1)/int(c2))
-			"Pot":
-				print(pow(c1,c2))
-		rpc_id(id, "card_removed")
+	if current_player == id:
+		print("Player-ID: " + str(id))
+		var player_id = player_IDs.find(id)
+		print("player in array ID:" + str(player_id))
+		var op = ops[0]
+		var c1 = int(ops[1])
+		var c2 = int(ops[2])
+		print("Card 1 in array: " + str(player_cards[player_id].find(c1)))
+		print("Card 2 in array: " + str(player_cards[player_id].find(c2)))
+		if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= -10:
+			print("move possible")
+			match op:
+				"Add":
+					print(int(c1)+int(c2))
+				"Sub":
+					print(int(c1)-int(c2))
+				"Mul":
+					print(int(c1)*int(c2))
+				"Div":
+					print(int(c1)/int(c2))
+				"Pot":
+					print(pow(c1,c2))
+				"Sqr":
+					print(str(c2) + "root of " + str(c1))
+					print(pow(c2,float(1)/c1))
+			rpc_id(id, "card_removed")
+		else:
+			print("clientside cards don't match serverside cards")
 	else:
-		print("clientside cards don't match serverside cards")
+		print("not your turn")
 	
-	
-	
-
-func hand_card_pressed(card):
-	print(card.name)
-	var value = card.name.split("_")
-	print(int(value[1]))
-
-func button_pressed(switch):
-	print(switch)
 
 func _physics_process(delta):
 	rand = rnd.randi()
@@ -105,6 +104,7 @@ func _physics_process(delta):
 func _on_Button_pressed():
 	if not game_started:
 		current_card = rnd.randi_range(0,9)
+		current_player = player_IDs[rnd.randi_range(0, player_IDs.size()-1)]
 		
 		for i in range(player_IDs.size()):
 			for j in range(7):

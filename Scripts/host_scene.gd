@@ -5,6 +5,8 @@ var peer = null
 var peer_id = 0
 var playerPos = {}
 
+var current_player = 0
+
 var player_IDs = []
 
 #test

@@ -75,8 +75,8 @@ puppet func card_removed():
 	my_card_nodes.erase(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[4]))
 	get_node("Cards").remove_child(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[3]))
 	get_node("Cards").remove_child(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[4]))
-	
 	my_card_num -= 2
+	resized()
 
 func hand_card_pressed(card):
 	var value = card.name.split("_")
