@@ -46,11 +46,8 @@ func card_removed(card):
 
 
 func hand_card_pressed(card):
-	print(card.name)
 	var value = card.name.split("_")
 	print(int(value[1]))
 
 func button_pressed(switch):
 	print(switch)
-
-

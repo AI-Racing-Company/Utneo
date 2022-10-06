@@ -25,42 +25,50 @@ color = Color( 0.537255, 0.537255, 0.537255, 1 )
 
 [node name="Add" type="Button" parent="SelectActionButtons"]
 margin_top = 460.0
-margin_right = 180.0
+margin_right = 150.0
 margin_bottom = 500.0
 custom_fonts/font = ExtResource( 2 )
 text = "+"
 
 [node name="Sub" type="Button" parent="SelectActionButtons"]
-margin_left = 180.0
+margin_left = 150.0
 margin_top = 460.0
-margin_right = 360.0
+margin_right = 300.0
 margin_bottom = 500.0
 custom_fonts/font = ExtResource( 2 )
 text = "-"
 
 [node name="Mul" type="Button" parent="SelectActionButtons"]
-margin_left = 360.0
+margin_left = 300.0
 margin_top = 460.0
-margin_right = 540.0
+margin_right = 450.0
 margin_bottom = 500.0
 custom_fonts/font = ExtResource( 2 )
 text = "*"
 
 [node name="Div" type="Button" parent="SelectActionButtons"]
-margin_left = 540.0
+margin_left = 450.0
 margin_top = 460.0
-margin_right = 720.0
+margin_right = 600.0
 margin_bottom = 500.0
 custom_fonts/font = ExtResource( 2 )
 text = "/"
 
 [node name="Pot" type="Button" parent="SelectActionButtons"]
-margin_left = 720.0
+margin_left = 600.0
+margin_top = 460.0
+margin_right = 750.0
+margin_bottom = 500.0
+custom_fonts/font = ExtResource( 2 )
+text = "^"
+
+[node name="Sqr" type="Button" parent="SelectActionButtons"]
+margin_left = 750.0
 margin_top = 460.0
 margin_right = 900.0
 margin_bottom = 500.0
 custom_fonts/font = ExtResource( 2 )
-text = "^"
+text = "√"
 
 [node name="ULTIMATE_PUSH" type="Button" parent="SelectActionButtons"]
 margin_top = 420.0
@@ -81,5 +89,6 @@ expand = true
 [connection signal="pressed" from="SelectActionButtons/Mul" to="." method="_on_Mul_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Div" to="." method="_on_Div_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Pot" to="." method="_on_Pot_pressed"]
+[connection signal="pressed" from="SelectActionButtons/Sqr" to="." method="_on_Sqr_pressed"]
 [connection signal="pressed" from="SelectActionButtons/ULTIMATE_PUSH" to="." method="_on_ULTIMATE_PUSH_pressed"]
 [connection signal="pressed" from="Draw_Card" to="." method="_on_Draw_Card_pressed"]
