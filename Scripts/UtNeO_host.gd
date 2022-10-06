@@ -5,6 +5,9 @@ var all_cards = []
 var player_cards = []
 var player_IDs = []
 
+var current_card = 0
+var game_started = false
+
 var peer = null
 
 
@@ -96,4 +99,24 @@ func button_pressed(switch):
 
 func _physics_process(delta):
 	rand = rnd.randi()
+	
+
+
+func _on_Button_pressed():
+	if not game_started:
+		current_card = rnd.randi_range(0,9)
+		
+		for i in range(player_IDs.size()):
+			for j in range(7):
+				rand = rnd.randi_range(0,9)
+		
+				all_cards.append(rnd)
+				player_cards[i].append(rand)
+				rpc_id(player_IDs[i], "master_add_card", rand)
+		game_started = true
+		
+	
+	
+	
+	
 	
