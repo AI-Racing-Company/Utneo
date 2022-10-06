@@ -18,6 +18,10 @@ func _ready():
 	get_tree().connect("connected_to_server", self, "connected_to_server")
 	get_tree().connect("connection_failed", self, "connection_failed")
 	get_tree().connect("server_disconnected", self, "serversided_disconnect")
+	
+puppet func connection_established(id):
+	my_id = id
+	print("Connection succsess")
 
 
 func resized():
@@ -57,7 +61,7 @@ puppet func master_add_card(rand):
 		9:
 			card = preload("res://Prefabs/Cards/card_9_dev.tscn").instance()
 
-	card.set_name("card_"+str(rand))
+	card.set_name("card_"+str(rand)+"_")
 	card.set_size(Vector2(75,100))
 	
 	my_card_num += 1
@@ -77,3 +81,8 @@ func hand_card_pressed(card):
 
 func button_pressed(switch):
 	print(switch)
+	
+
+	
+	
+	
