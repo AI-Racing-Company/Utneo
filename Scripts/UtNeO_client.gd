@@ -17,9 +17,9 @@ func _ready():
 	get_tree().network_peer = peer
 	print(get_tree().network_peer)
 	get_node("ClientText").text = "Connected To " + global.ip + ":" + str(global.port)
-	get_tree().connect("connected_to_server", self, "connected_to_server")
-	get_tree().connect("connection_failed", self, "connection_failed")
-	get_tree().connect("server_disconnected", self, "serversided_disconnect")
+	#get_tree().connect("connected_to_server", self, "connected_to_server")
+	#get_tree().connect("connection_failed", self, "connection_failed")
+	#get_tree().connect("server_disconnected", self, "serversided_disconnect")
 
 puppet func connection_established(id):
 	my_id = id
@@ -70,11 +70,12 @@ puppet func master_add_card(rand):
 	my_card_nodes.append(card)
 	resized()
 
-func card_removed():
-	my_card_nodes.erase(get_node(operation_value0_value1_cname0_cname1[3]))
-	my_card_nodes.erase(get_node(operation_value0_value1_cname0_cname1[4]))
-	get_parent().remove_child(get_node(operation_value0_value1_cname0_cname1[3]))
-	get_parent().remove_child(get_node(operation_value0_value1_cname0_cname1[4]))
+puppet func card_removed():
+	my_card_nodes.erase(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[3]))
+	my_card_nodes.erase(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[4]))
+	get_node("Cards").remove_child(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[3]))
+	get_node("Cards").remove_child(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[4]))
+	
 	my_card_num -= 2
 
 func hand_card_pressed(card):
@@ -82,6 +83,7 @@ func hand_card_pressed(card):
 	if(!selected_card):
 		operation_value0_value1_cname0_cname1[1] = value[1]
 		operation_value0_value1_cname0_cname1[3] = card.name
+		print(operation_value0_value1_cname0_cname1[3])
 		selected_card = 1
 	else:
 		operation_value0_value1_cname0_cname1[2] = value[1]
