@@ -15,6 +15,10 @@ var peer = null
 var rnd = RandomNumberGenerator.new()
 var rand = 0
 
+var r_t = 60 # round time
+
+onready var timer = get_node("Timer") 
+
 func _ready():
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	peer = NetworkedMultiplayerENet.new()
@@ -105,6 +109,8 @@ func _on_Button_pressed():
 	if not game_started:
 		current_card = rnd.randi_range(0,9)
 		current_player = player_IDs[rnd.randi_range(0, player_IDs.size()-1)]
+		timer.start(r_t)
+		rpc_id(current_player, "startGame")
 		
 		for i in range(player_IDs.size()):
 			for j in range(7):
@@ -115,8 +121,6 @@ func _on_Button_pressed():
 				rpc_id(player_IDs[i], "master_add_card", rand)
 		game_started = true
 		
-	
-	
-	
-	
-	
+
+func _on_Timer_timeout():
+	rpc_id(current_player, "endOfRound")

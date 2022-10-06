@@ -24,4 +24,7 @@ margin_right = 634.0
 margin_bottom = 269.0
 text = "Start Gamme"
 
+[node name="Timer" type="Timer" parent="."]
+
 [connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
+[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
