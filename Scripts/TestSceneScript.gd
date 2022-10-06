@@ -14,5 +14,7 @@ func _on_Client_pressed():
 
 func _on_Host_pressed():
 	global.port = int(get_node("Host/host_port").text)
-	global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
+	for adress in IP.get_local_addresses():
+		if(adress.split(".").size() == 4 and adress.split(".")[0] == "192"):
+			global.ip = adress
 	get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
