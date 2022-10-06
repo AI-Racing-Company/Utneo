@@ -2,7 +2,7 @@ extends Node2D
 
 
 var all_cards = []
-var player_cards = [[]]
+var player_cards = []
 var player_IDs = []
 
 var peer = null
@@ -26,16 +26,18 @@ func _ready():
 func client_connect(id):
 	print("connected player ID: ",id)
 	player_IDs.append(id)
-	rset_id(id, "my_id", id)
 	var player = preload("res://Prefabs/PlayerPrefab.tscn").instance()
 	player.set_name("player_"+str(id))
+	player_cards.append([])
 	player.set_network_master(id) # Each other connected peer has authority over their own player.
 	get_parent().add_child(player)
-	rpc("client_connect", id)
+	#rpc("client_connect", id)
 	rpc_id(id, "connection_established", id)
 
 func client_disconnect(id):
+	var player_id = player_IDs.find(id)
 	player_IDs.erase(id)
+	player_cards.remove(player_id)
 	print("disconnected player ID: ",id)
 	var player = get_parent().get_node("player_"+str(id))
 	get_parent().remove_child(player)
@@ -49,7 +51,7 @@ master func add_card(id):
 	var player_id = player_IDs.find(id,0)
 	print("player in array ID:" + str(player_id))
 	player_cards[player_id].append(rand)
-	print("Array: " + str(player_cards[0]))
+	print("Array: " + str(player_cards))
 	
 	rpc_id(id, "master_add_card", rand)
 	
@@ -62,8 +64,9 @@ master func cards_pushed(id, ops):
 	var op = ops[0]
 	var c1 = int(ops[1])
 	var c2 = int(ops[2])
-	print("Card in array: " + str(player_cards[player_id].find(c1)))
-	if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= 0:
+	print("Card 1 in array: " + str(player_cards[player_id].find(c1)))
+	print("Card 2 in array: " + str(player_cards[player_id].find(c2)))
+	if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= -10:
 		print("move possible")
 		match op:
 			"Add":
