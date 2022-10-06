@@ -4,6 +4,8 @@ var my_id = 0
 var my_card_num = 0
 var my_cards = []
 var my_card_nodes = []
+var operation_value0_value1 = ["",0,0]
+var selected_card = 0
 
 var peer = null
 
@@ -18,11 +20,10 @@ func _ready():
 	get_tree().connect("connected_to_server", self, "connected_to_server")
 	get_tree().connect("connection_failed", self, "connection_failed")
 	get_tree().connect("server_disconnected", self, "serversided_disconnect")
-	
+
 puppet func connection_established(id):
 	my_id = id
 	print("Connection succsess")
-
 
 func resized():
 	var width = get_viewport().get_visible_rect().size.x
@@ -36,9 +37,8 @@ func add_card():
 	rpc_id(0, "add_card", my_id)
 
 puppet func master_add_card(rand):
-	
+
 	var card = null
-	
 	match rand:
 		0:
 			card = preload("res://Prefabs/Cards/card_0_dev.tscn").instance()
@@ -63,7 +63,7 @@ puppet func master_add_card(rand):
 
 	card.set_name("card_"+str(rand)+"_")
 	card.set_size(Vector2(75,100))
-	
+
 	my_card_num += 1
 	get_node("Cards").call_deferred("add_child", card)
 
@@ -74,15 +74,18 @@ func card_removed(card):
 	my_card_nodes.erase(card)
 	my_card_num -= 1
 
-
 func hand_card_pressed(card):
 	var value = card.name.split("_")
-	print(int(value[1]))
+	if(!selected_card):
+		operation_value0_value1[1] = value[1]
+		selected_card = 1
+	else:
+		operation_value0_value1[2] = value[1]
+		selected_card = 0
 
-func button_pressed(switch):
-	print(switch)
-	
+func button_pressed(operation):
 
-	
-	
-	
+	if(operation != "Pus"):
+		operation_value0_value1[0] = operation
+	elif(operation == "Pus"):
+		rpc_id(1,"cards_pushed",my_id,operation_value0_value1)
