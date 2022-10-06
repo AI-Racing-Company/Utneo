@@ -6,6 +6,7 @@ var my_cards = []
 var my_card_nodes = []
 var operation_value0_value1_cname0_cname1 = ["",0,0, "", ""]
 var selected_card = 0
+puppet var current_card = -1
 
 var peer = null
 
@@ -105,3 +106,6 @@ func button_pressed(operation):
 		operation_value0_value1_cname0_cname1[0] = operation
 	elif(operation == "Pus"):
 		rpc_id(1,"cards_pushed",my_id,operation_value0_value1_cname0_cname1)
+
+func _physics_process(delta):
+	get_node("ClientText").text = str(current_card)
