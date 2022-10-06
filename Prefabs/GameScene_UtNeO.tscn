@@ -62,6 +62,14 @@ margin_bottom = 500.0
 custom_fonts/font = ExtResource( 2 )
 text = "^"
 
+[node name="Sqr" type="Button" parent="SelectActionButtons"]
+margin_left = 900.0
+margin_top = 459.0
+margin_right = 1080.0
+margin_bottom = 499.0
+custom_fonts/font = ExtResource( 2 )
+text = "√"
+
 [node name="ULTIMATE_PUSH" type="Button" parent="SelectActionButtons"]
 margin_top = 420.0
 margin_right = 900.0
@@ -81,5 +89,6 @@ expand = true
 [connection signal="pressed" from="SelectActionButtons/Mul" to="." method="_on_Mul_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Div" to="." method="_on_Div_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Pot" to="." method="_on_Pot_pressed"]
+[connection signal="pressed" from="SelectActionButtons/Sqr" to="." method="_on_Sqr_pressed"]
 [connection signal="pressed" from="SelectActionButtons/ULTIMATE_PUSH" to="." method="_on_ULTIMATE_PUSH_pressed"]
 [connection signal="pressed" from="Draw_Card" to="." method="_on_Draw_Card_pressed"]

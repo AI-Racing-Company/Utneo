@@ -67,7 +67,7 @@ func button_pressed(switch):
 func hand_card_pressed(card):
 	print(card.name)
 	var value = card.name.split("_")
-	print(int(value[1])+5)
+	print(int(value[1]))
 
 
 func _physics_process(delta):
