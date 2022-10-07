@@ -149,3 +149,4 @@ func next_player():
 
 func _on_Timer_timeout():
 	rpc_id(current_player, "endOfRound")
+	next_player()
