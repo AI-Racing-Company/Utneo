@@ -4,7 +4,7 @@ var my_id = 0
 var my_card_num = 0
 var my_cards = []
 var my_card_nodes = []
-var operation_value0_value1_cname0_cname1 = ["",0,0, "", ""]
+var operation_value0_value1_cname0_cname1 = ["","","","",""]
 var selected_card = 0
 puppet var current_card = -1
 puppet var my_turn = false
@@ -29,6 +29,7 @@ func _ready():
 	#get_tree().connect("connection_failed", self, "connection_failed")
 	get_tree().connect("server_disconnected", self, "serversided_disconnect")
 	timer.set_autostart(false)
+	resized()
 
 puppet func connection_established(id):
 	my_id = id
@@ -41,6 +42,7 @@ func resized():
 	for i in range(len(my_card_nodes)):
 		var vec = Vector2((i+1)*add - 75/2,height-100)
 		my_card_nodes[i].set_global_position(vec)
+	get_node("Current Calculation").set_global_position(Vector2(width/2-75, height-225))
 
 func add_card():
 	rpc_id(0, "add_card", my_id)
@@ -85,6 +87,7 @@ puppet func card_removed():
 	get_node("Cards").remove_child(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[3]))
 	get_node("Cards").remove_child(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[4]))
 	my_card_num -= 2
+	operation_value0_value1_cname0_cname1 = ["","","","",""]
 	resized()
 
 func hand_card_pressed(card):
@@ -120,6 +123,26 @@ func _physics_process(delta):
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
 		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
+		
+	
+	get_node("Current Calculation").text = str(operation_value0_value1_cname0_cname1[1])
+	var txt = get_node("Current Calculation").text
+	match str(operation_value0_value1_cname0_cname1[0]):
+				"Add":
+					get_node("Current Calculation").text = txt + " + "
+				"Sub":
+					get_node("Current Calculation").text = txt + " - "
+				"Mul":
+					get_node("Current Calculation").text = txt + " * "
+				"Div":
+					get_node("Current Calculation").text = txt + " / "
+				"Pot":
+					get_node("Current Calculation").text = txt + " ^ "
+				"Sqr":
+					get_node("Current Calculation").text = txt + " √ "
+	
+	get_node("Current Calculation").text = get_node("Current Calculation").text + str(operation_value0_value1_cname0_cname1[2])
+	
 	timerRect.set_size(Vector2(30,2*timer.time_left))
 	timerRect.set_global_position(Vector2(0,320-2*timer.time_left))
 	timerRect.color = Color(r,g,0,1)

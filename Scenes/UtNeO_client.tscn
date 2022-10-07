@@ -20,6 +20,17 @@ margin_bottom = 33.0
 rect_pivot_offset = Vector2( -928, 63 )
 custom_fonts/font = ExtResource( 3 )
 
+[node name="Current Calculation" type="Label" parent="."]
+margin_left = 375.0
+margin_top = 371.0
+margin_right = 525.0
+margin_bottom = 401.0
+rect_pivot_offset = Vector2( -928, 63 )
+custom_fonts/font = ExtResource( 3 )
+text = "8 + 8"
+align = 1
+valign = 1
+
 [node name="Timer" type="Timer" parent="."]
 wait_time = 60.0
 
