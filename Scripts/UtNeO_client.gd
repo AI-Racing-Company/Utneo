@@ -50,27 +50,10 @@ func add_card():
 puppet func master_add_card(rand):
 
 	var card = null
-	match rand:
-		0:
-			card = preload("res://Prefabs/Cards/card_0_dev.tscn").instance()
-		1:
-			card = preload("res://Prefabs/Cards/card_1_dev.tscn").instance()
-		2:
-			card = preload("res://Prefabs/Cards/card_2_dev.tscn").instance()
-		3:
-			card = preload("res://Prefabs/Cards/card_3_dev.tscn").instance()
-		4:
-			card = preload("res://Prefabs/Cards/card_4_dev.tscn").instance()
-		5:
-			card = preload("res://Prefabs/Cards/card_5_dev.tscn").instance()
-		6:
-			card = preload("res://Prefabs/Cards/card_6_dev.tscn").instance()
-		7:
-			card = preload("res://Prefabs/Cards/card_7_dev.tscn").instance()
-		8:
-			card = preload("res://Prefabs/Cards/card_8_dev.tscn").instance()
-		9:
-			card = preload("res://Prefabs/Cards/card_9_dev.tscn").instance()
+	var xoub = "a %s" % "Hello"
+	print(xoub)
+
+	card = load("res://Prefabs/Cards/card_" + str(rand) + "_dev.tscn").instance()
 
 	card.set_name("card_"+str(rand)+"_")
 	card.set_size(Vector2(75,100))
