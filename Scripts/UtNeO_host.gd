@@ -43,6 +43,8 @@ func client_connect(id):
 	rpc_id(id, "connection_established", id)
 
 func client_disconnect(id):
+	if id == current_player:
+		next_player()
 	var player_id = player_IDs.find(id)
 	player_IDs.erase(id)
 	player_cards.remove(player_id)
@@ -63,6 +65,7 @@ master func add_card(id):
 		print("Array: " + str(player_cards))
 		
 		rpc_id(id, "master_add_card", rand)
+		next_player()
 	else:
 		print("not your turn")
 
@@ -107,7 +110,7 @@ master func cards_pushed(id, ops):
 				current_card = rnd.randi_range(0,9)
 				rset("current_card", current_card)
 				
-				current_player = player_IDs[(player_id+1)%player_IDs.size()]
+				next_player()
 				
 		else:
 			print("clientside cards don't match serverside cards")
@@ -124,7 +127,9 @@ func _on_Button_pressed():
 	if not game_started:
 		current_card = rnd.randi_range(0,9)
 		rset("current_card", current_card)
-		current_player = player_IDs[rnd.randi_range(0, player_IDs.size()-1)]
+		var randplay = rnd.randi_range(0, player_IDs.size()-1)
+		current_player = player_IDs[randplay]
+		rset_id(current_player, "my_turn", true)
 		timer.start(r_t)
 		rpc_id(current_player, "startGame")
 		
@@ -137,6 +142,10 @@ func _on_Button_pressed():
 				rpc_id(player_IDs[i], "master_add_card", rand)
 		game_started = true
 		
+func next_player():
+	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
+	rset("my_turn", false)
+	rset_id(current_player, "my_turn", true)
 
 func _on_Timer_timeout():
 	rpc_id(current_player, "endOfRound")

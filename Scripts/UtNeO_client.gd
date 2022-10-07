@@ -7,6 +7,7 @@ var my_card_nodes = []
 var operation_value0_value1_cname0_cname1 = ["",0,0, "", ""]
 var selected_card = 0
 puppet var current_card = -1
+puppet var my_turn = false
 
 onready var timerRect = get_node("Timer/ColorRect")
 onready var timer = get_node("Timer")
@@ -27,6 +28,7 @@ func _ready():
 	#get_tree().connect("connected_to_server", self, "connected_to_server")
 	#get_tree().connect("connection_failed", self, "connection_failed")
 	get_tree().connect("server_disconnected", self, "serversided_disconnect")
+	timer.set_autostart(false)
 
 puppet func connection_established(id):
 	my_id = id
@@ -86,16 +88,17 @@ puppet func card_removed():
 	resized()
 
 func hand_card_pressed(card):
-	var value = card.name.split("_")
-	if(!selected_card):
-		operation_value0_value1_cname0_cname1[1] = value[1]
-		operation_value0_value1_cname0_cname1[3] = card.name
-		print(operation_value0_value1_cname0_cname1[3])
-		selected_card = 1
-	else:
-		operation_value0_value1_cname0_cname1[2] = value[1]
-		operation_value0_value1_cname0_cname1[4] = card.name
-		selected_card = 0
+	if my_turn:
+		var value = card.name.split("_")
+		if(!selected_card):
+			operation_value0_value1_cname0_cname1[1] = value[1]
+			operation_value0_value1_cname0_cname1[3] = card.name
+			print(operation_value0_value1_cname0_cname1[3])
+			selected_card = 1
+		else:
+			operation_value0_value1_cname0_cname1[2] = value[1]
+			operation_value0_value1_cname0_cname1[4] = card.name
+			selected_card = 0
 
 func serversided_disconnect():
 	print("Server disconnected")
@@ -107,14 +110,16 @@ func serversided_disconnect():
 	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 
 func button_pressed(operation):
-
-	if(operation != "Pus"):
-		operation_value0_value1_cname0_cname1[0] = operation
-	elif(operation == "Pus"):
-		rpc_id(1,"cards_pushed",my_id,operation_value0_value1_cname0_cname1)
+	if my_turn:
+		if(operation != "Pus"):
+			operation_value0_value1_cname0_cname1[0] = operation
+		elif(operation == "Pus"):
+			rpc_id(1,"cards_pushed",my_id,operation_value0_value1_cname0_cname1)
 
 func _physics_process(delta):
 	get_node("ClientText").text = str(current_card)
+	if my_turn:
+		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
 	timerRect.set_size(Vector2(30,2*timer.time_left))
 	timerRect.set_global_position(Vector2(0,320-2*timer.time_left))
 	timerRect.color = Color(r,g,0,1)
