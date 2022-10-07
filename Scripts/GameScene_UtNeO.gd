@@ -27,26 +27,26 @@ func _on_Draw_Card_pressed():
 
 
 func _on_Add_pressed():
-	get_parent().button_pressed("Add")
+	get_parent().button_pressed(" + ")
 
 
 func _on_Sub_pressed():
-	get_parent().button_pressed("Sub")
+	get_parent().button_pressed(" - ")
 
 
 func _on_Mul_pressed():
-	get_parent().button_pressed("Mul")
+	get_parent().button_pressed(" * ")
 
 
 func _on_Div_pressed():
-	get_parent().button_pressed("Div")
+	get_parent().button_pressed(" / ")
 
 
 func _on_Pot_pressed():
-	get_parent().button_pressed("Pot")
+	get_parent().button_pressed(" ^ ")
 
 func _on_Sqr_pressed():
-	get_parent().button_pressed("Sqr")
+	get_parent().button_pressed(" √ ")
 
 
 func _on_ULTIMATE_PUSH_pressed():

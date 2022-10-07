@@ -110,19 +110,8 @@ func _physics_process(delta):
 	
 	get_node("Current Calculation").text = str(operation_value0_value1_cname0_cname1[1])
 	var txt = get_node("Current Calculation").text
-	match str(operation_value0_value1_cname0_cname1[0]):
-				"Add":
-					get_node("Current Calculation").text = txt + " + "
-				"Sub":
-					get_node("Current Calculation").text = txt + " - "
-				"Mul":
-					get_node("Current Calculation").text = txt + " * "
-				"Div":
-					get_node("Current Calculation").text = txt + " / "
-				"Pot":
-					get_node("Current Calculation").text = txt + " ^ "
-				"Sqr":
-					get_node("Current Calculation").text = txt + " √ "
+	get_node("Current Calculation").text = txt + str(operation_value0_value1_cname0_cname1[0])
+
 	
 	get_node("Current Calculation").text = get_node("Current Calculation").text + str(operation_value0_value1_cname0_cname1[2])
 	

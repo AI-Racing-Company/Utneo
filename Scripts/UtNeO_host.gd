@@ -84,25 +84,25 @@ master func cards_pushed(id, ops):
 			print("move possible")
 			var res = -1
 			match op:
-				"Add":
+				" + ":
 					res = str(int(c1 + c2))
 					res = res[res.length()-1]
 					print(res)
-				"Sub":
+				" - ":
 					res = c1-c2
 					print(res)
-				"Mul":
+				" * ":
 					res = str(int(c1)*int(c2))
 					res = res[res.length()-1]
 					print(res)
-				"Div":
+				" / ":
 					res = str(int(float(c1)/c2))
 					print(res)
-				"Pot":
+				" ^ ":
 					res = str(pow(c1,c2))
 					res = res[res.length()-1]
 					print(res)
-				"Sqr":
+				" √ ":
 					res = pow(c2,float(1)/c1)
 					print(res)
 			if int(res) == current_card:
