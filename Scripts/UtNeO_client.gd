@@ -4,7 +4,7 @@ var my_id = 0
 var my_card_num = 0
 var my_cards = []
 var my_card_nodes = []
-var operation_value0_value1_cname0_cname1 = ["","","","",""]
+var current_calc = ["","","","",""] # Array for Operation, value 1, value 2, name 1 and name 2
 var selected_card = 0
 puppet var current_card = -1
 puppet var my_turn = false
@@ -65,25 +65,25 @@ puppet func master_add_card(rand):
 	resized()
 
 puppet func card_removed():
-	my_card_nodes.erase(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[3]))
-	my_card_nodes.erase(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[4]))
-	get_node("Cards").remove_child(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[3]))
-	get_node("Cards").remove_child(get_node("Cards").get_node(operation_value0_value1_cname0_cname1[4]))
+	my_card_nodes.erase(get_node("Cards").get_node(current_calc[3]))
+	my_card_nodes.erase(get_node("Cards").get_node(current_calc[4]))
+	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[3]))
+	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[4]))
 	my_card_num -= 2
-	operation_value0_value1_cname0_cname1 = ["","","","",""]
+	current_calc = ["","","","",""]
 	resized()
 
 func hand_card_pressed(card):
 	if my_turn:
 		var value = card.name.split("_")
 		if(!selected_card):
-			operation_value0_value1_cname0_cname1[1] = value[1]
-			operation_value0_value1_cname0_cname1[3] = card.name
-			print(operation_value0_value1_cname0_cname1[3])
+			current_calc[1] = value[1]
+			current_calc[3] = card.name
+			print(current_calc[3])
 			selected_card = 1
 		else:
-			operation_value0_value1_cname0_cname1[2] = value[1]
-			operation_value0_value1_cname0_cname1[4] = card.name
+			current_calc[2] = value[1]
+			current_calc[4] = card.name
 			selected_card = 0
 
 func serversided_disconnect():
@@ -98,9 +98,9 @@ func serversided_disconnect():
 func button_pressed(operation):
 	if my_turn:
 		if(operation != "Pus"):
-			operation_value0_value1_cname0_cname1[0] = operation
+			current_calc[0] = operation
 		elif(operation == "Pus"):
-			rpc_id(1,"cards_pushed",my_id,operation_value0_value1_cname0_cname1)
+			rpc_id(1,"cards_pushed",my_id,current_calc)
 
 func _physics_process(delta):
 	get_node("ClientText").text = str(current_card)
@@ -108,12 +108,12 @@ func _physics_process(delta):
 		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
 		
 	
-	get_node("Current Calculation").text = str(operation_value0_value1_cname0_cname1[1])
+	get_node("Current Calculation").text = str(current_calc[1])
 	var txt = get_node("Current Calculation").text
-	get_node("Current Calculation").text = txt + str(operation_value0_value1_cname0_cname1[0])
+	get_node("Current Calculation").text = txt + str(current_calc[0])
 
 	
-	get_node("Current Calculation").text = get_node("Current Calculation").text + str(operation_value0_value1_cname0_cname1[2])
+	get_node("Current Calculation").text = get_node("Current Calculation").text + str(current_calc[2])
 	
 	timerRect.set_size(Vector2(30,2*timer.time_left))
 	timerRect.set_global_position(Vector2(0,320-2*timer.time_left))
@@ -127,3 +127,4 @@ puppet func startGame():
 
 puppet func endOfRound():
 	print("Round end")
+
