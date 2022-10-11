@@ -80,7 +80,11 @@ master func cards_pushed(id, ops):
 		var c2 = int(ops[2])
 		print("Card 1 in array: " + str(player_cards[player_id].find(c1)))
 		print("Card 2 in array: " + str(player_cards[player_id].find(c2)))
-		if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= -10:
+		if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= 0:
+			print(player_cards[player_id].count(c1))
+			if c1 == c2 && player_cards[player_id].count(c1) < 2:
+				
+				return null
 			print("move possible")
 			var res = -1
 			match op:
@@ -124,7 +128,7 @@ func _physics_process(delta):
 
 
 func _on_Button_pressed():
-	if not game_started:
+	if not game_started and player_IDs.size()>0:
 		current_card = rnd.randi_range(0,9)
 		rset("current_card", current_card)
 		var randplay = rnd.randi_range(0, player_IDs.size()-1)

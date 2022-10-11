@@ -38,7 +38,7 @@ puppet func connection_established(id):
 func resized():
 	var width = get_viewport().get_visible_rect().size.x
 	var height = get_viewport().get_visible_rect().size.y
-	var add = width / (my_card_num+1)
+	var add = width / (my_card_nodes.size()+1)
 	for i in range(len(my_card_nodes)):
 		var vec = Vector2((i+1)*add - 75/2,height-100)
 		my_card_nodes[i].set_global_position(vec)

@@ -15,7 +15,7 @@ func _on_Client_pressed():
 func _on_Host_pressed():
 	global.port = int(get_node("Host/host_port").text)
 	for adress in IP.get_local_addresses():
-		if(adress.split(".").size() == 4 and adress.split(".")[0] == "192"):
+		if(adress.split(".").size() == 4 and (adress.split(".")[0] == "192" or adress.split(".")[0] == "10" )):
 			global.ip = adress
 	if global.ip == "":
 		global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
