@@ -21,6 +21,7 @@ onready var timer = get_node("Timer")
 
 func _ready():
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
+	get_node("ClientConnect").text = "Connected Clients: 0"
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_server(global.port, 5)
 	peer.COMPRESS_ZLIB
@@ -41,6 +42,8 @@ func client_connect(id):
 	get_parent().add_child(player)
 	#rpc("client_connect", id)
 	rpc_id(id, "connection_established", id)
+	rpc_id(id, "r_t", r_t)
+	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
 
 func client_disconnect(id):
 	if id == current_player:
@@ -52,6 +55,7 @@ func client_disconnect(id):
 	var player = get_parent().get_node("player_"+str(id))
 	get_parent().remove_child(player)
 	rpc("client_disconnect", id)
+	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
 
 
 master func add_card(id):
@@ -80,7 +84,7 @@ master func cards_pushed(id, ops):
 		var c2 = int(ops[2])
 		print("Card 1 in array: " + str(player_cards[player_id].find(c1)))
 		print("Card 2 in array: " + str(player_cards[player_id].find(c2)))
-		if player_cards[player_id].find(c1,0)+player_cards.find(c2,0) >= 0:
+		if player_cards[player_id].find(c1) >= 0 and player_cards.find(c2) >= 0:
 			print(player_cards[player_id].count(c1))
 			if c1 == c2 && player_cards[player_id].count(c1) < 2:
 				
@@ -111,7 +115,7 @@ master func cards_pushed(id, ops):
 					print(res)
 			if int(res) == current_card:
 				rpc_id(id, "card_removed")
-				current_card = rnd.randi_range(0,9)
+				current_card = c2
 				rset("current_card", current_card)
 				
 				next_player()
@@ -140,7 +144,6 @@ func _on_Button_pressed():
 		for i in range(player_IDs.size()):
 			for j in range(7):
 				rand = rnd.randi_range(0,9)
-		
 				all_cards.append(rnd)
 				player_cards[i].append(rand)
 				rpc_id(player_IDs[i], "master_add_card", rand)
@@ -150,6 +153,7 @@ func next_player():
 	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
 	rset("my_turn", false)
 	rset_id(current_player, "my_turn", true)
+	rpc_id(current_player, "startOfRound")
 
 func _on_Timer_timeout():
 	rpc_id(current_player, "endOfRound")

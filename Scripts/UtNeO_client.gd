@@ -4,7 +4,7 @@ var my_id = 0
 var my_card_num = 0
 var my_cards = []
 var my_card_nodes = []
-var current_calc = ["",0,0,"",""] # Array for Operation, value 1, value 2, name 1 and name 2
+var current_calc = ["","","","",""] # Array for Operation, value 1, value 2, name 1 and name 2
 var selected_card = 0
 puppet var current_card = -1
 puppet var my_turn = false
@@ -13,7 +13,7 @@ onready var timerRect = get_node("Timer/ColorRect")
 onready var timer = get_node("Timer")
 var r = 0    # value of red
 var g = 1    # value of green
-var r_t = 60 # round time
+puppet var r_t = 60 # round time
 
 var peer = null
 
@@ -62,29 +62,38 @@ puppet func master_add_card(rand):
 	get_node("Cards").call_deferred("add_child", card)
 
 	my_card_nodes.append(card)
+	my_cards.append(rand)
 	resized()
 
 puppet func card_removed():
-	my_card_nodes.erase(get_node("Cards").get_node(current_calc[3]))
-	my_card_nodes.erase(get_node("Cards").get_node(current_calc[4]))
+	var x = my_card_nodes.find(get_node("Cards").get_node(current_calc[3]))
+	my_card_nodes.remove(x)
+	my_cards.remove(x)
+	x = my_card_nodes.find(get_node("Cards").get_node(current_calc[4]))
+	my_card_nodes.remove(x)
+	my_cards.remove(x)
+	
 	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[3]))
 	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[4]))
 	my_card_num -= 2
 	current_calc = ["","","","",""]
 	resized()
+	selected_card = 0
 
 func hand_card_pressed(card):
 	if my_turn:
 		var value = card.name.split("_")
 		if(!selected_card):
-			current_calc[1] = value[1]
-			current_calc[3] = card.name
-			print(current_calc[3])
-			selected_card = 1
+			if(card.name != current_calc[4]):
+				current_calc[1] = value[1]
+				current_calc[3] = card.name
+				print(current_calc[3])
+				selected_card = 1
 		else:
-			current_calc[2] = value[1]
-			current_calc[4] = card.name
-			selected_card = 0
+			if(card.name != current_calc[3]):
+				current_calc[2] = value[1]
+				current_calc[4] = card.name
+				selected_card = 0
 
 func serversided_disconnect():
 	print("Server disconnected")
@@ -93,6 +102,7 @@ func serversided_disconnect():
 	for i in my_card_nodes:
 		get_node("Cards").remove_child(i)
 	my_card_nodes.clear()
+	my_cards.clear()
 	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 
 func button_pressed(operation):
@@ -101,7 +111,7 @@ func button_pressed(operation):
 			current_calc[0] = operation
 		elif(operation == "Pus"):
 			rpc_id(1,"cards_pushed",my_id,current_calc)
-
+			selected_card = 0
 func _physics_process(delta):
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
@@ -115,16 +125,29 @@ func _physics_process(delta):
 	
 	get_node("Current Calculation").text = get_node("Current Calculation").text + str(current_calc[2])
 	
-	timerRect.set_size(Vector2(30,2*timer.time_left))
-	timerRect.set_global_position(Vector2(0,320-2*timer.time_left))
-	timerRect.color = Color(r,g,0,1)
+	if not timer.is_stopped():
+		timerRect.set_size(Vector2(20,2*timer.time_left))
+		timerRect.set_global_position(Vector2(0,320-2*timer.time_left))
+		timerRect.color = Color(r,g,0,1)
 
-	r = r + float(1) / (r_t*60)
-	g = g - float(1) / (r_t*60)
+		r = r + float(1) / (r_t*60)
+		g = g - float(1) / (r_t*60)
+	else:
+		timerRect.set_size(Vector2(0,0))
 
 puppet func startGame():
+	r=0
+	g=1
 	timer.start(r_t)
 
 puppet func endOfRound():
 	print("Round end")
+	timer.stop()
 
+puppet func startOfRound():
+	r=0
+	g=1
+	timer.start(r_t)
+
+remote func printAlways(out):
+	print("From other source: /n" + str(out))
