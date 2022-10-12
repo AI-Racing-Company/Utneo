@@ -18,6 +18,13 @@ margin_right = 240.0
 margin_bottom = 25.0
 placeholder_text = "IP Adress"
 
+[node name="Client_LH" type="CheckBox" parent="Client"]
+margin_left = 240.0
+margin_top = -25.0
+margin_right = 329.0
+margin_bottom = -1.0
+text = "Localhost"
+
 [node name="Host" type="Button" parent="."]
 margin_right = 90.0
 margin_bottom = 25.0
@@ -29,6 +36,13 @@ margin_right = 240.0
 margin_bottom = 25.0
 text = "7777"
 placeholder_text = "Custom Port"
+
+[node name="Host_LH" type="CheckBox" parent="Host"]
+margin_left = 240.0
+margin_top = 25.0
+margin_right = 329.0
+margin_bottom = 49.0
+text = "Localhost"
 
 [connection signal="pressed" from="Client" to="." method="_on_Client_pressed"]
 [connection signal="pressed" from="Host" to="." method="_on_Host_pressed"]
