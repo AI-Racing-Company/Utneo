@@ -5,7 +5,7 @@ func _ready():
 	pass
 
 func _on_Client_pressed():
-	if !get_node("Client/Client_LH").toggle_mode:
+	if get_node("Client/Client_LH").toggle_mode:
 		var input_ip = get_node("Client/target_IP").text
 		var x = input_ip.split(":")
 		global.ip = x[0]
