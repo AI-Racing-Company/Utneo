@@ -82,12 +82,13 @@ master func cards_pushed(id, ops):
 		var op = ops[0]
 		var c1 = int(ops[1])
 		var c2 = int(ops[2])
-		print("Card 1 in array: " + str(player_cards[player_id].find(c1)))
-		print("Card 2 in array: " + str(player_cards[player_id].find(c2)))
-		if player_cards[player_id].find(c1) >= 0 and player_cards.find(c2) >= 0:
+		var ex1 = player_cards[player_id].find(c1)
+		var ex2 = player_cards[player_id].find(c2)
+		print("Card 1 in array: " + str(ex1))
+		print("Card 2 in array: " + str(ex2))
+		if ex2 >= 0 && ex2 >= 0:
 			print(player_cards[player_id].count(c1))
 			if c1 == c2 && player_cards[player_id].count(c1) < 2:
-				
 				return null
 			print("move possible")
 			var res = -1
@@ -116,7 +117,7 @@ master func cards_pushed(id, ops):
 			if int(res) == current_card:
 				rpc_id(id, "card_removed")
 				current_card = c2
-				rset("current_card", current_card)
+				rpc("set_current_card", current_card)
 				
 				next_player()
 				
@@ -132,9 +133,9 @@ func _physics_process(delta):
 
 
 func _on_Button_pressed():
-	if not game_started and player_IDs.size()>0:
+	if not game_started && player_IDs.size()>0:
 		current_card = rnd.randi_range(0,9)
-		rset("current_card", current_card)
+		rpc("set_current_card", current_card)
 		var randplay = rnd.randi_range(0, player_IDs.size()-1)
 		current_player = player_IDs[randplay]
 		rset_id(current_player, "my_turn", true)
@@ -150,10 +151,12 @@ func _on_Button_pressed():
 		game_started = true
 		
 func next_player():
+	rpc_id(current_player, "endOfRound")
 	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
 	rset("my_turn", false)
 	rset_id(current_player, "my_turn", true)
 	rpc_id(current_player, "startOfRound")
+	timer.start(r_t)
 
 func _on_Timer_timeout():
 	rpc_id(current_player, "endOfRound")

@@ -6,7 +6,8 @@ var my_cards = []
 var my_card_nodes = []
 var current_calc = ["","","","",""] # Array for Operation, value 1, value 2, name 1 and name 2
 var selected_card = 0
-puppet var current_card = -1
+var current_card = -1
+var current_card_node = null
 puppet var my_turn = false
 
 onready var timerRect = get_node("Timer/ColorRect")
@@ -43,6 +44,8 @@ func resized():
 		var vec = Vector2((i+1)*add - 75/2,height-100)
 		my_card_nodes[i].set_global_position(vec)
 	get_node("Current Calculation").set_global_position(Vector2(width/2-75, height-225))
+	if current_card_node != null:
+		current_card_node.set_global_position(Vector2(width/2-100,height/2-150))
 
 func add_card():
 	rpc_id(0, "add_card", my_id)
@@ -50,8 +53,6 @@ func add_card():
 puppet func master_add_card(rand):
 
 	var card = null
-	var xoub = "a %s" % "Hello"
-	print(xoub)
 
 	card = load("res://Prefabs/Cards/card_" + str(rand) + "_dev.tscn").instance()
 
@@ -149,5 +150,12 @@ puppet func startOfRound():
 	g=1
 	timer.start(r_t)
 
-remote func printAlways(out):
-	print("From other source: /n" + str(out))
+puppet func set_current_card(c):
+	remove_child(current_card_node)
+	current_card = c
+	current_card_node = load("res://Prefabs/Cards/card_" + str(c) + "_dev.tscn").instance()
+	current_card_node.set_name("current_card")
+	current_card_node.set_size(Vector2(75,100))
+	add_child(current_card_node)
+	resized()
+	
