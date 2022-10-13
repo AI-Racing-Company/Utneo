@@ -77,92 +77,56 @@ master func cards_pushed(id, ops):
 					rpc("set_current_card", current_card)
 					set_client_text()
 					next_player()
-		print("Player-ID: " + str(id))
-		var player_id = player_IDs.find(id)
-		print("player in array ID:" + str(player_id))
-		var op = ops[0]
-		var c1 = int(ops[1])
-		var c2 = int(ops[2])
-		var ex1 = player_cards[player_id].find(c1)
-		var ex2 = player_cards[player_id].find(c2)
-		print("Card 1 in array: " + str(ex1))
-		print("Card 2 in array: " + str(ex2))
-		if ex2 >= 0 && ex2 >= 0:
-			print(player_cards[player_id].count(c1))
-			if c1 == c2 && player_cards[player_id].count(c1) < 2:
-				return null
-			print("move possible")
-			var res = -1
-			match op:
-				" + ":
-					res = str(int(c1 + c2))
-					res = res[res.length()-1]
-					print(res)
-				" - ":
-					res = c1-c2
-					print(res)
-				" * ":
-					res = str(int(c1)*int(c2))
-					res = res[res.length()-1]
-					print(res)
-				" / ":
-					res = str(int(float(c1)/c2))
-					print(res)
-				" ^ ":
-					res = str(pow(c1,c2))
-					res = res[res.length()-1]
-					print(res)
-				" √ ":
-					res = pow(c2,float(1)/c1)
-					print(res)
-			if int(res) == current_card:
-				rpc_id(id, "card_removed")
-				player_cards[player_id].remove(c1)
-				player_cards[player_id].remove(c2)
-				if(player_cards[player_id].size() == 0):
-					print(player_names[player_id] + "Winner")
-				current_card = c2
-				rpc("set_current_card", current_card)
-				set_client_text()
-				next_player()
-
-
 		else:
+			print("Player-ID: " + str(id))
 			var player_id = player_IDs.find(id)
+			print("player in array ID:" + str(player_id))
 			var op = ops[0]
 			var c1 = int(ops[1])
 			var c2 = int(ops[2])
 			var ex1 = player_cards[player_id].find(c1)
 			var ex2 = player_cards[player_id].find(c2)
+			print("Card 1 in array: " + str(ex1))
+			print("Card 2 in array: " + str(ex2))
 			if ex2 >= 0 && ex2 >= 0:
+				print(player_cards[player_id].count(c1))
 				if c1 == c2 && player_cards[player_id].count(c1) < 2:
 					return null
+				print("move possible")
 				var res = -1
 				match op:
 					" + ":
 						res = str(int(c1 + c2))
 						res = res[res.length()-1]
+						print(res)
 					" - ":
 						res = c1-c2
+						print(res)
 					" * ":
 						res = str(int(c1)*int(c2))
 						res = res[res.length()-1]
+						print(res)
 					" / ":
 						res = str(int(float(c1)/c2))
+						print(res)
 					" ^ ":
 						res = str(pow(c1,c2))
 						res = res[res.length()-1]
+						print(res)
 					" √ ":
 						res = pow(c2,float(1)/c1)
+						print(res)
 				if int(res) == current_card:
 					rpc_id(id, "card_removed")
 					player_cards[player_id].erase(c1)
 					player_cards[player_id].erase(c2)
+					print(str(player_cards[player_id].size()) + "Cards on hand")
+					if(player_cards[player_id].size() == 0):
+						print(player_names[id] + "Winner")
 					current_card = c2
 					rpc("set_current_card", current_card)
 					set_client_text()
 					next_player()
-
 
 			else:
 				print("clientside cards don't match serverside cards")
