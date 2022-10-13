@@ -35,6 +35,7 @@ func _ready():
 puppet func connection_established(id):
 	my_id = id
 	print("Connection succsess")
+	rpc_id(1, "set_player_name", global.username, my_id)
 
 func resized():
 	var width = get_viewport().get_visible_rect().size.x
@@ -158,4 +159,7 @@ puppet func set_current_card(c):
 	current_card_node.set_size(Vector2(75,100))
 	add_child(current_card_node)
 	resized()
-	
+
+puppet func update_player_list(sendstr):
+	get_node("Player List").text = sendstr
+	print(get_node("Player List").size())

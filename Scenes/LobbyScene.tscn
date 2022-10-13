@@ -18,6 +18,12 @@ margin_right = 240.0
 margin_bottom = 25.0
 placeholder_text = "IP Adress"
 
+[node name="name" type="LineEdit" parent="Client"]
+margin_top = 25.0
+margin_right = 240.0
+margin_bottom = 50.0
+placeholder_text = "Username"
+
 [node name="Client_LH" type="CheckBox" parent="Client"]
 margin_left = 240.0
 margin_top = -25.0

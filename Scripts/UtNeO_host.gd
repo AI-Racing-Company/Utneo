@@ -4,6 +4,7 @@ extends Node2D
 var all_cards = []
 var player_cards = []
 var player_IDs = []
+var player_names = {}
 
 var current_card = 0
 var game_started = false
@@ -35,15 +36,11 @@ func _ready():
 func client_connect(id):
 	print("connected player ID: ",id)
 	player_IDs.append(id)
-	var player = preload("res://Prefabs/PlayerPrefab.tscn").instance()
-	player.set_name("player_"+str(id))
 	player_cards.append([])
-	player.set_network_master(id) # Each other connected peer has authority over their own player.
-	get_parent().add_child(player)
 	#rpc("client_connect", id)
 	rpc_id(id, "connection_established", id)
 	rpc_id(id, "r_t", r_t)
-	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
+	set_client_text()
 
 func client_disconnect(id):
 	if id == current_player:
@@ -55,7 +52,7 @@ func client_disconnect(id):
 	var player = get_parent().get_node("player_"+str(id))
 	get_parent().remove_child(player)
 	rpc("client_disconnect", id)
-	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
+	set_client_text()
 
 
 master func add_card(id):
@@ -116,10 +113,13 @@ master func cards_pushed(id, ops):
 					print(res)
 			if int(res) == current_card:
 				rpc_id(id, "card_removed")
+				player_cards[player_id].remove(c1)
+				player_cards[player_id].remove(c2)
 				current_card = c2
 				rpc("set_current_card", current_card)
-				
+				set_client_text()
 				next_player()
+				
 				
 		else:
 			print("clientside cards don't match serverside cards")
@@ -149,15 +149,40 @@ func _on_Button_pressed():
 				player_cards[i].append(rand)
 				rpc_id(player_IDs[i], "master_add_card", rand)
 		game_started = true
+		set_client_text()
 		
 func next_player():
+	
 	rpc_id(current_player, "endOfRound")
 	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
 	rset("my_turn", false)
 	rset_id(current_player, "my_turn", true)
 	rpc_id(current_player, "startOfRound")
 	timer.start(r_t)
+	set_client_text()
 
 func _on_Timer_timeout():
 	rpc_id(current_player, "endOfRound")
 	next_player()
+
+master func set_player_name(nme, id):
+	print(nme)
+	var insnme = nme
+	while player_names.values().find(insnme) > 0:
+		insnme = nme + str(rnd.randi())
+	player_names[id] = insnme
+	set_client_text()
+
+func set_client_text():
+	var sendstr = ""
+	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
+	for i in player_names:
+		print(i)
+		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i])
+		if game_started:
+			sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[player_IDs.find(i)].size()) + "\n" 
+		else:
+			sendstr = sendstr  + str(player_names[i]) + "\n"
+	rpc("update_player_list", sendstr)
+
+

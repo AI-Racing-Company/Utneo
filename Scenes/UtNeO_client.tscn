@@ -20,6 +20,16 @@ margin_bottom = 33.0
 rect_pivot_offset = Vector2( -928, 63 )
 custom_fonts/font = ExtResource( 3 )
 
+[node name="Player List" type="Label" parent="."]
+margin_left = 595.0
+margin_top = 5.0
+margin_right = 895.0
+margin_bottom = 45.0
+grow_horizontal = 0
+rect_pivot_offset = Vector2( -928, 63 )
+custom_fonts/font = ExtResource( 3 )
+align = 2
+
 [node name="Current Calculation" type="Label" parent="."]
 margin_left = 375.0
 margin_top = 371.0
