@@ -27,14 +27,11 @@ func _ready():
 	peer.create_server(global.port, 5)
 	peer.COMPRESS_ZLIB
 	get_tree().network_peer = peer
-	print(get_tree().get_network_peer())
-	print(get_tree().is_network_server())
 	get_tree().connect("network_peer_connected", self, "client_connect")
 	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
 	#get_viewport().connect("size_changed", self, "resized")
 
 func client_connect(id):
-	print("connected player ID: ",id)
 	player_IDs.append(id)
 	player_cards.append([])
 	#rpc("client_connect", id)
@@ -48,8 +45,8 @@ func client_disconnect(id):
 	var player_id = player_IDs.find(id)
 	player_IDs.erase(id)
 	player_cards.remove(player_id)
-	print("disconnected player ID: ",id)
 	rpc("client_disconnect", id)
+	player_names.erase(id)
 	set_client_text()
 
 
@@ -59,9 +56,7 @@ master func add_card(id):
 		
 		all_cards.append(rnd)
 		var player_id = player_IDs.find(id,0)
-		print("player in array ID:" + str(player_id))
 		player_cards[player_id].append(rand)
-		print("Array: " + str(player_cards))
 		
 		rpc_id(id, "master_add_card", rand)
 		next_player()
@@ -71,56 +66,56 @@ master func add_card(id):
 	
 master func cards_pushed(id, ops):
 	if current_player == id:
-		print("Player-ID: " + str(id))
-		var player_id = player_IDs.find(id)
-		print("player in array ID:" + str(player_id))
-		var op = ops[0]
-		var c1 = int(ops[1])
-		var c2 = int(ops[2])
-		var ex1 = player_cards[player_id].find(c1)
-		var ex2 = player_cards[player_id].find(c2)
-		print("Card 1 in array: " + str(ex1))
-		print("Card 2 in array: " + str(ex2))
-		if ex2 >= 0 && ex2 >= 0:
-			print(player_cards[player_id].count(c1))
-			if c1 == c2 && player_cards[player_id].count(c1) < 2:
-				return null
-			print("move possible")
-			var res = -1
-			match op:
-				" + ":
-					res = str(int(c1 + c2))
-					res = res[res.length()-1]
-					print(res)
-				" - ":
-					res = c1-c2
-					print(res)
-				" * ":
-					res = str(int(c1)*int(c2))
-					res = res[res.length()-1]
-					print(res)
-				" / ":
-					res = str(int(float(c1)/c2))
-					print(res)
-				" ^ ":
-					res = str(pow(c1,c2))
-					res = res[res.length()-1]
-					print(res)
-				" √ ":
-					res = pow(c2,float(1)/c1)
-					print(res)
-			if int(res) == current_card:
-				rpc_id(id, "card_removed")
-				player_cards[player_id].remove(c1)
-				player_cards[player_id].remove(c2)
-				current_card = c2
-				rpc("set_current_card", current_card)
-				set_client_text()
-				next_player()
-				
-				
+		if ops[2] == "":
+			var c1 = int(ops[1])
+			var player_id = player_IDs.find(id)
+			if player_cards[player_id].find(c1) >= 0:
+				if c1 == current_card:
+					rpc_id(id, "card_removed")
+					player_cards[player_id].erase(c1)
+					current_card = c1
+					rpc("set_current_card", current_card)
+					set_client_text()
+					next_player()
 		else:
-			print("clientside cards don't match serverside cards")
+			var player_id = player_IDs.find(id)
+			var op = ops[0]
+			var c1 = int(ops[1])
+			var c2 = int(ops[2])
+			var ex1 = player_cards[player_id].find(c1)
+			var ex2 = player_cards[player_id].find(c2)
+			if ex2 >= 0 && ex2 >= 0:
+				if c1 == c2 && player_cards[player_id].count(c1) < 2:
+					return null
+				var res = -1
+				match op:
+					" + ":
+						res = str(int(c1 + c2))
+						res = res[res.length()-1]
+					" - ":
+						res = c1-c2
+					" * ":
+						res = str(int(c1)*int(c2))
+						res = res[res.length()-1]
+					" / ":
+						res = str(int(float(c1)/c2))
+					" ^ ":
+						res = str(pow(c1,c2))
+						res = res[res.length()-1]
+					" √ ":
+						res = pow(c2,float(1)/c1)
+				if int(res) == current_card:
+					rpc_id(id, "card_removed")
+					player_cards[player_id].erase(c1)
+					player_cards[player_id].erase(c2)
+					current_card = c2
+					rpc("set_current_card", current_card)
+					set_client_text()
+					next_player()
+					
+					
+			else:
+				print("clientside cards don't match serverside cards")
 	else:
 		print("not your turn")
 	
@@ -150,7 +145,6 @@ func _on_Button_pressed():
 		set_client_text()
 		
 func next_player():
-	
 	rpc_id(current_player, "endOfRound")
 	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
 	rset("my_turn", false)
@@ -164,7 +158,6 @@ func _on_Timer_timeout():
 	next_player()
 
 master func set_player_name(nme, id):
-	print(nme)
 	var insnme = nme
 	while player_names.values().find(insnme) > 0:
 		insnme = nme + str(rnd.randi())
@@ -175,7 +168,6 @@ func set_client_text():
 	var sendstr = ""
 	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
 	for i in player_names:
-		print(i)
 		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i])
 		if game_started:
 			sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[player_IDs.find(i)].size()) + "\n" 
