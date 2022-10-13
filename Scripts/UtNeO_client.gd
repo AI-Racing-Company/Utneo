@@ -47,6 +47,7 @@ func resized():
 	get_node("Current Calculation").set_global_position(Vector2(width/2-75, height-225))
 	if current_card_node != null:
 		current_card_node.set_global_position(Vector2(width/2-100,height/2-150))
+	get_node("Player List").set_global_position(Vector2(width-get_node("Player List").get_rect().size.x-5, 5))
 
 func add_card():
 	rpc_id(0, "add_card", my_id)
@@ -132,7 +133,7 @@ func _physics_process(delta):
 	
 	if not timer.is_stopped():
 		timerRect.set_size(Vector2(20,2*timer.time_left))
-		timerRect.set_global_position(Vector2(0,320-2*timer.time_left))
+		timerRect.set_global_position(Vector2(0,get_viewport().get_visible_rect().size.y/2-2*timer.time_left+r_t/2))
 		timerRect.color = Color(r,g,0,1)
 
 		r = r + float(1) / (r_t*60)
@@ -166,4 +167,3 @@ puppet func set_current_card(c):
 
 puppet func update_player_list(sendstr):
 	get_node("Player List").text = sendstr
-	print(get_node("Player List").size())

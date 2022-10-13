@@ -49,8 +49,6 @@ func client_disconnect(id):
 	player_IDs.erase(id)
 	player_cards.remove(player_id)
 	print("disconnected player ID: ",id)
-	var player = get_parent().get_node("player_"+str(id))
-	get_parent().remove_child(player)
 	rpc("client_disconnect", id)
 	set_client_text()
 

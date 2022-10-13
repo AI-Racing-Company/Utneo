@@ -21,6 +21,9 @@ func resized():
 	get_node("PutCardsHere").set_global_position(Vector2(x/2-105,y/2-155))
 	get_node("Draw_Card").set_global_position(Vector2(x/2+25,y/2-150))
 	
+	get_node("SelectActionButtons/Clear").set_size(Vector2(offset,40))
+	get_node("SelectActionButtons/Clear").set_global_position(Vector2(x-offset,y-220))
+	
 
 func _on_Draw_Card_pressed():
 	get_parent().add_card()
