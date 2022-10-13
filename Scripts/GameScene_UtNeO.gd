@@ -48,6 +48,9 @@ func _on_Pot_pressed():
 func _on_Sqr_pressed():
 	get_parent().button_pressed(" √ ")
 
+func _on_Clear_pressed():
+	get_parent().button_pressed("clear")
+
 
 func _on_ULTIMATE_PUSH_pressed():
 	get_parent().button_pressed("Pus")

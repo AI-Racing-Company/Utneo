@@ -109,11 +109,14 @@ func serversided_disconnect():
 
 func button_pressed(operation):
 	if my_turn:
-		if(operation != "Pus"):
+		if(operation != "Pus" && operation != "clear"):
 			current_calc[0] = operation
 		elif(operation == "Pus"):
 			rpc_id(1,"cards_pushed",my_id,current_calc)
 			selected_card = 0
+		elif(operation == "clear"):
+			current_calc = ["","","","",""]
+
 func _physics_process(delta):
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
@@ -143,10 +146,11 @@ puppet func startGame():
 	timer.start(r_t)
 
 puppet func endOfRound():
-	print("Round end")
+	current_calc = ["","","","",""]
 	timer.stop()
 
 puppet func startOfRound():
+	current_calc = ["","","","",""]
 	r=0
 	g=1
 	timer.start(r_t)
