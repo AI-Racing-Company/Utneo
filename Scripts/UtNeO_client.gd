@@ -90,7 +90,6 @@ func hand_card_pressed(card):
 			if(card.name != current_calc[4]):
 				current_calc[1] = value[1]
 				current_calc[3] = card.name
-				print(current_calc[3])
 				selected_card = 1
 		else:
 			if(card.name != current_calc[3]):
