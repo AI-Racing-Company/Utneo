@@ -113,6 +113,8 @@ master func cards_pushed(id, ops):
 				rpc_id(id, "card_removed")
 				player_cards[player_id].remove(c1)
 				player_cards[player_id].remove(c2)
+				if(player_cards[player_id].size() == 0):
+					print(player_names[player_id] + "Winner")
 				current_card = c2
 				rpc("set_current_card", current_card)
 				set_client_text()
@@ -182,5 +184,7 @@ func set_client_text():
 		else:
 			sendstr = sendstr  + str(player_names[i]) + "\n"
 	rpc("update_player_list", sendstr)
+	
+	
 
 
