@@ -156,6 +156,8 @@ func player_done(id):
 	rpc("player_won", player_names[id])
 	player_classment.append(id)
 	rpc("player_done", player_names[id], player_classment.size())
+	set_client_text()
+	
 
 func game_end():
 	end_of_game = true
@@ -213,7 +215,8 @@ func set_client_text():
 	for i in player_names:
 		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i])
 		if game_started:
-			if(players_ignore.find(player_names.values().find(i)) > 0):
+			print(players_ignore.count(i))
+			if(players_ignore.count(i) > 0):
 				sendstr = sendstr +"(Done) "+ str(player_names[i]) + ": " + str(player_cards[player_IDs.find(i)].size()) + "\n"
 			else:
 				sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[player_IDs.find(i)].size()) + "\n"
@@ -223,6 +226,7 @@ func set_client_text():
 
 
 func _on_win_pressed():
+	
 	player_done(player_IDs[0])
 
 
