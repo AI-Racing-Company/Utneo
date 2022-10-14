@@ -177,5 +177,9 @@ puppet func update_player_list(sendstr):
 	get_node("Player List").text = sendstr
 
 
-puppet func player_won(p_name):
-	get_node("WinnerMessage").text = str(p_name) + " Won"
+puppet func player_done(p_name, pos):
+	pass
+	#get_node("WinnerMessage").text = str(p_name) + " Won"
+	
+puppet func game_end():
+	pass
