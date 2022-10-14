@@ -7,6 +7,7 @@ var player_IDs = []
 var player_names = {}
 var players_ignore = []
 var player_classment = []
+var end_of_game = false
 
 var win = [false, false] # 0= Player won, 1 = Continue after player win
 
@@ -66,7 +67,7 @@ func client_disconnect(id):
 
 
 master func add_card(id):
-	if !win[0] || (win[0] && win[1]):
+	if (!win[0] || (win[0] && win[1])) && !end_of_game:
 		if current_player == id:
 			rand = rnd.randi_range(0,9)
 
@@ -81,8 +82,8 @@ master func add_card(id):
 
 
 master func cards_pushed(id, ops):
-	if !win[0] || (win[0] && win[1]):
-		if current_player == id && players_ignore.find(id) == 0:
+	if (!win[0] || (win[0] && win[1])) && !end_of_game:
+		if current_player == id && players_ignore.count(id) == 0:
 			if ops[2] == "":
 				var c1 = int(ops[1])
 				var player_id = player_IDs.find(id)
@@ -95,52 +96,39 @@ master func cards_pushed(id, ops):
 						set_client_text()
 						next_player()
 			else:
-				print("Player-ID: " + str(id))
 				var player_id = player_IDs.find(id)
-				print("player in array ID:" + str(player_id))
 				var op = ops[0]
 				var c1 = int(ops[1])
 				var c2 = int(ops[2])
 				var ex1 = player_cards[player_id].find(c1)
 				var ex2 = player_cards[player_id].find(c2)
-				print("Card 1 in array: " + str(ex1))
-				print("Card 2 in array: " + str(ex2))
 				if ex2 >= 0 && ex2 >= 0:
-					print(player_cards[player_id].count(c1))
 					if c1 == c2 && player_cards[player_id].count(c1) < 2:
 						return null
-					print("move possible")
 					var res = -1
 					match op:
 						" + ":
 							res = str(int(c1 + c2))
 							res = res[res.length()-1]
-							print(res)
 						" - ":
 							res = c1-c2
-							print(res)
 						" * ":
 							res = str(int(c1)*int(c2))
 							res = res[res.length()-1]
-							print(res)
 						" / ":
 							res = str(int(float(c1)/c2))
-							print(res)
 						" ^ ":
 							res = str(pow(c1,c2))
 							res = res[res.length()-1]
-							print(res)
 						" √ ":
 							res = pow(c2,float(1)/c1)
-							print(res)
 					if int(res) == current_card:
 						rpc_id(id, "card_removed")
 						player_cards[player_id].erase(c1)
 						player_cards[player_id].erase(c2)
-						print(str(player_cards[player_id].size()) + "Cards on hand")
 						if(player_cards[player_id].size() == 0):
 							player_done(id)
-						if(players_ignore.size() == player_IDs.size()-1):
+						if(players_ignore.size() == player_IDs.size()-1 && players_ignore.size() > 0):
 							game_end()
 						current_card = c2
 						rpc("set_current_card", current_card)
@@ -161,7 +149,7 @@ master func cards_pushed(id, ops):
 		else:
 			print("not your turn or already won")
 	else:
-		print("Someone, waiting on host to continue or end")
+		print("Someone won, waiting on host to continue or end")
 
 func player_done(id):
 	players_ignore.append(id)
@@ -170,6 +158,7 @@ func player_done(id):
 	rpc("player_done", player_names[id], player_classment.size())
 
 func game_end():
+	end_of_game = true
 	rpc("game_end")
 
 func _physics_process(delta):
@@ -197,11 +186,10 @@ func _on_Button_pressed():
 		set_client_text()
 
 func next_player():
-	rpc_id(current_player, "endOfRound")
+	if player_IDs.count(current_player) > 0:
+		rpc_id(current_player, "endOfRound")
 	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
-	if players_ignore.size() < player_IDs.size():
-		while players_ignore.find(current_player):
-			current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
+	
 	rset("my_turn", false)
 	rset_id(current_player, "my_turn", true)
 	rpc_id(current_player, "startOfRound")
