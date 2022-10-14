@@ -81,8 +81,8 @@ puppet func card_removed():
 	var x = my_card_nodes.find(get_node("Cards").get_node(current_calc[3]))
 	my_card_nodes.remove(x)
 	my_cards.remove(x)
-	
-	
+
+
 	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[3]))
 	if(current_calc[4] != ""):
 		x = my_card_nodes.find(get_node("Cards").get_node(current_calc[4]))
@@ -143,15 +143,15 @@ func _physics_process(delta):
 			g = g - float(1) / (r_t*60)
 		else:
 			timerRect.set_size(Vector2(0,0))
-		
-	
+
+
 	get_node("Current Calculation").text = str(current_calc[1])
 	var txt = get_node("Current Calculation").text
 	get_node("Current Calculation").text = txt + str(current_calc[0])
 
-	
+
 	get_node("Current Calculation").text = get_node("Current Calculation").text + str(current_calc[2])
-	
+
 puppet func startGame():
 	r=0
 	g=1
@@ -185,10 +185,14 @@ func update_player_timer():
 puppet func player_done(p_name, pos):
 	pass
 	#get_node("WinnerMessage").text = str(p_name) + " Won"
-	
+
 puppet func game_end():
 	pass
 
 puppet func set_current_player(pname):
 	current_player_name = pname
 	timer.start(r_t)
+func disconnect_from_server():
+	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
+	get_tree().network_peer = null
+	peer.close_connection()
