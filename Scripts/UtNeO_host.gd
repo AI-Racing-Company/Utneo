@@ -6,6 +6,7 @@ var player_cards = []
 var player_IDs = []
 var player_names = {}
 var players_ignore = []
+var player_classment = []
 
 var current_card = 0
 var game_started = false
@@ -123,7 +124,9 @@ master func cards_pushed(id, ops):
 					player_cards[player_id].erase(c2)
 					print(str(player_cards[player_id].size()) + "Cards on hand")
 					if(player_cards[player_id].size() == 0):
-						player_won(id)
+						player_done(id)
+					if(players_ignore.size() == player_IDs.size()-1):
+						game_end()
 					current_card = c2
 					rpc("set_current_card", current_card)
 					set_client_text()
@@ -134,10 +137,13 @@ master func cards_pushed(id, ops):
 	else:
 		print("not your turn or already won")
 
-func player_won(id):
+func player_done(id):
 	players_ignore.append(id)
-	rpc("player_won", player_names[id])
-	print(id)
+	player_classment.appen(id)
+	rpc("player_done", player_names[id], player_classment.size())
+	
+func game_end():
+	rpc("game_end")
 
 func _physics_process(delta):
 	rand = rnd.randi()
@@ -198,4 +204,4 @@ func set_client_text():
 
 
 func _on_win_pressed():
-	player_won(player_IDs[0])
+	pass
