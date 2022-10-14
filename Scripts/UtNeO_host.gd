@@ -9,6 +9,9 @@ var players_ignore = []
 var player_classment = []
 var end_of_game = false
 
+var max_players = 6
+var starting_hand = 7
+
 var win = [false, false] # 0= Player won, 1 = Continue after player win
 
 var current_card = 0
@@ -27,14 +30,6 @@ onready var timer = get_node("Timer")
 
 func _ready():
 	get_viewport().connect("size_changed", self, "resized")
-	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
-	get_node("ClientConnect").text = "Connected Clients: 0"
-	peer = NetworkedMultiplayerENet.new()
-	peer.create_server(global.port, 5)
-	peer.COMPRESS_ZLIB
-	get_tree().network_peer = peer
-	get_tree().connect("network_peer_connected", self, "client_connect")
-	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
 	resized()
 	#get_viewport().connect("size_changed", self, "resized")
 
@@ -53,6 +48,10 @@ func client_connect(id):
 	rpc_id(id, "connection_established", id)
 	#rpc_id(id, "r_t", r_t)
 	set_client_text()
+	
+	if player_IDs.size() >= int(max_players):
+		get_tree().set_refuse_new_network_connections(true)
+	
 
 func client_disconnect(id):
 	if id == current_player:
@@ -179,7 +178,7 @@ func _on_Button_pressed():
 		rpc_id(current_player, "startGame")
 
 		for i in range(player_IDs.size()):
-			for j in range(7):
+			for j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
 				all_cards.append(rnd)
 				player_cards[i].append(rand)
@@ -236,3 +235,21 @@ func _on_Contunue_pressed():
 
 func _on_End_pressed():
 	game_end()
+
+func _on_start_host_pressed():
+	
+	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
+	get_node("ClientConnect").text = "Connected Clients: 0"
+	peer = NetworkedMultiplayerENet.new()
+	peer.create_server(global.port, 5)
+	peer.COMPRESS_ZLIB
+	get_tree().network_peer = peer
+	get_tree().connect("network_peer_connected", self, "client_connect")
+	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
+	if get_node("max_play").text != "":
+		max_players = get_node("max_play").text
+	if get_node("start_card").text != "":
+		starting_hand = int(get_node("start_card").text)
+	remove_child(get_node("max_play"))
+	remove_child(get_node("start_card"))
+	remove_child(get_node("start_host"))
