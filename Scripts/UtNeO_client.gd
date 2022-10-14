@@ -30,6 +30,10 @@ func _ready():
 	#get_tree().connect("connection_failed", self, "connection_failed")
 	get_tree().connect("server_disconnected", self, "serversided_disconnect")
 	timer.set_autostart(false)
+	current_card_node = load("res://Prefabs/Cards/card_back_dev.tscn").instance()
+	current_card_node.set_name("current_card")
+	current_card_node.set_size(Vector2(75,100))
+	add_child(current_card_node)
 	resized()
 
 puppet func connection_established(id):
@@ -48,6 +52,8 @@ func resized():
 	if current_card_node != null:
 		current_card_node.set_global_position(Vector2(width/2-100,height/2-150))
 	get_node("Player List").set_global_position(Vector2(width-get_node("Player List").get_rect().size.x-5, 5))
+	get_node("WinnerMessage").set_global_position(Vector2(0,height-275))
+	get_node("WinnerMessage").set_size(Vector2(width,50))
 
 func add_card():
 	rpc_id(0, "add_card", my_id)
@@ -72,13 +78,16 @@ puppet func card_removed():
 	var x = my_card_nodes.find(get_node("Cards").get_node(current_calc[3]))
 	my_card_nodes.remove(x)
 	my_cards.remove(x)
-	x = my_card_nodes.find(get_node("Cards").get_node(current_calc[4]))
-	my_card_nodes.remove(x)
-	my_cards.remove(x)
+	
 	
 	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[3]))
-	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[4]))
-	my_card_num -= 2
+	if(current_calc[4] != ""):
+		x = my_card_nodes.find(get_node("Cards").get_node(current_calc[4]))
+		my_card_nodes.remove(x)
+		my_cards.remove(x)
+		get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[4]))
+		my_card_num -= 1
+	my_card_num -= 1
 	current_calc = ["","","","",""]
 	resized()
 	selected_card = 0
@@ -166,3 +175,7 @@ puppet func set_current_card(c):
 
 puppet func update_player_list(sendstr):
 	get_node("Player List").text = sendstr
+
+
+puppet func player_won(p_name):
+	get_node("WinnerMessage").text = str(p_name) + " Won"
