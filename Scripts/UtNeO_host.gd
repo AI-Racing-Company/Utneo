@@ -34,6 +34,7 @@ func _ready():
 	get_tree().network_peer = peer
 	get_tree().connect("network_peer_connected", self, "client_connect")
 	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
+	resized()
 	#get_viewport().connect("size_changed", self, "resized")
 
 func resized():
@@ -58,9 +59,10 @@ func client_disconnect(id):
 	var player_id = player_IDs.find(id)
 	player_IDs.erase(id)
 	player_cards.remove(player_id)
-	rpc("client_disconnect", id)
 	player_names.erase(id)
+	rpc("client_disconnect", id)
 	set_client_text()
+	
 
 
 master func add_card(id):
@@ -144,56 +146,27 @@ master func cards_pushed(id, ops):
 						rpc("set_current_card", current_card)
 						set_client_text()
 						next_player()
-
-				else:
-					var player_id = player_IDs.find(id)
-					var op = ops[0]
-					var c1 = int(ops[1])
-					var c2 = int(ops[2])
-					var ex1 = player_cards[player_id].find(c1)
-					var ex2 = player_cards[player_id].find(c2)
-					if ex2 >= 0 && ex2 >= 0:
-						if c1 == c2 && player_cards[player_id].count(c1) < 2:
-							return null
-						var res = -1
-						match op:
-							" + ":
-								res = str(int(c1 + c2))
-								res = res[res.length()-1]
-							" - ":
-								res = c1-c2
-							" * ":
-								res = str(int(c1)*int(c2))
-								res = res[res.length()-1]
-							" / ":
-								res = str(int(float(c1)/c2))
-							" ^ ":
-								res = str(pow(c1,c2))
-								res = res[res.length()-1]
-							" √ ":
-								res = pow(c2,float(1)/c1)
 						if int(res) == current_card:
 							rpc_id(id, "card_removed")
 							player_cards[player_id].erase(c1)
 							player_cards[player_id].erase(c2)
 							if(player_cards[player_id].size() == 0):
-								player_won(id)
+								player_done(id)
 							current_card = c2
 							rpc("set_current_card", current_card)
 							set_client_text()
 							next_player()
-
 					else:
 						print("clientside cards don't match serverside cards")
-			else:
-				print("not your turn or already won")
 		else:
-			print("Someone, waiting on host to continue or end")
+			print("not your turn or already won")
+	else:
+		print("Someone, waiting on host to continue or end")
 
 func player_done(id):
 	players_ignore.append(id)
 	rpc("player_won", player_names[id])
-	player_classment.appen(id)
+	player_classment.append(id)
 	rpc("player_done", player_names[id], player_classment.size())
 
 func game_end():
@@ -226,7 +199,7 @@ func _on_Button_pressed():
 func next_player():
 	rpc_id(current_player, "endOfRound")
 	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
-	if players_ignore.size < player_IDs.size:
+	if players_ignore.size() < player_IDs.size():
 		while players_ignore.find(current_player):
 			current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
 	rset("my_turn", false)
@@ -259,7 +232,7 @@ func set_client_text():
 
 
 func _on_win_pressed():
-	player_won(player_IDs[0])
+	player_done(player_IDs[0])
 
 
 func _on_Contunue_pressed():
