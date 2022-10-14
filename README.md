@@ -5,3 +5,4 @@
 - Lobby
 - Random middle card
 - Code instead of IP
+- Points are results of calculation
