@@ -183,3 +183,8 @@ puppet func player_done(p_name, pos):
 	
 puppet func game_end():
 	pass
+
+func disconnect_from_server():
+	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
+	get_tree().network_peer = null
+	peer.close_connection()

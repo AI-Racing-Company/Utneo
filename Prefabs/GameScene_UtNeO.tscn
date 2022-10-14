@@ -83,6 +83,13 @@ margin_right = 899.0
 margin_bottom = 417.0
 text = "Clear Hand"
 
+[node name="Disconnect" type="Button" parent="SelectActionButtons"]
+margin_left = 2.0
+margin_top = 3.0
+margin_right = 164.0
+margin_bottom = 45.0
+text = "Disconnect"
+
 [node name="Draw_Card" type="TextureButton" parent="."]
 margin_left = 428.0
 margin_top = 204.0
@@ -99,4 +106,5 @@ expand = true
 [connection signal="pressed" from="SelectActionButtons/Sqr" to="." method="_on_Sqr_pressed"]
 [connection signal="pressed" from="SelectActionButtons/ULTIMATE_PUSH" to="." method="_on_ULTIMATE_PUSH_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Clear" to="." method="_on_Clear_pressed"]
+[connection signal="pressed" from="SelectActionButtons/Disconnect" to="." method="_on_Disconnect_pressed"]
 [connection signal="pressed" from="Draw_Card" to="." method="_on_Draw_Card_pressed"]

@@ -58,6 +58,7 @@ func _on_Clear_pressed():
 func _on_ULTIMATE_PUSH_pressed():
 	get_parent().button_pressed("Pus")
 
-
-
-
+func _on_Disconnect_pressed():
+	get_parent().disconnect_from_server()
+	
+	

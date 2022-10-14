@@ -23,10 +23,10 @@ rect_pivot_offset = Vector2( -928, 63 )
 custom_fonts/font = ExtResource( 1 )
 
 [node name="Disconnect" type="Button" parent="."]
-margin_left = 800.0
-margin_top = 5.0
-margin_right = 890.0
-margin_bottom = 30.0
+margin_left = 805.0
+margin_top = 4.0
+margin_right = 895.0
+margin_bottom = 29.0
 text = "Disconnect"
 
 [connection signal="pressed" from="Disconnect" to="." method="_on_Disconnect_pressed"]
