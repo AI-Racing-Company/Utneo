@@ -5,6 +5,7 @@ var all_cards = []
 var player_cards = []
 var player_IDs = []
 var player_names = {}
+var players_ignore = []
 
 var current_card = 0
 var game_started = false
@@ -36,7 +37,7 @@ func client_connect(id):
 	player_cards.append([])
 	#rpc("client_connect", id)
 	rpc_id(id, "connection_established", id)
-	rpc_id(id, "r_t", r_t)
+	#rpc_id(id, "r_t", r_t)
 	set_client_text()
 
 func client_disconnect(id):
@@ -65,7 +66,7 @@ master func add_card(id):
 
 	
 master func cards_pushed(id, ops):
-	if current_player == id:
+	if current_player == id && players_ignore.find(id) == 0:
 		if ops[2] == "":
 			var c1 = int(ops[1])
 			var player_id = player_IDs.find(id)
@@ -122,7 +123,7 @@ master func cards_pushed(id, ops):
 					player_cards[player_id].erase(c2)
 					print(str(player_cards[player_id].size()) + "Cards on hand")
 					if(player_cards[player_id].size() == 0):
-						print(player_names[id] + "Winner")
+						player_won(id)
 					current_card = c2
 					rpc("set_current_card", current_card)
 					set_client_text()
@@ -131,8 +132,12 @@ master func cards_pushed(id, ops):
 			else:
 				print("clientside cards don't match serverside cards")
 	else:
-		print("not your turn")
+		print("not your turn or already won")
 
+func player_won(id):
+	players_ignore.append(id)
+	rpc("player_won", player_names[id])
+	print(id)
 
 func _physics_process(delta):
 	rand = rnd.randi()
@@ -161,6 +166,8 @@ func _on_Button_pressed():
 func next_player():
 	rpc_id(current_player, "endOfRound")
 	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
+	while players_ignore.find(current_player):
+		current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
 	rset("my_turn", false)
 	rset_id(current_player, "my_turn", true)
 	rpc_id(current_player, "startOfRound")
@@ -188,3 +195,7 @@ func set_client_text():
 		else:
 			sendstr = sendstr  + str(player_names[i]) + "\n"
 	rpc("update_player_list", sendstr)
+
+
+func _on_win_pressed():
+	player_won(player_IDs[0])

@@ -38,7 +38,15 @@ margin_right = 634.0
 margin_bottom = 269.0
 text = "Start Gamme"
 
+[node name="win" type="Button" parent="."]
+margin_left = 41.0
+margin_top = 278.0
+margin_right = 234.0
+margin_bottom = 339.0
+text = "win"
+
 [node name="Timer" type="Timer" parent="."]
 
 [connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="win" to="." method="_on_win_pressed"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
