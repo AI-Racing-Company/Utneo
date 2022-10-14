@@ -58,6 +58,18 @@ text = "8 + 8"
 align = 1
 valign = 1
 
+[node name="Current Player" type="Label" parent="."]
+margin_left = 375.0
+margin_top = 5.0
+margin_right = 525.0
+margin_bottom = 35.0
+grow_horizontal = 2
+rect_pivot_offset = Vector2( -928, 63 )
+custom_fonts/font = ExtResource( 3 )
+text = "Player: 69"
+align = 1
+valign = 1
+
 [node name="Timer" type="Timer" parent="."]
 wait_time = 60.0
 

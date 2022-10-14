@@ -7,7 +7,9 @@
 - cards drawable
 - multiple players on multiple devices
 - winner is shown
- 
+- Host can decide max player amount
+- Host can decide first handcard count
+
 ## Future ideas:
 - Game mode with calculations up to three cards
 - Lobby

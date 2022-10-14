@@ -10,6 +10,9 @@ var current_card = -1
 var current_card_node = null
 puppet var my_turn = false
 
+puppet var current_player = 0
+puppet var current_player_name = ""
+
 onready var timerRect = get_node("Timer/ColorRect")
 onready var timer = get_node("Timer")
 var r = 0    # value of red
@@ -127,9 +130,19 @@ func button_pressed(operation):
 			current_calc = ["","","","",""]
 
 func _physics_process(delta):
+	update_player_timer()
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
 		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
+		if not timer.is_stopped():
+			timerRect.set_size(Vector2(20,2*timer.time_left))
+			timerRect.set_global_position(Vector2(0,get_viewport().get_visible_rect().size.y/2-2*timer.time_left+r_t/2))
+			timerRect.color = Color(r,g,0,1)
+
+			r = r + float(1) / (r_t*60)
+			g = g - float(1) / (r_t*60)
+		else:
+			timerRect.set_size(Vector2(0,0))
 		
 	
 	get_node("Current Calculation").text = str(current_calc[1])
@@ -139,16 +152,6 @@ func _physics_process(delta):
 	
 	get_node("Current Calculation").text = get_node("Current Calculation").text + str(current_calc[2])
 	
-	if not timer.is_stopped():
-		timerRect.set_size(Vector2(20,2*timer.time_left))
-		timerRect.set_global_position(Vector2(0,get_viewport().get_visible_rect().size.y/2-2*timer.time_left+r_t/2))
-		timerRect.color = Color(r,g,0,1)
-
-		r = r + float(1) / (r_t*60)
-		g = g - float(1) / (r_t*60)
-	else:
-		timerRect.set_size(Vector2(0,0))
-
 puppet func startGame():
 	r=0
 	g=1
@@ -176,6 +179,8 @@ puppet func set_current_card(c):
 puppet func update_player_list(sendstr):
 	get_node("Player List").text = sendstr
 
+func update_player_timer():
+	get_node("Current Player").text = current_player_name + ": " + str(int(timer.time_left))
 
 puppet func player_done(p_name, pos):
 	pass
@@ -183,3 +188,7 @@ puppet func player_done(p_name, pos):
 	
 puppet func game_end():
 	pass
+
+puppet func set_current_player(pname):
+	current_player_name = pname
+	timer.start(r_t)

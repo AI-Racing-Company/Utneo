@@ -185,6 +185,7 @@ func _on_Button_pressed():
 				rpc_id(player_IDs[i], "master_add_card", rand)
 		game_started = true
 		set_client_text()
+		rpc("set_current_player", player_names[current_player])
 
 func next_player():
 	if player_IDs.count(current_player) > 0:
@@ -196,6 +197,7 @@ func next_player():
 	rpc_id(current_player, "startOfRound")
 	timer.start(r_t)
 	set_client_text()
+	rpc("set_current_player", player_names[current_player])
 
 func _on_Timer_timeout():
 	rpc_id(current_player, "endOfRound")
@@ -225,9 +227,7 @@ func set_client_text():
 
 
 func _on_win_pressed():
-	
 	player_done(player_IDs[0])
-
 
 func _on_Contunue_pressed():
 	win[1] = true
