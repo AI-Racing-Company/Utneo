@@ -7,9 +7,12 @@
 - cards drawable
 - multiple players on multiple devices
 - winner is shown
-- Host can decide max player amount
-- Host can decide first handcard count
+- Host can decide:
+  - Max players
+  - Starting card count
+  - Max round time
 - Disconnect from Server
+- Get card when time's up
 
 ## Future ideas:
 - Game mode with calculations up to three cards
@@ -17,4 +20,3 @@
 - Random middle card
 - Code instead of IP
 - Points are results of calculation
-- Host can decide on round time

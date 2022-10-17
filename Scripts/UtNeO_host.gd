@@ -169,6 +169,7 @@ func _physics_process(delta):
 
 func _on_Button_pressed():
 	if not game_started && player_IDs.size()>0:
+		rset("r_t", r_t)
 		current_card = rnd.randi_range(0,9)
 		rpc("set_current_card", current_card)
 		var randplay = rnd.randi_range(0, player_IDs.size()-1)
@@ -200,6 +201,7 @@ func next_player():
 	rpc("set_current_player", player_names[current_player])
 
 func _on_Timer_timeout():
+	add_card(current_player)
 	rpc_id(current_player, "endOfRound")
 	next_player()
 
@@ -250,6 +252,9 @@ func _on_start_host_pressed():
 		max_players = get_node("max_play").text
 	if get_node("start_card").text != "":
 		starting_hand = int(get_node("start_card").text)
+	if get_node("max_round").text != "":
+		r_t = int(get_node("max_round").text)
 	remove_child(get_node("max_play"))
 	remove_child(get_node("start_card"))
 	remove_child(get_node("start_host"))
+	remove_child(get_node("max_round"))

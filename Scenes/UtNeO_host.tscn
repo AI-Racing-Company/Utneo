@@ -67,11 +67,18 @@ margin_right = 155.0
 margin_bottom = 60.0
 placeholder_text = "Starting hand"
 
-[node name="start_host" type="Button" parent="."]
+[node name="max_round" type="LineEdit" parent="."]
 margin_left = 5.0
 margin_top = 65.0
 margin_right = 155.0
 margin_bottom = 90.0
+placeholder_text = "Max round time"
+
+[node name="start_host" type="Button" parent="."]
+margin_left = 5.0
+margin_top = 95.0
+margin_right = 155.0
+margin_bottom = 120.0
 text = "Start hosting"
 
 [connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
