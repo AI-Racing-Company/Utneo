@@ -202,6 +202,7 @@ func next_player():
 
 func _on_Timer_timeout():
 	add_card(current_player)
+	add_card(current_player)
 	rpc_id(current_player, "endOfRound")
 	next_player()
 
