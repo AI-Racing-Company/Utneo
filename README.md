@@ -9,6 +9,7 @@
 - winner is shown
 - Host can decide max player amount
 - Host can decide first handcard count
+- Disconnect from Server
 
 ## Future ideas:
 - Game mode with calculations up to three cards
