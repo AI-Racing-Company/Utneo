@@ -18,6 +18,9 @@
 ## Currently working on:
 - Cards "glowing" on mouse hover
 
+## Current Problems:
+- Sometimes players randomly skip
+
 ## Future ideas:
 - Game mode with calculations up to three cards
 - Lobby

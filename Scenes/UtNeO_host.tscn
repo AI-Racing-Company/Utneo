@@ -27,29 +27,36 @@ custom_fonts/font = SubResource( 1 )
 [node name="Button" type="Button" parent="."]
 margin_left = 650.0
 margin_right = 900.0
-margin_bottom = 75.0
+margin_bottom = 50.0
 text = "Start/restart Gamme"
 
 [node name="win" type="Button" parent="."]
 margin_left = 650.0
 margin_top = 75.0
 margin_right = 900.0
-margin_bottom = 150.0
+margin_bottom = 125.0
 text = "win"
 
 [node name="Continue" type="Button" parent="."]
 margin_left = 650.0
 margin_top = 150.0
 margin_right = 900.0
-margin_bottom = 225.0
+margin_bottom = 200.0
 text = "Continue Gamme"
 
 [node name="End" type="Button" parent="."]
 margin_left = 650.0
 margin_top = 225.0
 margin_right = 900.0
-margin_bottom = 300.0
+margin_bottom = 275.0
 text = "End Gamme"
+
+[node name="Disconnect" type="Button" parent="."]
+margin_left = 650.0
+margin_top = 300.0
+margin_right = 900.0
+margin_bottom = 350.0
+text = "Disconnect"
 
 [node name="Timer" type="Timer" parent="."]
 
@@ -85,5 +92,6 @@ text = "Start hosting"
 [connection signal="pressed" from="win" to="." method="_on_win_pressed"]
 [connection signal="pressed" from="Continue" to="." method="_on_Contunue_pressed"]
 [connection signal="pressed" from="End" to="." method="_on_End_pressed"]
+[connection signal="pressed" from="Disconnect" to="." method="_on_Disconnect_pressed"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
 [connection signal="pressed" from="start_host" to="." method="_on_start_host_pressed"]

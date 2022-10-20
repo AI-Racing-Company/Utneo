@@ -37,9 +37,10 @@ func resized():
 	var x = get_viewport().get_visible_rect().size.x
 	var y = get_viewport().get_visible_rect().size.y
 	get_node("Button").set_global_position(Vector2(x-250,0))
-	get_node("win").set_global_position(Vector2(x-250,75))
-	get_node("Continue").set_global_position(Vector2(x-250,150))
-	get_node("End").set_global_position(Vector2(x-250,225))
+	get_node("win").set_global_position(Vector2(x-250,50))
+	get_node("Continue").set_global_position(Vector2(x-250,100))
+	get_node("End").set_global_position(Vector2(x-250,150))
+	get_node("Disconnect").set_global_position(Vector2(x-250,150))
 
 func client_connect(id):
 	player_IDs.append(id)
@@ -259,3 +260,10 @@ func _on_start_host_pressed():
 	remove_child(get_node("start_card"))
 	remove_child(get_node("start_host"))
 	remove_child(get_node("max_round"))
+
+
+func _on_Disconnect_pressed():
+	
+	get_tree().network_peer = null
+	peer.close_connection()
+	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
