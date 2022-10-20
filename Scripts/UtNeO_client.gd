@@ -64,7 +64,7 @@ func resized():
 	get_node("Player List").set_global_position(Vector2(width-get_node("Player List").get_rect().size.x-5, 5))
 	get_node("WinnerMessage").set_global_position(Vector2(0,height-275))
 	get_node("WinnerMessage").set_size(Vector2(width,50))
-	
+
 	get_node("OverColorRect").set_size(Vector2(width,100))
 	get_node("OverColorRect").set_global_position(Vector2(0,height - 100 + overRectAdd))
 
@@ -91,7 +91,6 @@ puppet func card_removed():
 	var x = my_card_nodes.find(get_node("Cards").get_node(current_calc[3]))
 	my_card_nodes.remove(x)
 	my_cards.remove(x)
-
 
 	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[3]))
 	if(current_calc[4] != ""):
@@ -141,6 +140,7 @@ func button_pressed(operation):
 			current_calc = ["","","","",""]
 			selected_card = 0
 
+
 func _physics_process(delta):
 	update_player_timer()
 	get_node("ClientText").text = str(current_card)
@@ -160,8 +160,6 @@ func _physics_process(delta):
 	get_node("Current Calculation").text = str(current_calc[1])
 	var txt = get_node("Current Calculation").text
 	get_node("Current Calculation").text = txt + str(current_calc[0])
-
-
 	get_node("Current Calculation").text = get_node("Current Calculation").text + str(current_calc[2])
 
 
@@ -208,3 +206,11 @@ func disconnect_from_server():
 	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 	get_tree().network_peer = null
 	peer.close_connection()
+
+
+
+func start_hover_above_card(card):
+	pass
+
+func end_hover_above_card(card):
+	pass
