@@ -70,7 +70,7 @@ master func add_card(id):
 		if current_player == id:
 			rand = rnd.randi_range(0,9)
 
-			all_cards.append(rnd)
+			all_cards.append(rand)
 			var player_id = player_IDs.find(id,0)
 			player_cards[player_id].append(rand)
 
@@ -175,12 +175,12 @@ func _on_Button_pressed():
 		current_player = player_IDs[randplay]
 		rset_id(current_player, "my_turn", true)
 		timer.start(r_t)
-		rpc_id(current_player, "startGame")
+		rpc_id(current_player, "startOfRound")
 
 		for i in range(player_IDs.size()):
 			for j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
-				all_cards.append(rnd)
+				all_cards.append(rand)
 				player_cards[i].append(rand)
 				rpc_id(player_IDs[i], "master_add_card", rand)
 		game_started = true
@@ -216,7 +216,7 @@ func set_client_text():
 	var sendstr = ""
 	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
 	for i in player_names:
-		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i])
+		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i] + " " + str(i))
 		if game_started:
 			print(players_ignore.count(i))
 			if(players_ignore.count(i) > 0):
@@ -229,7 +229,8 @@ func set_client_text():
 
 
 func _on_win_pressed():
-	player_done(player_IDs[0])
+	if player_IDs.size != 0:
+		player_done(player_IDs[0])
 
 func _on_Contunue_pressed():
 	win[1] = true

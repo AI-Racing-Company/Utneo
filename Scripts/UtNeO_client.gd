@@ -10,6 +10,11 @@ var current_card = -1
 var current_card_node = null
 puppet var my_turn = false
 
+var overRectAdd = 0
+
+var s_width = 0
+var s_height = 0
+
 puppet var current_player = 0
 puppet var current_player_name = ""
 
@@ -47,6 +52,8 @@ puppet func connection_established(id):
 func resized():
 	var width = get_viewport().get_visible_rect().size.x
 	var height = get_viewport().get_visible_rect().size.y
+	s_width = width
+	s_height = height
 	var add = width / (my_card_nodes.size()+1)
 	for i in range(len(my_card_nodes)):
 		var vec = Vector2((i+1)*add - 75/2,height-100)
@@ -57,6 +64,9 @@ func resized():
 	get_node("Player List").set_global_position(Vector2(width-get_node("Player List").get_rect().size.x-5, 5))
 	get_node("WinnerMessage").set_global_position(Vector2(0,height-275))
 	get_node("WinnerMessage").set_size(Vector2(width,50))
+
+	get_node("OverColorRect").set_size(Vector2(width,100))
+	get_node("OverColorRect").set_global_position(Vector2(0,height - 100 + overRectAdd))
 
 func add_card():
 	rpc_id(1, "add_card", my_id)
@@ -71,7 +81,7 @@ puppet func master_add_card(rand):
 	card.set_size(Vector2(75,100))
 
 	my_card_num += 1
-	get_node("Cards").call_deferred("add_child", card)
+	get_node("Cards").add_child(card)
 
 	my_card_nodes.append(card)
 	my_cards.append(rand)
@@ -95,8 +105,9 @@ puppet func card_removed():
 	selected_card = 0
 
 func hand_card_pressed(card):
-	if my_turn:
+	if my_turn && card.name != "":
 		var value = card.name.split("_")
+		print("c name: " + card.name)
 		if(!selected_card):
 			if(card.name != current_calc[4]):
 				current_calc[1] = value[1]
@@ -128,14 +139,14 @@ func button_pressed(operation):
 		elif(operation == "clear"):
 			current_calc = ["","","","",""]
 			selected_card = 0
-			
+
 
 func _physics_process(delta):
 	update_player_timer()
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
 		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
-		if not timer.is_stopped():
+		if !timer.is_stopped():
 			timerRect.set_size(Vector2(20,2*timer.time_left))
 			timerRect.set_global_position(Vector2(0,get_viewport().get_visible_rect().size.y/2-2*timer.time_left+r_t/2))
 			timerRect.color = Color(r,g,0,1)
@@ -151,20 +162,20 @@ func _physics_process(delta):
 	get_node("Current Calculation").text = txt + str(current_calc[0])
 	get_node("Current Calculation").text = get_node("Current Calculation").text + str(current_calc[2])
 
-puppet func startGame():
-	r=0
-	g=1
-	timer.start(r_t)
 
 puppet func endOfRound():
 	current_calc = ["","","","",""]
 	timer.stop()
+	overRectAdd = 0
+	get_node("OverColorRect").set_global_position(Vector2(0,s_height - 100 + overRectAdd))
 
 puppet func startOfRound():
 	current_calc = ["","","","",""]
 	r=0
 	g=1
 	timer.start(r_t)
+	overRectAdd = 150
+	get_node("OverColorRect").set_global_position(Vector2(0,s_height - 100 + overRectAdd))
 
 puppet func set_current_card(c):
 	remove_child(current_card_node)
@@ -195,11 +206,11 @@ func disconnect_from_server():
 	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 	get_tree().network_peer = null
 	peer.close_connection()
-	
-	
-	
+
+
+
 func start_hover_above_card(card):
 	pass
-	
+
 func end_hover_above_card(card):
 	pass

@@ -12,7 +12,11 @@
   - Starting card count
   - Max round time
 - Disconnect from Server
-- Get card when time's up
+- Get two cards when time's up
+- Handcards gray when not players turn
+
+## Currently working on:
+- Cards "glowing" on mouse hover
 
 ## Future ideas:
 - Game mode with calculations up to three cards
