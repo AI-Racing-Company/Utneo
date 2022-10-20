@@ -152,7 +152,6 @@ master func cards_pushed(id, ops):
 
 func player_done(id):
 	players_ignore.append(id)
-	rpc("player_won", player_names[id])
 	player_classment.append(id)
 	rpc("player_done", player_names[id], player_classment.size())
 	set_client_text()
