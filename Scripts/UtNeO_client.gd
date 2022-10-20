@@ -59,7 +59,7 @@ func resized():
 	get_node("WinnerMessage").set_size(Vector2(width,50))
 
 func add_card():
-	rpc_id(0, "add_card", my_id)
+	rpc_id(1, "add_card", my_id)
 
 puppet func master_add_card(rand):
 
@@ -134,15 +134,15 @@ func _physics_process(delta):
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
 		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
-		if not timer.is_stopped():
+		if !timer.is_stopped():
 			timerRect.set_size(Vector2(20,2*timer.time_left))
 			timerRect.set_global_position(Vector2(0,get_viewport().get_visible_rect().size.y/2-2*timer.time_left+r_t/2))
 			timerRect.color = Color(r,g,0,1)
 
 			r = r + float(1) / (r_t*60)
 			g = g - float(1) / (r_t*60)
-		else:
-			timerRect.set_size(Vector2(0,0))
+	else:
+		timerRect.set_size(Vector2(0,0))
 
 
 	get_node("Current Calculation").text = str(current_calc[1])
