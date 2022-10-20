@@ -80,5 +80,8 @@ margin_right = 40.0
 margin_bottom = 355.0
 color = Color( 0, 0.815686, 0.0156863, 1 )
 
-[connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
-[connection signal="timeout" from="Timer" to="Timer" method="_on_Timer_timeout"]
+[node name="OverColorRect" type="ColorRect" parent="."]
+margin_top = 500.0
+margin_right = 900.0
+margin_bottom = 600.0
+color = Color( 0.537255, 0.537255, 0.537255, 0.501961 )

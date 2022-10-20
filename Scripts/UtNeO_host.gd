@@ -175,7 +175,7 @@ func _on_Button_pressed():
 		current_player = player_IDs[randplay]
 		rset_id(current_player, "my_turn", true)
 		timer.start(r_t)
-		rpc_id(current_player, "startGame")
+		rpc_id(current_player, "startOfRound")
 
 		for i in range(player_IDs.size()):
 			for j in range(starting_hand):
