@@ -22,3 +22,15 @@ func _on_Host_pressed():
 		global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
 
 	get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
+
+
+func _on_Client_LH_pressed():
+	global.ip = "localhost"
+	get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
+	
+
+
+func _on_Host_LH_pressed():
+	global.ip = "localhost"
+	global.username = get_node("Client/name").text
+	get_tree().change_scene("res://Scenes/UtNeO_client.tscn")

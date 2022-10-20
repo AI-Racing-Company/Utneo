@@ -71,7 +71,7 @@ puppet func master_add_card(rand):
 	card.set_size(Vector2(75,100))
 
 	my_card_num += 1
-	get_node("Cards").call_deferred("add_child", card)
+	get_node("Cards").add_child(card)
 
 	my_card_nodes.append(card)
 	my_cards.append(rand)

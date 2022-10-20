@@ -229,7 +229,8 @@ func set_client_text():
 
 
 func _on_win_pressed():
-	player_done(player_IDs[0])
+	if player_IDs.size != 0:
+		player_done(player_IDs[0])
 
 func _on_Contunue_pressed():
 	win[1] = true
