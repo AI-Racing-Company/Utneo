@@ -86,6 +86,7 @@ puppet func master_add_card(rand):
 	my_card_nodes.append(card)
 	my_cards.append(rand)
 	resized()
+	end_hover_above_card(card)
 
 puppet func card_removed():
 	var x = my_card_nodes.find(get_node("Cards").get_node(current_calc[3]))
@@ -210,7 +211,7 @@ func disconnect_from_server():
 
 
 func start_hover_above_card(card):
-	pass
+	card.modulate.a8 = 255
 
 func end_hover_above_card(card):
-	pass
+	card.modulate.a8 = 100
