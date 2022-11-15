@@ -5,18 +5,17 @@ var width
 var height
 var my_id
 
+var nue
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	get_viewport().connect("size_changed", self, "resized")
+	nue = get_viewport().connect("size_changed", self, "resized")
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_client(global.ip, global.port)
-	peer.COMPRESS_ZLIB
 	get_tree().network_peer = peer
 	print(get_tree().network_peer)
-	#get_tree().connect("connected_to_server", self, "connected_to_server")
-	#get_tree().connect("connection_failed", self, "connection_failed")
-	get_tree().connect("server_disconnected", self, "serversided_disconnect")
+	nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
 	resized()
 
 func resized():
@@ -27,7 +26,7 @@ func serversided_disconnect():
 	print("Server disconnected")
 	get_tree().network_peer = null
 	peer.close_connection()
-	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
+	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 
 puppet func connection_established(id):
 	my_id = id
@@ -46,7 +45,7 @@ func Login():
 
 puppet func Login_return(worked):
 	if(worked):
-		get_tree().change_scene("res://Scenes/UtNeO_client.tscn")
+		nue = get_tree().change_scene("res://Scenes/UtNeO_client.tscn")
 
 
 func Register():
@@ -61,4 +60,4 @@ func Register():
 
 puppet func Register_return(worked):
 	if(worked):
-		get_tree().change_scene("res://Scenes/UtNeO_client.tscn")
+		nue = get_tree().change_scene("res://Scenes/UtNeO_client.tscn")

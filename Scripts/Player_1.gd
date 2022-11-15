@@ -1,5 +1,5 @@
 extends KinematicBody2D
-
+var nue #no useless errors (returns a never used value)
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -26,7 +26,7 @@ func move(w,a,s,d):
 	else:
 		vel.y = 0
 	
-	move_and_collide(vel)
+	nue = move_and_collide(vel)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

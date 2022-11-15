@@ -1,5 +1,5 @@
 extends Node2D
-
+var nue #no useless errors (returns a never used value)
 
 func _ready():
 	pass
@@ -11,7 +11,7 @@ func _on_Client_pressed():
 	if x.size() == 2:
 		global.port = int(x[1])
 	global.username = get_node("Client/name").text
-	get_tree().change_scene("res://Scenes/Login-Screen.tscn")
+	nue = get_tree().change_scene("res://Scenes/Login-Screen.tscn")
 
 func _on_Host_pressed():
 	global.port = int(get_node("Host/host_port").text)
@@ -21,16 +21,16 @@ func _on_Host_pressed():
 	if global.ip == "":
 		global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
 
-	get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
+	nue = get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
 
 
 func _on_Client_LH_pressed():
 	global.ip = "localhost"
-	get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
+	nue = get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
 	
 
 
 func _on_Host_LH_pressed():
 	global.ip = "localhost"
 	global.username = get_node("Client/name").text
-	get_tree().change_scene("res://Scenes/Login-Screen.tscn")
+	nue = get_tree().change_scene("res://Scenes/Login-Screen.tscn")

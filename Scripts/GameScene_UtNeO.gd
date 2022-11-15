@@ -1,9 +1,9 @@
 extends Node2D
-
+var nue
 var btns = ["Add","Sub","Mul","Div","Pot","Sqr"]
 
 func _ready():
-		get_viewport().connect("size_changed", self, "resized")
+		nue = get_viewport().connect("size_changed", self, "resized")
 		resized()
 
 

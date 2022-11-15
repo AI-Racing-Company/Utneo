@@ -9,6 +9,7 @@ var selected_card = 0
 var current_card = -1
 var current_card_node = null
 puppet var my_turn = false
+var nue
 
 var overRectAdd = 0
 
@@ -27,21 +28,16 @@ puppet var r_t = 60 # round time
 var peer = null
 
 func _ready():
-	get_viewport().connect("size_changed", self, "resized")
+	nue = get_viewport().connect("size_changed", self, "resized")
 	peer = NetworkedMultiplayerENet.new()
-	peer.create_client(global.ip, global.port)
+	nue = peer.create_client(global.ip, global.port)
 	peer.COMPRESS_ZLIB
 	get_tree().network_peer = peer
 	print(get_tree().network_peer)
 	get_node("ClientText").text = "Connected To " + global.ip + ":" + str(global.port)
-	#get_tree().connect("connected_to_server", self, "connected_to_server")
-	#get_tree().connect("connection_failed", self, "connection_failed")
-	get_tree().connect("server_disconnected", self, "serversided_disconnect")
+	nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
 	timer.set_autostart(false)
-	current_card_node = load("res://Prefabs/Cards/card_back_dev.tscn").instance()
-	current_card_node.set_name("current_card")
-	current_card_node.set_size(Vector2(75,100))
-	add_child(current_card_node)
+
 	resized()
 
 puppet func connection_established(id):
@@ -128,7 +124,7 @@ func serversided_disconnect():
 		get_node("Cards").remove_child(i)
 	my_card_nodes.clear()
 	my_cards.clear()
-	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
+	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 
 func button_pressed(operation):
 	if my_turn:
@@ -143,6 +139,7 @@ func button_pressed(operation):
 
 
 func _physics_process(delta):
+	nue = delta
 	update_player_timer()
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
@@ -179,13 +176,14 @@ puppet func startOfRound():
 	get_node("OverColorRect").set_global_position(Vector2(0,s_height - 100 + overRectAdd))
 
 puppet func set_current_card(c):
-	remove_child(current_card_node)
-	current_card = c
-	current_card_node = load("res://Prefabs/Cards/card_" + str(c) + "_dev.tscn").instance()
-	current_card_node.set_name("current_card")
-	current_card_node.set_size(Vector2(75,100))
-	add_child(current_card_node)
-	resized()
+	if get_node(current_card_node):
+		remove_child(current_card_node)
+		current_card = c
+		current_card_node = load("res://Prefabs/Cards/card_" + str(c) + "_dev.tscn").instance()
+		current_card_node.set_name("current_card")
+		current_card_node.set_size(Vector2(75,100))
+		add_child(current_card_node)
+		resized()
 
 puppet func update_player_list(sendstr):
 	get_node("Player List").text = sendstr
@@ -194,6 +192,7 @@ func update_player_timer():
 	get_node("Current Player").text = current_player_name + ": " + str(int(timer.time_left))
 
 puppet func player_done(p_name, pos):
+	p_name = pos
 	pass
 	#get_node("WinnerMessage").text = str(p_name) + " Won"
 
@@ -204,7 +203,7 @@ puppet func set_current_player(pname):
 	current_player_name = pname
 	timer.start(r_t)
 func disconnect_from_server():
-	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
+	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 	get_tree().network_peer = null
 	peer.close_connection()
 
