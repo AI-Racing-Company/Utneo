@@ -230,7 +230,7 @@ func set_client_text():
 				sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[player_IDs.find(i)].size()) + "\n"
 		else:
 			sendstr = sendstr  + str(player_names[i]) + "\n"
-	rpc("update_player_list", sendstr)
+	#rpc("update_player_list", sendstr)
 
 
 func _on_win_pressed():
@@ -308,7 +308,17 @@ master func register(id, name, pwd, mail):
 	else:
 		rpc_id(id, "Register_return", false)
 
-
+master func login(id, name, pwd):
+	print("registering")
+	db.open_db()
+	var query = "SELECT * FROM Users WHERE Name = ? AND pwd = ?"
+	var bindings = [name,pwd]
+	db.query_with_bindings(query, bindings)
+	if db.query_result.size() > 0:
+		
+		rpc_id(id, "Login_return", true)
+	else:
+		rpc_id(id, "Login_return", false)
 
 
 

@@ -40,13 +40,13 @@ puppet func connection_established(id):
 
 func Login():
 	var username = get_node("Login/Username").text
-	var pwd = get_node("Login/Password").text
+	var pwd = get_node("Login/Pasword").text
 	var hashpwd = (username+pwd).sha256_text()
 	rpc_id(1, "login", my_id, username, hashpwd)
 
 puppet func Login_return(worked):
-	if worked:
-		print("logged in")
+	if(worked):
+		get_tree().change_scene("res://Scenes/UtNeO_client.tscn")
 
 
 func Register():
@@ -60,4 +60,5 @@ func Register():
 		rpc_id(1, "register", my_id, username, hashpwd, email)
 
 puppet func Register_return(worked):
-	print(worked)
+	if(worked):
+		get_tree().change_scene("res://Scenes/UtNeO_client.tscn")
