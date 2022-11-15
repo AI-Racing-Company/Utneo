@@ -14,9 +14,10 @@
 - Disconnect from Server
 - Get two cards when time's up
 - Handcards gray when not players turn
+- Cards "glowing" on mouse hover
 
 ## Currently working on:
-- Cards "glowing" on mouse hover
+- Account System with Database
 
 ## Current Problems:
 - Sometimes players randomly skip
