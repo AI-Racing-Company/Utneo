@@ -31,6 +31,8 @@ var r_t = 60 # round time
 onready var timer = get_node("Timer")
 
 func _ready():
+	db = SQLite.new()
+	db.path = "res://Data/UserData"
 	get_viewport().connect("size_changed", self, "resized")
 	resized()
 	#get_viewport().connect("size_changed", self, "resized")
@@ -237,13 +239,16 @@ func _on_win_pressed():
 
 func _on_Contunue_pressed():
 	win[1] = true
-	print("Hell")
+	print("wv'oJ%9%a8!0(LANS'$".sha256_text())
 	
 	db = SQLite.new()
 	db.path = "res://Data/UserData"
 	# db.verbosity_level = VerbosityLevel.VERBOSE
 	# Open the database using the db_name found in the path variable
 	db.open_db()
+	
+#	
+	
 	db.query("SELECT email FROM Users;")
 	print(db.query_result)
 	db.close_db()
@@ -279,3 +284,42 @@ func _on_Disconnect_pressed():
 	get_tree().network_peer = null
 	peer.close_connection()
 	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
+	
+master func register(id, name, pwd, mail):
+	print("registering")
+	db.open_db()
+	var query = "SELECT * FROM Users WHERE Name = ? OR email = ?"
+	var bindings = [name,mail]
+	db.query_with_bindings(query, bindings)
+	if db.query_result.size() == 0:
+		var row_array : Array = []
+		var row_dict : Dictionary = Dictionary()
+
+		row_dict["name"] = name
+		row_dict["Played_Games"] = 0
+		row_dict["Won_Games"] = 0
+		row_dict["Points"] = 0
+		row_dict["email"] = mail
+		row_dict["pwd"] = pwd
+		row_array.append(row_dict.duplicate())
+		db.insert_rows("Users", row_array)
+		row_dict.clear()
+		rpc_id(id, "Register_return", true)
+	else:
+		rpc_id(id, "Register_return", false)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

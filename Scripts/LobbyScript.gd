@@ -11,7 +11,7 @@ func _on_Client_pressed():
 	if x.size() == 2:
 		global.port = int(x[1])
 	global.username = get_node("Client/name").text
-	get_tree().change_scene("res://Scenes/UtNeO_client.tscn")
+	get_tree().change_scene("res://Scenes/Login-Screen.tscn")
 
 func _on_Host_pressed():
 	global.port = int(get_node("Host/host_port").text)
@@ -33,4 +33,4 @@ func _on_Client_LH_pressed():
 func _on_Host_LH_pressed():
 	global.ip = "localhost"
 	global.username = get_node("Client/name").text
-	get_tree().change_scene("res://Scenes/UtNeO_client.tscn")
+	get_tree().change_scene("res://Scenes/Login-Screen.tscn")
