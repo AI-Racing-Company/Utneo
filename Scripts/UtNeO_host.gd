@@ -1,5 +1,7 @@
 extends Node2D
 
+const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
+var db
 
 var all_cards = []
 var player_cards = []
@@ -230,14 +232,24 @@ func set_client_text():
 
 
 func _on_win_pressed():
-	if player_IDs.size != 0:
+	if player_IDs.size() != 0:
 		player_done(player_IDs[0])
 
 func _on_Contunue_pressed():
 	win[1] = true
-
+	print("Hell")
+	
+	db = SQLite.new()
+	db.path = "res://Data/UserData"
+	# db.verbosity_level = VerbosityLevel.VERBOSE
+	# Open the database using the db_name found in the path variable
+	db.open_db()
+	db.query("SELECT email FROM Users;")
+	print(db.query_result)
+	db.close_db()
 
 func _on_End_pressed():
+	
 	game_end()
 
 func _on_start_host_pressed():
