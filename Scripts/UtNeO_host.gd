@@ -11,6 +11,8 @@ var players_ignore = []
 var player_classment = []
 var end_of_game = false
 
+var key_list = []
+
 var max_players = 6
 var starting_hand = 7
 
@@ -54,9 +56,13 @@ func client_connect(id):
 	#rpc_id(id, "r_t", r_t)
 	set_client_text()
 	
+	
 	if player_IDs.size() >= int(max_players):
 		get_tree().set_refuse_new_network_connections(true)
-	
+
+master func give_key(id, key):
+	if !key_list.has(key):
+		pass
 
 func client_disconnect(id):
 	if id == current_player:
@@ -239,20 +245,7 @@ func _on_win_pressed():
 
 func _on_Contunue_pressed():
 	win[1] = true
-	print("wv'oJ%9%a8!0(LANS'$".sha256_text())
 	
-	db = SQLite.new()
-	db.path = "res://Data/UserData"
-	# db.verbosity_level = VerbosityLevel.VERBOSE
-	# Open the database using the db_name found in the path variable
-	db.open_db()
-	
-#	
-	
-	db.query("SELECT email FROM Users;")
-	print(db.query_result)
-	db.close_db()
-
 func _on_End_pressed():
 	
 	game_end()
@@ -263,7 +256,7 @@ func _on_start_host_pressed():
 	get_node("ClientConnect").text = "Connected Clients: 0"
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_server(global.port, 5)
-	peer.COMPRESS_ZLIB
+	peer.compression_mode = NetworkedMultiplayerENet.COMPRESS_ZLIB
 	get_tree().network_peer = peer
 	get_tree().connect("network_peer_connected", self, "client_connect")
 	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
@@ -315,10 +308,13 @@ master func login(id, name, pwd):
 	var bindings = [name,pwd]
 	db.query_with_bindings(query, bindings)
 	if db.query_result.size() > 0:
-		
-		rpc_id(id, "Login_return", true)
+		var key = PoolStringArray(OS.get_time().values()).join("")
+		key = (key + name).sha256_text()
+		print(key)
+		key_list.append(key)
+		rpc_id(id, "Login_return", true, key)
 	else:
-		rpc_id(id, "Login_return", false)
+		rpc_id(id, "Login_return", false, "")
 
 
 

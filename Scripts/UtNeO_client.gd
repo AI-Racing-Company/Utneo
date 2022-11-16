@@ -30,6 +30,7 @@ var peer = null
 func _ready():
 	nue = get_viewport().connect("size_changed", self, "resized")
 	peer = NetworkedMultiplayerENet.new()
+	peer.compression_mode = NetworkedMultiplayerENet.COMPRESS_ZLIB
 	nue = peer.create_client(global.ip, global.port)
 	peer.COMPRESS_ZLIB
 	get_tree().network_peer = peer
@@ -43,6 +44,7 @@ func _ready():
 puppet func connection_established(id):
 	my_id = id
 	print("Connection succsess")
+	rpc_id(1, "give_key", my_id, global.login_key)
 	rpc_id(1, "set_player_name", global.username, my_id)
 
 func resized():
