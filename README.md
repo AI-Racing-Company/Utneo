@@ -15,9 +15,10 @@
 - Get two cards when time's up
 - Handcards gray when not players turn
 - Cards "glowing" on mouse hover
+- Account system with Database
 
 ## Currently working on:
-- Account System with Database
+- nothing yet
 
 ## Current Problems:
 - Sometimes players randomly skip
@@ -28,3 +29,4 @@
 - Random middle card
 - Code instead of IP
 - Points are results of calculation
+- Showing last calculation of oponent
