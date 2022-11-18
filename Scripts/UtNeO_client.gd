@@ -1,6 +1,5 @@
 extends Node2D
 
-var my_id = 0
 var my_card_num = 0
 var my_cards = []
 var my_card_nodes = []
@@ -25,27 +24,23 @@ var r = 0    # value of red
 var g = 1    # value of green
 puppet var r_t = 60 # round time
 
+var c = 0
+
 var peer = null
 
 func _ready():
 	nue = get_viewport().connect("size_changed", self, "resized")
-	peer = NetworkedMultiplayerENet.new()
-	peer.compression_mode = NetworkedMultiplayerENet.COMPRESS_ZLIB
-	nue = peer.create_client(global.ip, global.port)
-	peer.COMPRESS_ZLIB
-	get_tree().network_peer = peer
-	print(get_tree().network_peer)
 	get_node("ClientText").text = "Connected To " + global.ip + ":" + str(global.port)
 	nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
 	timer.set_autostart(false)
-
 	resized()
+	rpc_id(1, "give_key", global.my_id, global.login_key)
+	
 
 puppet func connection_established(id):
-	my_id = id
+	global.my_id = id
 	print("Connection succsess")
-	rpc_id(1, "give_key", my_id, global.login_key)
-	rpc_id(1, "set_player_name", global.username, my_id)
+	
 
 func resized():
 	var width = get_viewport().get_visible_rect().size.x
@@ -67,7 +62,7 @@ func resized():
 	get_node("OverColorRect").set_global_position(Vector2(0,height - 100 + overRectAdd))
 
 func add_card():
-	rpc_id(1, "add_card", my_id)
+	rpc_id(1, "add_card", global.my_id)
 
 puppet func master_add_card(rand):
 
@@ -133,7 +128,7 @@ func button_pressed(operation):
 		if(operation != "Pus" && operation != "clear"):
 			current_calc[0] = operation
 		elif(operation == "Pus"):
-			rpc_id(1,"cards_pushed",my_id,current_calc)
+			rpc_id(1,"cards_pushed",global.my_id,current_calc)
 			selected_card = 0
 		elif(operation == "clear"):
 			current_calc = ["","","","",""]
@@ -141,6 +136,7 @@ func button_pressed(operation):
 
 
 func _physics_process(delta):
+	
 	nue = delta
 	update_player_timer()
 	get_node("ClientText").text = str(current_card)
@@ -178,14 +174,14 @@ puppet func startOfRound():
 	get_node("OverColorRect").set_global_position(Vector2(0,s_height - 100 + overRectAdd))
 
 puppet func set_current_card(c):
-	if get_node(current_card_node):
+	if current_card_node != null:
 		remove_child(current_card_node)
-		current_card = c
-		current_card_node = load("res://Prefabs/Cards/card_" + str(c) + "_dev.tscn").instance()
-		current_card_node.set_name("current_card")
-		current_card_node.set_size(Vector2(75,100))
-		add_child(current_card_node)
-		resized()
+	current_card = c
+	current_card_node = load("res://Prefabs/Cards/card_" + str(c) + "_dev.tscn").instance()
+	current_card_node.set_name("current_card")
+	current_card_node.set_size(Vector2(75,100))
+	add_child(current_card_node)
+	resized()
 
 puppet func update_player_list(sendstr):
 	get_node("Player List").text = sendstr

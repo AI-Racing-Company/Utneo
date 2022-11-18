@@ -3,7 +3,7 @@ extends Node2D
 var peer
 var width
 var height
-var my_id
+
 
 var nue
 
@@ -29,19 +29,21 @@ func serversided_disconnect():
 	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 
 puppet func connection_established(id):
-	my_id = id
+	global.my_id = id
 	print("Connection succsess")
-	rpc_id(1, "set_player_name", global.username, my_id)
 	remove_child(get_node("Overlay"))
 
 
 
 
 func Login():
-	var username = get_node("Login/Username").text
-	var pwd = get_node("Login/Pasword").text
+	print("Login function called")
+	var username = "" + get_node("Login/Username").text
+	var pwd = "" + get_node("Login/Pasword").text
 	var hashpwd = (username+pwd).sha256_text()
-	rpc_id(1, "login", my_id, username, hashpwd)
+	var time = PoolStringArray(OS.get_time().values()).join("")
+	hashpwd = (hashpwd+time).sha256_text()
+	rpc_id(1, "login", global.my_id, username, hashpwd, time)
 
 puppet func Login_return(worked, login_key):
 	if(worked):
@@ -50,14 +52,12 @@ puppet func Login_return(worked, login_key):
 
 
 func Register():
-	var username = get_node("Register/Username").text
-	var email = get_node("Register/email").text
-	var pwd = get_node("Register/Pasword").text
-	print("first")
-	if pwd == get_node("Register/Pasword2").text:
-		print("second")
+	var username = "" + get_node("Register/Username").text
+	var email = "" + get_node("Register/email").text
+	var pwd = "" + get_node("Register/Pasword").text
+	if pwd == "" + get_node("Register/Pasword2").text:
 		var hashpwd = (username+pwd).sha256_text()
-		rpc_id(1, "register", my_id, username, hashpwd, email)
+		rpc_id(1, "register", global.my_id, username, hashpwd, email)
 
 puppet func Register_return(worked, login_key):
 	if(worked):

@@ -4,14 +4,14 @@ const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
 
 var all_cards = []
-var player_cards = []
+var player_cards = {}
 var player_IDs = []
 var player_names = {}
 var players_ignore = []
 var player_classment = []
 var end_of_game = false
 
-var key_list = []
+var key_names = {"mty":"22"}
 
 var max_players = 6
 var starting_hand = 7
@@ -49,30 +49,40 @@ func resized():
 	get_node("Disconnect").set_global_position(Vector2(x-250,150))
 
 func client_connect(id):
-	player_IDs.append(id)
-	player_cards.append([])
-	#rpc("client_connect", id)
+	print("Connecting")
 	rpc_id(id, "connection_established", id)
-	#rpc_id(id, "r_t", r_t)
 	set_client_text()
-	
-	
-	if player_IDs.size() >= int(max_players):
-		get_tree().set_refuse_new_network_connections(true)
 
 master func give_key(id, key):
-	if !key_list.has(key):
-		pass
+	print("giving key " + str(id))
+	print(key)
+	if key_names.has(key):
+		print("key valid")
+		
+		player_cards[id] = []
+		player_names[id] = key_names[key]
+		print("append playerIDs by " + str(id))
+		player_IDs.append(id)
+		
+		#rpc("client_connect", id)
+		rpc_id(id, "r_t", r_t)
+		set_client_text()
+		if player_IDs.size() >= int(max_players):
+			get_tree().set_refuse_new_network_connections(true)
 
 func client_disconnect(id):
-	if id == current_player:
-		next_player()
-	var player_id = player_IDs.find(id)
-	player_IDs.erase(id)
-	player_cards.remove(player_id)
-	player_names.erase(id)
-	rpc("client_disconnect", id)
-	set_client_text()
+	print("disconnecting")
+	if player_IDs.has(id):
+		if id == current_player:
+			next_player()
+		var player_id = player_IDs.find(id)
+		
+		player_cards.erase(player_id)
+		player_names.erase(id)
+		player_IDs.erase(id)
+		
+		rpc("client_disconnect", id)
+		set_client_text()
 	
 
 
@@ -82,8 +92,7 @@ master func add_card(id):
 			rand = rnd.randi_range(0,9)
 
 			all_cards.append(rand)
-			var player_id = player_IDs.find(id,0)
-			player_cards[player_id].append(rand)
+			player_cards[id].append(rand)
 
 			rpc_id(id, "master_add_card", rand)
 			next_player()
@@ -96,17 +105,16 @@ master func cards_pushed(id, ops):
 		if current_player == id && players_ignore.count(id) == 0:
 			if ops[2] == "":
 				var c1 = int(ops[1])
-				var player_id = player_IDs.find(id)
-				if player_cards[player_id].find(c1) >= 0:
+				if player_cards[id].find(c1) >= 0:
 					if c1 == current_card:
 						rpc_id(id, "card_removed")
-						player_cards[player_id].erase(c1)
+						player_cards[id].erase(c1)
 						current_card = c1
 						rpc("set_current_card", current_card)
 						set_client_text()
 						next_player()
 			else:
-				var player_id = player_IDs.find(id)
+				var player_id = id
 				var op = ops[0]
 				var c1 = int(ops[1])
 				var c2 = int(ops[2])
@@ -138,7 +146,8 @@ master func cards_pushed(id, ops):
 						player_cards[player_id].erase(c2)
 						if(player_cards[player_id].size() == 0):
 							player_done(id)
-						if(players_ignore.size() == player_IDs.size()-1 && players_ignore.size() > 0):
+						var pis = players_ignore.size()
+						if(pis == pis-1 && pis > 0):
 							game_end()
 						current_card = c2
 						rpc("set_current_card", current_card)
@@ -177,23 +186,24 @@ func _physics_process(delta):
 
 
 
-func _on_Button_pressed():
+func _on_Button_pressed(): # Start game
 	if not game_started && player_IDs.size()>0:
-		rset("r_t", r_t)
+		print("num of games started")
 		current_card = rnd.randi_range(0,9)
 		rpc("set_current_card", current_card)
 		var randplay = rnd.randi_range(0, player_IDs.size()-1)
 		current_player = player_IDs[randplay]
 		rset_id(current_player, "my_turn", true)
-		timer.start(r_t)
-		rpc_id(current_player, "startOfRound")
-
-		for i in range(player_IDs.size()):
+		print(player_IDs)
+		for i in player_IDs:
 			for j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
 				all_cards.append(rand)
 				player_cards[i].append(rand)
-				rpc_id(player_IDs[i], "master_add_card", rand)
+				rpc_id(i, "master_add_card", rand)
+		
+		timer.start(r_t)
+		rpc_id(current_player, "startOfRound")
 		game_started = true
 		set_client_text()
 		rpc("set_current_player", player_names[current_player])
@@ -216,14 +226,9 @@ func _on_Timer_timeout():
 	rpc_id(current_player, "endOfRound")
 	next_player()
 
-master func set_player_name(nme, id):
-	var insnme = nme
-	while player_names.values().find(insnme) > 0:
-		insnme = nme + str(rnd.randi())
-	player_names[id] = insnme
-	set_client_text()
 
 func set_client_text():
+	print("setting text...")
 	var sendstr = ""
 	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
 	for i in player_names:
@@ -233,7 +238,7 @@ func set_client_text():
 			if(players_ignore.count(i) > 0):
 				sendstr = sendstr +"(Done) "+ str(player_names[i]) + ": " + str(player_cards[player_IDs.find(i)].size()) + "\n"
 			else:
-				sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[player_IDs.find(i)].size()) + "\n"
+				sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[i].size()) + "\n"
 		else:
 			sendstr = sendstr  + str(player_names[i]) + "\n"
 	#rpc("update_player_list", sendstr)
@@ -300,21 +305,27 @@ master func register(id, name, pwd, mail):
 		rpc_id(id, "Register_return", true)
 	else:
 		rpc_id(id, "Register_return", false)
+	db.close_db()
 
-master func login(id, name, pwd):
-	print("registering")
+master func login(id, name, pwd, time):
 	db.open_db()
-	var query = "SELECT * FROM Users WHERE Name = ? AND pwd = ?"
-	var bindings = [name,pwd]
+	var query = "SELECT pwd FROM Users WHERE Name = ?"
+	var bindings = [name]
 	db.query_with_bindings(query, bindings)
 	if db.query_result.size() > 0:
-		var key = PoolStringArray(OS.get_time().values()).join("")
-		key = (key + name).sha256_text()
-		print(key)
-		key_list.append(key)
-		rpc_id(id, "Login_return", true, key)
-	else:
-		rpc_id(id, "Login_return", false, "")
+		var db_pwd = db.query_result[0]["pwd"]
+		var local_pwd = (db_pwd+time).sha256_text()
+		if local_pwd == pwd:
+			var key = PoolStringArray(OS.get_time().values()).join("")
+			key = (key + name).sha256_text()
+			key_names[key] = name
+			print(key_names)
+			rpc_id(id, "Login_return", true, key)
+		else:
+			print("Acces Denied")
+			rpc_id(id, "Login_return", false, "")
+	db.close_db()
+	set_client_text()
 
 
 
