@@ -116,7 +116,6 @@ func hand_card_pressed(card):
 
 func serversided_disconnect():
 	print("Server disconnected")
-	peer.close_connection()
 	get_tree().network_peer = null
 	
 	for i in my_card_nodes:
@@ -125,16 +124,20 @@ func serversided_disconnect():
 	my_cards.clear()
 	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 
+
 func button_pressed(operation):
+
 	if my_turn:
-		if(operation != "Pus" && operation != "clear"):
-			current_calc[0] = operation
-		elif(operation == "Pus"):
-			rpc_id(1,"cards_pushed",global.my_id,current_calc)
-			selected_card = 0
-		elif(operation == "clear"):
-			current_calc = ["","","","",""]
-			selected_card = 0
+		
+		match operation:
+			"Pus":
+				rpc_id(1,"cards_pushed",global.my_id,current_calc)
+				selected_card = 0
+			"clear":
+				current_calc = ["","","","",""]
+				selected_card = 0
+			_:
+				current_calc[0] = operation
 
 
 func _physics_process(delta):
