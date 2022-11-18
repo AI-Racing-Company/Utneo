@@ -3,7 +3,6 @@ extends Node2D
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
 
-var all_cards = []
 var player_cards = {}
 var player_IDs = []
 var player_names = {}
@@ -91,7 +90,6 @@ master func add_card(id):
 		if current_player == id:
 			rand = rnd.randi_range(0,9)
 
-			all_cards.append(rand)
 			player_cards[id].append(rand)
 
 			rpc_id(id, "master_add_card", rand)
@@ -198,7 +196,6 @@ func _on_Button_pressed(): # Start game
 		for i in player_IDs:
 			for j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
-				all_cards.append(rand)
 				player_cards[i].append(rand)
 				rpc_id(i, "master_add_card", rand)
 		
@@ -232,7 +229,7 @@ func set_client_text():
 	var sendstr = ""
 	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
 	for i in player_names:
-		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i] + " " + str(i))
+		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i] + " (" + str(i) + ")")
 		if game_started:
 			print(players_ignore.count(i))
 			if(players_ignore.count(i) > 0):
@@ -241,7 +238,7 @@ func set_client_text():
 				sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[i].size()) + "\n"
 		else:
 			sendstr = sendstr  + str(player_names[i]) + "\n"
-	#rpc("update_player_list", sendstr)
+	rpc("update_player_list", sendstr)
 
 
 func _on_win_pressed():

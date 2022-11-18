@@ -82,13 +82,14 @@ puppet func master_add_card(rand):
 	end_hover_above_card(card)
 
 puppet func card_removed():
-	var x = my_card_nodes.find(get_node("Cards").get_node(current_calc[3]))
-	my_card_nodes.remove(x)
-	my_cards.remove(x)
+	if(current_calc[3] != ""):
+		var x = my_card_nodes.find(get_node("Cards").get_node(current_calc[3]))
+		my_card_nodes.remove(x)
+		my_cards.remove(x)
 
-	get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[3]))
+		get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[3]))
 	if(current_calc[4] != ""):
-		x = my_card_nodes.find(get_node("Cards").get_node(current_calc[4]))
+		var x = my_card_nodes.find(get_node("Cards").get_node(current_calc[4]))
 		my_card_nodes.remove(x)
 		my_cards.remove(x)
 		get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[4]))
@@ -115,8 +116,9 @@ func hand_card_pressed(card):
 
 func serversided_disconnect():
 	print("Server disconnected")
-	get_tree().network_peer = null
 	peer.close_connection()
+	get_tree().network_peer = null
+	
 	for i in my_card_nodes:
 		get_node("Cards").remove_child(i)
 	my_card_nodes.clear()
