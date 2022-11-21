@@ -60,6 +60,8 @@ func resized():
 
 	get_node("OverColorRect").set_size(Vector2(width,100))
 	get_node("OverColorRect").set_global_position(Vector2(0,height - 100 + overRectAdd))
+	timerRect.set_global_position(Vector2(0,s_height - 190))
+	get_node("past Calculations").set_global_position(Vector2(10,s_height - 360))
 
 func add_card():
 	rpc_id(1, "add_card", global.my_id)
@@ -148,16 +150,17 @@ func _physics_process(delta):
 	if my_turn:
 		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
 		if !timer.is_stopped():
-			timerRect.set_size(Vector2(20,2*timer.time_left))
-			timerRect.set_global_position(Vector2(0,get_viewport().get_visible_rect().size.y/2-2*timer.time_left+r_t/2))
+			timerRect.set_size(Vector2(s_width*(timer.time_left/r_t),10))
+			
 			timerRect.color = Color(r,g,0,1)
+			
 
 			r = r + float(1) / (r_t*60)
 			g = g - float(1) / (r_t*60)
 	else:
 		timerRect.set_size(Vector2(0,0))
 
-
+	
 	get_node("Current Calculation").text = str(current_calc[1])
 	var txt = get_node("Current Calculation").text
 	get_node("Current Calculation").text = txt + str(current_calc[0])
@@ -205,10 +208,15 @@ puppet func game_end():
 puppet func set_current_player(pname):
 	current_player_name = pname
 	timer.start(r_t)
+	
 func disconnect_from_server():
 	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 	get_tree().network_peer = null
 	peer.close_connection()
+
+puppet func set_past_calc(newText):
+	print("should give new text: \n" + newText)
+	get_node("past Calculations").text = str(newText)
 
 
 

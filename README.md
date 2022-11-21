@@ -16,12 +16,13 @@
 - Handcards gray when not players turn
 - Cards "glowing" on mouse hover
 - Account system with Database
+- Showing last calculation of oponent
 
 ## Currently working on:
-- nothing yet
+- nothing
 
 ## Current Problems:
-- Sometimes players randomly skip
+- nothing we are currently aware of
 
 ## Future ideas:
 - Game mode with calculations up to three cards
@@ -29,4 +30,5 @@
 - Random middle card
 - Code instead of IP
 - Points are results of calculation
-- Showing last calculation of oponent
+- Showing oponents moves which weren't possible
+- Maximum of two failed tries per round

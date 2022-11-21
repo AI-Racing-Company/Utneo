@@ -78,9 +78,9 @@ text = "ULTIMATE PUSH"
 
 [node name="Clear" type="Button" parent="SelectActionButtons"]
 margin_left = 737.0
-margin_top = 375.0
+margin_top = 365.0
 margin_right = 899.0
-margin_bottom = 417.0
+margin_bottom = 405.0
 text = "Clear Hand"
 
 [node name="Disconnect" type="Button" parent="SelectActionButtons"]
@@ -97,6 +97,12 @@ margin_right = 502.0
 margin_bottom = 304.0
 texture_normal = ExtResource( 3 )
 expand = true
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+margin_top = 405.0
+margin_right = 900.0
+margin_bottom = 420.0
+color = Color( 0, 0, 0, 1 )
 
 [connection signal="pressed" from="SelectActionButtons/Add" to="." method="_on_Add_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Sub" to="." method="_on_Sub_pressed"]

@@ -12,6 +12,8 @@ var end_of_game = false
 
 var pir = [] # Player position in round
 
+var past_calcs = []
+
 var key_names = {"mty":"22"}
 
 var max_players = 6
@@ -96,11 +98,31 @@ master func add_card(id):
 			rand = rnd.randi_range(0,9)
 
 			player_cards[id].append(rand)
-
+			
+			rpc("set_past_calc", set_past_calc_mas(["", " drew a card", ""]))
+			
 			rpc_id(id, "master_add_card", rand)
 			next_player()
 		else:
 			print("not your turn")
+
+func set_past_calc_mas(ops):
+	print(ops)
+	if past_calcs.size() >= 5:
+		past_calcs.remove(0)
+	
+	if ops[2] == "":
+		past_calcs.append(str(player_names[current_player]) + ": " + str(ops[1]))
+	else:
+		past_calcs.append(player_names[current_player] + ": " + str(ops[1]) + str(ops[0]) + str(ops[2]))
+	
+	var sendstr = ""
+	for i in range(past_calcs.size()):
+		if i < past_calcs.size()-1:
+			sendstr += past_calcs[i] + "\n"
+		else:
+			sendstr += past_calcs[i]
+	return sendstr
 
 
 master func cards_pushed(id, ops):
@@ -115,6 +137,7 @@ master func cards_pushed(id, ops):
 						current_card = c1
 						rpc("set_current_card", current_card)
 						set_client_text()
+						rpc("set_past_calc", set_past_calc_mas(ops))
 						next_player()
 			else:
 				var player_id = id
@@ -144,6 +167,7 @@ master func cards_pushed(id, ops):
 						" √ ":
 							res = pow(c2,float(1)/c1)
 					if int(res) == current_card:
+						rpc("set_past_calc", set_past_calc_mas(ops))
 						rpc_id(id, "card_removed")
 						player_cards[player_id].erase(c1)
 						player_cards[player_id].erase(c2)
@@ -200,13 +224,9 @@ func _on_Button_pressed(): # Start game
 		rpc("set_current_player", player_names[current_player])
 
 func next_player():
-	var x = current_player
 	if player_IDs.count(current_player) > 0:
 		rpc_id(current_player, "endOfRound")
 	current_player = pir[(pir.find(current_player)+1)%pir.size()]
-	
-	if current_player == x:
-		printerr("Current player didn't change")
 	
 	rset("my_turn", false)
 	rset_id(current_player, "my_turn", true)
@@ -230,7 +250,6 @@ func add_card_timeout(id):
 
 
 func set_client_text():
-	print("setting text...")
 	var sendstr = ""
 	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
 	for i in player_names:

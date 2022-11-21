@@ -58,6 +58,16 @@ text = "8 + 8"
 align = 1
 valign = 1
 
+[node name="past Calculations" type="Label" parent="."]
+margin_left = 10.0
+margin_top = 240.0
+margin_right = 260.0
+margin_bottom = 400.0
+rect_pivot_offset = Vector2( -928, 63 )
+custom_fonts/font = ExtResource( 3 )
+text = "8 + 8"
+valign = 2
+
 [node name="Current Player" type="Label" parent="."]
 margin_left = 375.0
 margin_top = 5.0
@@ -74,11 +84,10 @@ valign = 1
 wait_time = 60.0
 
 [node name="ColorRect" type="ColorRect" parent="Timer"]
-margin_left = -40.0
-margin_top = 173.0
-margin_right = 40.0
-margin_bottom = 355.0
-color = Color( 0, 0.815686, 0.0156863, 1 )
+margin_top = 405.0
+margin_right = 900.0
+margin_bottom = 420.0
+color = Color( 0, 1, 0, 1 )
 
 [node name="OverColorRect" type="ColorRect" parent="."]
 margin_top = 500.0
