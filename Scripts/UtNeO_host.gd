@@ -117,6 +117,27 @@ func set_past_calc_mas(ops):
 	else:
 		past_calcs.append(player_names[current_player] + ": " + str(ops[1]) + str(ops[0]) + str(ops[2]))
 	
+	return create_past_calc_str()
+
+func selt_past_calc_fail(ops):
+	if past_calcs.size() >= 5:
+		past_calcs.remove(0)
+	
+	if ops[2] == "":
+		past_calcs.append(str(player_names[current_player]) + " tried " + str(ops[1]) + " = " + str(current_card))
+	else:
+		past_calcs.append(str(player_names[current_player]) + " tried " + str(ops[1]) + str(ops[0]) + str(ops[2]) + " = " + str(current_card))
+	
+
+	return create_past_calc_str()
+
+func set_past_calc_time():
+	if past_calcs.size() >= 5:
+		past_calcs.remove(0)
+	past_calcs.append(str(player_names[current_player]) + " ran out of time")
+	return create_past_calc_str()
+
+func create_past_calc_str():
 	var sendstr = ""
 	for i in range(past_calcs.size()):
 		if i < past_calcs.size()-1:
@@ -140,13 +161,17 @@ master func cards_pushed(id, ops):
 						set_client_text()
 						rpc("set_past_calc", set_past_calc_mas(ops))
 						next_player()
+					else:
+						rpc("set_past_calc", selt_past_calc_fail(ops))
+						
 			else:
 				var player_id = id
 				var op = ops[0]
 				var c1 = int(ops[1])
 				var c2 = int(ops[2])
+				var ex1 = player_cards[player_id].find(c1)
 				var ex2 = player_cards[player_id].find(c2)
-				if ex2 >= 0 && ex2 >= 0:
+				if ex1 >= 0 && ex2 >= 0:
 					if c1 == c2 && player_cards[player_id].count(c1) < 2:
 						return null
 					var res = -1
@@ -181,7 +206,9 @@ master func cards_pushed(id, ops):
 						set_client_text()
 						next_player()
 					else:
-						print("clientside cards don't match serverside cards")
+						rpc("set_past_calc", selt_past_calc_fail(ops))
+				else:
+					print("clientside cards don't match serverside cards")
 		else:
 			print("not your turn or already won")
 	else:
@@ -238,6 +265,7 @@ func next_player():
 func _on_Timer_timeout():
 	add_card_timeout(current_player)
 	rpc_id(current_player, "endOfRound")
+	rpc("set_past_calc", set_past_calc_time())
 	next_player()
 
 func add_card_timeout(id):
@@ -349,14 +377,5 @@ master func login(id, name, pwd, time):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+func _on_Button2_pressed():
+	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")

@@ -88,6 +88,13 @@ margin_right = 155.0
 margin_bottom = 120.0
 text = "Start hosting"
 
+[node name="Button2" type="Button" parent="."]
+margin_left = 5.0
+margin_top = 150.0
+margin_right = 155.0
+margin_bottom = 180.0
+text = "Go back"
+
 [connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
 [connection signal="pressed" from="win" to="." method="_on_win_pressed"]
 [connection signal="pressed" from="Continue" to="." method="_on_Contunue_pressed"]
@@ -95,3 +102,4 @@ text = "Start hosting"
 [connection signal="pressed" from="Disconnect" to="." method="_on_Disconnect_pressed"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
 [connection signal="pressed" from="start_host" to="." method="_on_start_host_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_Button2_pressed"]

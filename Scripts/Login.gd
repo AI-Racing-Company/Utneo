@@ -63,3 +63,7 @@ puppet func Register_return(worked, login_key):
 	if(worked):
 		global.login_key = login_key
 		nue = get_tree().change_scene("res://Scenes/UtNeO_client.tscn")
+
+
+func _on_Button_pressed():
+	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")

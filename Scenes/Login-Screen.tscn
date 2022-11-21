@@ -56,5 +56,12 @@ margin_right = 250.0
 margin_bottom = 225.0
 color = Color( 0, 0, 0, 0.392157 )
 
+[node name="Button" type="Button" parent="."]
+margin_top = 240.0
+margin_right = 250.0
+margin_bottom = 270.0
+text = "Go back"
+
 [connection signal="pressed" from="Login" to="." method="Login"]
 [connection signal="pressed" from="Register" to="." method="Register"]
+[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
