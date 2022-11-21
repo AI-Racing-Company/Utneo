@@ -10,6 +10,8 @@ var players_ignore = []
 var player_classment = []
 var end_of_game = false
 
+var pir = [] # Player position in round
+
 var key_names = {"mty":"22"}
 
 var max_players = 6
@@ -63,6 +65,8 @@ master func give_key(id, key):
 		print("append playerIDs by " + str(id))
 		player_IDs.append(id)
 		
+		pir.append(id)
+		
 		#rpc("client_connect", id)
 		rpc_id(id, "r_t", r_t)
 		set_client_text()
@@ -79,6 +83,7 @@ func client_disconnect(id):
 		player_cards.erase(player_id)
 		player_names.erase(id)
 		player_IDs.erase(id)
+		pir.erase(id)
 		
 		rpc("client_disconnect", id)
 		set_client_text()
@@ -151,16 +156,6 @@ master func cards_pushed(id, ops):
 						rpc("set_current_card", current_card)
 						set_client_text()
 						next_player()
-						if int(res) == current_card:
-							rpc_id(id, "card_removed")
-							player_cards[player_id].erase(c1)
-							player_cards[player_id].erase(c2)
-							if(player_cards[player_id].size() == 0):
-								player_done(id)
-							current_card = c2
-							rpc("set_current_card", current_card)
-							set_client_text()
-							next_player()
 					else:
 						print("clientside cards don't match serverside cards")
 		else:
@@ -181,7 +176,6 @@ func game_end():
 
 func _physics_process(delta):
 	rand = rnd.randi()
-
 
 
 func _on_Button_pressed(): # Start game
@@ -206,9 +200,13 @@ func _on_Button_pressed(): # Start game
 		rpc("set_current_player", player_names[current_player])
 
 func next_player():
+	var x = current_player
 	if player_IDs.count(current_player) > 0:
 		rpc_id(current_player, "endOfRound")
-	current_player = player_IDs[(player_IDs.find(current_player)+1)%player_IDs.size()]
+	current_player = pir[(pir.find(current_player)+1)%pir.size()]
+	
+	if current_player == x:
+		printerr("Current player didn't change")
 	
 	rset("my_turn", false)
 	rset_id(current_player, "my_turn", true)
@@ -218,10 +216,17 @@ func next_player():
 	rpc("set_current_player", player_names[current_player])
 
 func _on_Timer_timeout():
-	add_card(current_player)
-	add_card(current_player)
+	add_card_timeout(current_player)
 	rpc_id(current_player, "endOfRound")
 	next_player()
+
+func add_card_timeout(id):
+	if (!win[0] || (win[0] && win[1])) && !end_of_game:
+		if current_player == id:
+			for i in range(2):
+				rand = rnd.randi_range(0,9)
+				player_cards[id].append(rand)
+				rpc_id(id, "master_add_card", rand)
 
 
 func set_client_text():
@@ -231,9 +236,8 @@ func set_client_text():
 	for i in player_names:
 		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i] + " (" + str(i) + ")")
 		if game_started:
-			print(players_ignore.count(i))
 			if(players_ignore.count(i) > 0):
-				sendstr = sendstr +"(Done) "+ str(player_names[i]) + ": " + str(player_cards[player_IDs.find(i)].size()) + "\n"
+				sendstr = sendstr +"(Done) "+ str(player_names[i]) + ": " + str(player_cards[i]) + "\n"
 			else:
 				sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[i].size()) + "\n"
 		else:
