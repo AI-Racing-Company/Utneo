@@ -3,6 +3,8 @@ extends Node2D
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
 
+var nue
+
 var player_cards = {}
 var player_IDs = []
 var player_names = {}
@@ -38,13 +40,12 @@ onready var timer = get_node("Timer")
 func _ready():
 	db = SQLite.new()
 	db.path = "res://Data/UserData"
-	get_viewport().connect("size_changed", self, "resized")
+	nue = get_viewport().connect("size_changed", self, "resized")
 	resized()
 	#get_viewport().connect("size_changed", self, "resized")
 
 func resized():
 	var x = get_viewport().get_visible_rect().size.x
-	var y = get_viewport().get_visible_rect().size.y
 	get_node("Button").set_global_position(Vector2(x-250,0))
 	get_node("win").set_global_position(Vector2(x-250,50))
 	get_node("Continue").set_global_position(Vector2(x-250,100))
@@ -144,7 +145,6 @@ master func cards_pushed(id, ops):
 				var op = ops[0]
 				var c1 = int(ops[1])
 				var c2 = int(ops[2])
-				var ex1 = player_cards[player_id].find(c1)
 				var ex2 = player_cards[player_id].find(c2)
 				if ex2 >= 0 && ex2 >= 0:
 					if c1 == c2 && player_cards[player_id].count(c1) < 2:
@@ -198,7 +198,7 @@ func game_end():
 	end_of_game = true
 	rpc("game_end")
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	rand = rnd.randi()
 
 
@@ -212,7 +212,7 @@ func _on_Button_pressed(): # Start game
 		rset_id(current_player, "my_turn", true)
 		print(player_IDs)
 		for i in player_IDs:
-			for j in range(starting_hand):
+			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
 				player_cards[i].append(rand)
 				rpc_id(i, "master_add_card", rand)
@@ -243,7 +243,7 @@ func _on_Timer_timeout():
 func add_card_timeout(id):
 	if (!win[0] || (win[0] && win[1])) && !end_of_game:
 		if current_player == id:
-			for i in range(2):
+			for _i in range(2):
 				rand = rnd.randi_range(0,9)
 				player_cards[id].append(rand)
 				rpc_id(id, "master_add_card", rand)
@@ -283,8 +283,8 @@ func _on_start_host_pressed():
 	peer.create_server(global.port, 5)
 	peer.compression_mode = NetworkedMultiplayerENet.COMPRESS_ZLIB
 	get_tree().network_peer = peer
-	get_tree().connect("network_peer_connected", self, "client_connect")
-	get_tree().connect("network_peer_disconnected", self, "client_disconnect")
+	nue = get_tree().connect("network_peer_connected", self, "client_connect")
+	nue = get_tree().connect("network_peer_disconnected", self, "client_disconnect")
 	if get_node("max_play").text != "":
 		max_players = get_node("max_play").text
 	if get_node("start_card").text != "":
@@ -301,7 +301,7 @@ func _on_Disconnect_pressed():
 	
 	get_tree().network_peer = null
 	peer.close_connection()
-	get_tree().change_scene("res://Scenes/LobbyScene.tscn")
+	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 	
 master func register(id, name, pwd, mail):
 	print("registering")

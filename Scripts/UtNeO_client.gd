@@ -142,9 +142,8 @@ func button_pressed(operation):
 				current_calc[0] = operation
 
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	
-	nue = delta
 	update_player_timer()
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
