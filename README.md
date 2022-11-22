@@ -17,9 +17,13 @@
 - Cards "glowing" on mouse hover
 - Account system with Database
 - Showing last calculation of oponent
+- Late joining player gets seven cards as well
 
 ## Currently working on:
-- nothing
+- x
+
+## Has to be done:
+- x
 
 ## Current Problems:
 - nothing we are currently aware of

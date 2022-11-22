@@ -53,31 +53,31 @@ func resized():
 	get_node("Disconnect").set_global_position(Vector2(x-250,150))
 
 func client_connect(id):
-	print("Connecting")
 	rpc_id(id, "connection_established", id)
 	set_client_text()
 
 master func give_key(id, key):
-	print("giving key " + str(id))
-	print(key)
 	if key_names.has(key):
-		print("key valid")
-		
 		player_cards[id] = []
 		player_names[id] = key_names[key]
-		print("append playerIDs by " + str(id))
 		player_IDs.append(id)
 		
 		pir.append(id)
 		
 		#rpc("client_connect", id)
 		rpc_id(id, "r_t", r_t)
-		set_client_text()
+		
 		if player_IDs.size() >= int(max_players):
 			get_tree().set_refuse_new_network_connections(true)
+		
+		if game_started:
+			for i in range(starting_hand):
+				rand = rnd.randi_range(0,9)
+				player_cards[id].append(rand)
+				rpc_id(id, "master_add_card", rand)
+		set_client_text()
 
 func client_disconnect(id):
-	print("disconnecting")
 	if player_IDs.has(id):
 		if id == current_player:
 			next_player()
@@ -108,7 +108,6 @@ master func add_card(id):
 			print("not your turn")
 
 func set_past_calc_mas(ops):
-	print(ops)
 	if past_calcs.size() >= 5:
 		past_calcs.remove(0)
 	
@@ -231,13 +230,11 @@ func _physics_process(_delta):
 
 func _on_Button_pressed(): # Start game
 	if not game_started && player_IDs.size()>0:
-		print("num of games started")
 		current_card = rnd.randi_range(0,9)
 		rpc("set_current_card", current_card)
 		var randplay = rnd.randi_range(0, player_IDs.size()-1)
 		current_player = player_IDs[randplay]
 		rset_id(current_player, "my_turn", true)
-		print(player_IDs)
 		for i in player_IDs:
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
@@ -332,7 +329,6 @@ func _on_Disconnect_pressed():
 	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 	
 master func register(id, name, pwd, mail):
-	print("registering")
 	db.open_db()
 	var query = "SELECT * FROM Users WHERE Name = ? OR email = ?"
 	var bindings = [name,mail]
@@ -350,9 +346,12 @@ master func register(id, name, pwd, mail):
 		row_array.append(row_dict.duplicate())
 		db.insert_rows("Users", row_array)
 		row_dict.clear()
-		rpc_id(id, "Register_return", true)
+		var key = PoolStringArray(OS.get_time().values()).join("")
+		key = (key + name).sha256_text()
+		key_names[key] = name
+		rpc_id(id, "Register_return", true, key)
 	else:
-		rpc_id(id, "Register_return", false)
+		rpc_id(id, "Register_return", false, "")
 	db.close_db()
 
 master func login(id, name, pwd, time):
@@ -367,10 +366,8 @@ master func login(id, name, pwd, time):
 			var key = PoolStringArray(OS.get_time().values()).join("")
 			key = (key + name).sha256_text()
 			key_names[key] = name
-			print(key_names)
 			rpc_id(id, "Login_return", true, key)
 		else:
-			print("Acces Denied")
 			rpc_id(id, "Login_return", false, "")
 	db.close_db()
 	set_client_text()
