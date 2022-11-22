@@ -72,9 +72,7 @@ master func give_key(id, key):
 		player_IDs.append(id)
 		
 		pir.append(id)
-		
-		#rpc("client_connect", id)
-		rpc_id(id, "r_t", r_t)
+		rpc_id(id, "r_t_h", r_t)
 		
 		if player_IDs.size() >= int(max_players):
 			get_tree().set_refuse_new_network_connections(true)

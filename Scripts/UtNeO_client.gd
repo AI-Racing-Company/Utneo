@@ -168,6 +168,9 @@ func _physics_process(_delta):
 	get_node("Current Calculation").text = txt + str(current_calc[0])
 	get_node("Current Calculation").text = get_node("Current Calculation").text + str(current_calc[2])
 
+puppet func r_t_h(newRT):
+	r_t = newRT
+	get_node("Timer/time").text = r_t
 
 puppet func endOfRound():
 	current_calc = ["","","","",""]

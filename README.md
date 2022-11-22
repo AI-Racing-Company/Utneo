@@ -26,9 +26,6 @@ Basically UNO, just with math
 ## Currently working on:
 - x
 
-## Has to be done:
-- x
-
 ## Current Problems:
 - nothing we are currently aware of
 
