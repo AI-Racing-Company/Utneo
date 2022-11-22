@@ -4,6 +4,7 @@ const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
 
 var nue
+var settings
 
 var player_cards = {}
 var player_IDs = []
@@ -11,6 +12,8 @@ var player_names = {}
 var players_ignore = []
 var player_classment = []
 var end_of_game = false
+
+var host_started = false
 
 var pir = [] # Player position in round
 
@@ -20,6 +23,8 @@ var key_names = {"mty":"22"}
 
 var max_players = 6
 var starting_hand = 7
+var late_hand = 7
+var hum_play
 
 var win = [false, false] # 0= Player won, 1 = Continue after player win
 
@@ -28,6 +33,8 @@ var game_started = false
 var current_player = 0
 
 var peer = null
+
+var MenuButtons
 
 
 var rnd = RandomNumberGenerator.new()
@@ -41,16 +48,18 @@ func _ready():
 	db = SQLite.new()
 	db.path = "res://Data/UserData"
 	nue = get_viewport().connect("size_changed", self, "resized")
+	MenuButtons = get_node("MenuButtons")
+	remove_child(get_node("MenuButtons"))
 	resized()
 	#get_viewport().connect("size_changed", self, "resized")
 
 func resized():
 	var x = get_viewport().get_visible_rect().size.x
-	get_node("Button").set_global_position(Vector2(x-250,0))
-	get_node("win").set_global_position(Vector2(x-250,50))
-	get_node("Continue").set_global_position(Vector2(x-250,100))
-	get_node("End").set_global_position(Vector2(x-250,150))
-	get_node("Disconnect").set_global_position(Vector2(x-250,150))
+	
+	if host_started:
+		get_node("MenuButtons/Button").set_global_position(Vector2(x-250,0))
+		get_node("MenuButtons/Continue").set_global_position(Vector2(x-250,100))
+		get_node("MenuButtons/Disconnect").set_global_position(Vector2(x-250,150))
 
 func client_connect(id):
 	rpc_id(id, "connection_established", id)
@@ -71,10 +80,25 @@ master func give_key(id, key):
 			get_tree().set_refuse_new_network_connections(true)
 		
 		if game_started:
-			for i in range(starting_hand):
-				rand = rnd.randi_range(0,9)
-				player_cards[id].append(rand)
-				rpc_id(id, "master_add_card", rand)
+			if(str(late_hand) == "avg"):
+				var x = 0
+				var n = 0
+				for i in player_IDs:
+					if player_cards[i].size() > 0:
+						x += player_cards[i].size() 
+						n += 1
+				x = x/n
+				for i in range(x):
+					rand = rnd.randi_range(0,9)
+					player_cards[id].append(rand)
+					rpc_id(id, "master_add_card", rand)
+			else:
+				for i in range(late_hand):
+					rand = rnd.randi_range(0,9)
+					player_cards[id].append(rand)
+					rpc_id(id, "master_add_card", rand)
+				
+				
 		set_client_text()
 
 func client_disconnect(id):
@@ -118,7 +142,7 @@ func set_past_calc_mas(ops):
 	
 	return create_past_calc_str()
 
-func selt_past_calc_fail(ops):
+func set_past_calc_fail(ops):
 	if past_calcs.size() >= 5:
 		past_calcs.remove(0)
 	
@@ -161,7 +185,8 @@ master func cards_pushed(id, ops):
 						rpc("set_past_calc", set_past_calc_mas(ops))
 						next_player()
 					else:
-						rpc("set_past_calc", selt_past_calc_fail(ops))
+						if hum_play:
+							rpc("set_past_calc", set_past_calc_fail(ops))
 						
 			else:
 				var player_id = id
@@ -205,7 +230,8 @@ master func cards_pushed(id, ops):
 						set_client_text()
 						next_player()
 					else:
-						rpc("set_past_calc", selt_past_calc_fail(ops))
+						if hum_play:
+							rpc("set_past_calc", set_past_calc_fail(ops))
 				else:
 					print("clientside cards don't match serverside cards")
 		else:
@@ -301,7 +327,9 @@ func _on_End_pressed():
 	game_end()
 
 func _on_start_host_pressed():
+	settings = get_node("Settings")
 	
+	add_child(MenuButtons)
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	get_node("ClientConnect").text = "Connected Clients: 0"
 	peer = NetworkedMultiplayerENet.new()
@@ -310,17 +338,26 @@ func _on_start_host_pressed():
 	get_tree().network_peer = peer
 	nue = get_tree().connect("network_peer_connected", self, "client_connect")
 	nue = get_tree().connect("network_peer_disconnected", self, "client_disconnect")
-	if get_node("max_play").text != "":
-		max_players = get_node("max_play").text
-	if get_node("start_card").text != "":
-		starting_hand = int(get_node("start_card").text)
-	if get_node("max_round").text != "":
-		r_t = int(get_node("max_round").text)
-	remove_child(get_node("max_play"))
-	remove_child(get_node("start_card"))
-	remove_child(get_node("start_host"))
-	remove_child(get_node("max_round"))
-
+	
+	if get_node("Settings/max_play/cb").is_pressed() && get_node("Settings/max_play/ip").text != "":
+		max_players = int(get_node("Settings/max_play/ip").text)
+	if get_node("Settings/start_cards/ip").text != "":
+		starting_hand = int(get_node("Settings/start_cards/ip").text)
+	if get_node("Settings/max_rt/cb").is_pressed() && get_node("Settings/max_rt/ip").text != "":
+		r_t = int(get_node("Settings/max_rt/ip").text)
+	match int(get_node("Settings/late_cards/sl").value):
+		0:
+			late_hand = starting_hand
+		1:
+			late_hand = "avg"
+		2:
+			late_hand = int(get_node("Settings/late_cards/ip").text)
+	print(late_hand)
+	hum_play = get_node("Settings/hum_play/cb")
+	
+	remove_child(get_node("Settings"))
+	host_started = true
+	resized()
 
 func _on_Disconnect_pressed():
 	

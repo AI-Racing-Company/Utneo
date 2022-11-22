@@ -57,10 +57,13 @@ func resized():
 	get_node("Player List").set_global_position(Vector2(width-get_node("Player List").get_rect().size.x-5, 5))
 	get_node("WinnerMessage").set_global_position(Vector2(0,height-275))
 	get_node("WinnerMessage").set_size(Vector2(width,50))
+	
+	get_node("Current Player").set_global_position(Vector2(width/2-75, 5))
+	get_node("Timer/Time").set_global_position(Vector2(width/2-75, s_height - 205))
 
 	get_node("OverColorRect").set_size(Vector2(width,100))
 	get_node("OverColorRect").set_global_position(Vector2(0,height - 100 + overRectAdd))
-	timerRect.set_global_position(Vector2(0,s_height - 190))
+	timerRect.set_global_position(Vector2(0,s_height - 200))
 	get_node("past Calculations").set_global_position(Vector2(10,s_height - 360))
 
 func add_card():
@@ -144,12 +147,12 @@ func button_pressed(operation):
 
 func _physics_process(_delta):
 	
-	update_player_timer()
+	get_node("Timer/Time").text = str(int(timer.time_left))
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
 		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
 		if !timer.is_stopped():
-			timerRect.set_size(Vector2(s_width*(timer.time_left/r_t),10))
+			timerRect.set_size(Vector2(s_width*(timer.time_left/r_t),20))
 			
 			timerRect.color = Color(r,g,0,1)
 			
@@ -180,11 +183,11 @@ puppet func startOfRound():
 	overRectAdd = 150
 	get_node("OverColorRect").set_global_position(Vector2(0,s_height - 100 + overRectAdd))
 
-puppet func set_current_card(c):
+puppet func set_current_card(_c):
 	if current_card_node != null:
 		remove_child(current_card_node)
-	current_card = c
-	current_card_node = load("res://Prefabs/Cards/card_" + str(c) + "_dev.tscn").instance()
+	current_card = _c
+	current_card_node = load("res://Prefabs/Cards/card_" + str(_c) + "_dev.tscn").instance()
 	current_card_node.set_name("current_card")
 	current_card_node.set_size(Vector2(75,100))
 	add_child(current_card_node)
@@ -193,11 +196,9 @@ puppet func set_current_card(c):
 puppet func update_player_list(sendstr):
 	get_node("Player List").text = sendstr
 
-func update_player_timer():
-	get_node("Current Player").text = current_player_name + ": " + str(int(timer.time_left))
 
-puppet func player_done(p_name, pos):
-	p_name = pos
+
+puppet func player_done(_p_name, _pos):
 	pass
 	#get_node("WinnerMessage").text = str(p_name) + " Won"
 
@@ -205,7 +206,7 @@ puppet func game_end():
 	pass
 
 puppet func set_current_player(pname):
-	current_player_name = pname
+	get_node("Current Player").text = pname
 	timer.start(r_t)
 	
 func disconnect_from_server():

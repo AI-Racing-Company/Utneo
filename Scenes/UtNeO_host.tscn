@@ -24,82 +24,178 @@ margin_right = 45.0
 margin_bottom = 66.0
 custom_fonts/font = SubResource( 1 )
 
-[node name="Button" type="Button" parent="."]
+[node name="Timer" type="Timer" parent="."]
+
+[node name="MenuButtons" type="Node2D" parent="."]
+
+[node name="Disconnect" type="Button" parent="MenuButtons"]
+margin_left = 650.0
+margin_top = 117.0
+margin_right = 900.0
+margin_bottom = 167.0
+text = "Disconnect"
+
+[node name="Continue" type="Button" parent="MenuButtons"]
+margin_left = 650.0
+margin_top = 57.0
+margin_right = 900.0
+margin_bottom = 107.0
+text = "Continue Gamme"
+
+[node name="Button" type="Button" parent="MenuButtons"]
 margin_left = 650.0
 margin_right = 900.0
 margin_bottom = 50.0
 text = "Start/restart Gamme"
 
-[node name="win" type="Button" parent="."]
-margin_left = 650.0
-margin_top = 75.0
-margin_right = 900.0
-margin_bottom = 125.0
-text = "win"
+[node name="Settings" type="Node2D" parent="."]
 
-[node name="Continue" type="Button" parent="."]
-margin_left = 650.0
-margin_top = 150.0
-margin_right = 900.0
-margin_bottom = 200.0
-text = "Continue Gamme"
+[node name="max_play" type="Node2D" parent="Settings"]
 
-[node name="End" type="Button" parent="."]
-margin_left = 650.0
-margin_top = 225.0
-margin_right = 900.0
-margin_bottom = 275.0
-text = "End Gamme"
+[node name="mPt" type="Label" parent="Settings/max_play"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 50.0
+margin_bottom = 24.0
+text = "Max players"
 
-[node name="Disconnect" type="Button" parent="."]
-margin_left = 650.0
-margin_top = 300.0
-margin_right = 900.0
-margin_bottom = 350.0
-text = "Disconnect"
-
-[node name="Timer" type="Timer" parent="."]
-
-[node name="max_play" type="LineEdit" parent="."]
-margin_left = 5.0
+[node name="cb" type="CheckBox" parent="Settings/max_play"]
+margin_left = 90.0
 margin_top = 5.0
-margin_right = 155.0
+margin_right = 114.0
+margin_bottom = 29.0
+pressed = true
+
+[node name="ip" type="LineEdit" parent="Settings/max_play"]
+margin_left = 120.0
+margin_top = 5.0
+margin_right = 178.0
 margin_bottom = 30.0
-placeholder_text = "Max Players"
+placeholder_text = "6"
 
-[node name="start_card" type="LineEdit" parent="."]
-margin_left = 5.0
-margin_top = 35.0
-margin_right = 155.0
-margin_bottom = 60.0
-placeholder_text = "Starting hand"
+[node name="max_rt" type="Node2D" parent="Settings"]
+position = Vector2( 0, 30 )
 
-[node name="max_round" type="LineEdit" parent="."]
-margin_left = 5.0
-margin_top = 65.0
-margin_right = 155.0
-margin_bottom = 90.0
-placeholder_text = "Max round time"
+[node name="mRTt" type="Label" parent="Settings/max_rt"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 50.0
+margin_bottom = 24.0
+text = "Round time"
 
-[node name="start_host" type="Button" parent="."]
-margin_left = 5.0
-margin_top = 95.0
-margin_right = 155.0
-margin_bottom = 120.0
+[node name="cb" type="CheckBox" parent="Settings/max_rt"]
+margin_left = 90.0
+margin_top = 5.0
+margin_right = 114.0
+margin_bottom = 29.0
+pressed = true
+
+[node name="ip" type="LineEdit" parent="Settings/max_rt"]
+margin_left = 120.0
+margin_top = 5.0
+margin_right = 178.0
+margin_bottom = 30.0
+placeholder_text = "60"
+
+[node name="start_cards" type="Node2D" parent="Settings"]
+position = Vector2( 0, 60 )
+
+[node name="mSCt" type="Label" parent="Settings/start_cards"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 50.0
+margin_bottom = 24.0
+text = "Starting cards"
+
+[node name="ip" type="LineEdit" parent="Settings/start_cards"]
+margin_left = 120.0
+margin_top = 5.0
+margin_right = 178.0
+margin_bottom = 30.0
+placeholder_text = "7"
+
+[node name="late_cards" type="Node2D" parent="Settings"]
+position = Vector2( 0, 90 )
+
+[node name="mSCt" type="Label" parent="Settings/late_cards"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 50.0
+margin_bottom = 24.0
+text = "late player cards"
+
+[node name="mSCt2" type="Label" parent="Settings/late_cards"]
+margin_left = 20.0
+margin_top = 50.0
+margin_right = 70.0
+margin_bottom = 64.0
+text = "normal"
+align = 1
+
+[node name="mSCt3" type="Label" parent="Settings/late_cards"]
+margin_left = 110.0
+margin_top = 50.0
+margin_right = 160.0
+margin_bottom = 64.0
+text = "average"
+align = 1
+
+[node name="mSCt4" type="Label" parent="Settings/late_cards"]
+margin_left = 200.0
+margin_top = 50.0
+margin_right = 250.0
+margin_bottom = 64.0
+text = "unique"
+align = 1
+
+[node name="sl" type="HSlider" parent="Settings/late_cards"]
+margin_left = 30.0
+margin_top = 30.0
+margin_right = 230.0
+margin_bottom = 46.0
+max_value = 2.0
+
+[node name="ip" type="LineEdit" parent="Settings/late_cards"]
+margin_left = 255.0
+margin_top = 40.0
+margin_right = 313.0
+margin_bottom = 65.0
+placeholder_text = "7"
+
+[node name="hum_play" type="Node2D" parent="Settings"]
+position = Vector2( 0, 160 )
+
+[node name="mRTt" type="Label" parent="Settings/hum_play"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 50.0
+margin_bottom = 24.0
+text = "Humiliate players"
+
+[node name="cb" type="CheckBox" parent="Settings/hum_play"]
+margin_left = 125.0
+margin_top = 5.0
+margin_right = 149.0
+margin_bottom = 29.0
+pressed = true
+
+[node name="start_host" type="Button" parent="Settings"]
+margin_left = 10.0
+margin_top = 200.0
+margin_right = 310.0
+margin_bottom = 225.0
 text = "Start hosting"
 
-[node name="Button2" type="Button" parent="."]
-margin_left = 5.0
-margin_top = 150.0
-margin_right = 155.0
-margin_bottom = 180.0
+[node name="back" type="Button" parent="Settings"]
+margin_left = 12.0
+margin_top = 246.0
+margin_right = 162.0
+margin_bottom = 276.0
 text = "Go back"
 
-[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
-[connection signal="pressed" from="win" to="." method="_on_win_pressed"]
-[connection signal="pressed" from="Continue" to="." method="_on_Contunue_pressed"]
-[connection signal="pressed" from="End" to="." method="_on_End_pressed"]
-[connection signal="pressed" from="Disconnect" to="." method="_on_Disconnect_pressed"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
-[connection signal="pressed" from="start_host" to="." method="_on_start_host_pressed"]
-[connection signal="pressed" from="Button2" to="." method="_on_Button2_pressed"]
+[connection signal="pressed" from="MenuButtons/Disconnect" to="." method="_on_Disconnect_pressed"]
+[connection signal="pressed" from="MenuButtons/Continue" to="." method="_on_Contunue_pressed"]
+[connection signal="pressed" from="MenuButtons/Button" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="Settings/start_host" to="." method="_on_start_host_pressed"]
+[connection signal="pressed" from="Settings/back" to="." method="_on_Button2_pressed"]

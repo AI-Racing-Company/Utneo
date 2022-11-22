@@ -1,4 +1,6 @@
-# UtimesNpowerO
+# Utneo
+
+Basically UNO, just with math
 
 ## Currently implemented
 - Handcards
@@ -10,14 +12,16 @@
 - Host can decide:
   - Max players
   - Starting card count
+  - Late players starting card count
   - Max round time
+  - Players get humiliated
 - Disconnect from Server
 - Get two cards when time's up
 - Handcards gray when not players turn
 - Cards "glowing" on mouse hover
 - Account system with Database
 - Showing last calculation of oponent
-- Late joining player gets seven cards as well
+
 
 ## Currently working on:
 - x
