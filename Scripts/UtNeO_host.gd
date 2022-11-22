@@ -12,6 +12,7 @@ var player_names = {}
 var players_ignore = []
 var player_classment = []
 var end_of_game = false
+var unverified = []
 
 var host_started = false
 
@@ -25,6 +26,8 @@ var max_players = 6
 var starting_hand = 7
 var late_hand = 7
 var hum_play
+var unlimit_player = false
+var unlimit_time = false
 
 var win = [false, false] # 0= Player won, 1 = Continue after player win
 
@@ -62,6 +65,10 @@ func resized():
 		get_node("MenuButtons/Disconnect").set_global_position(Vector2(x-250,150))
 
 func client_connect(id):
+	unverified.append(id)
+	if !unlimit_player && unverified.size() >= int(max_players):
+			get_tree().set_refuse_new_network_connections(true)
+			
 	rpc_id(id, "connection_established", id)
 	set_client_text()
 
@@ -73,9 +80,8 @@ master func give_key(id, key):
 		
 		pir.append(id)
 		rpc_id(id, "r_t_h", r_t)
+		8
 		
-		if player_IDs.size() >= int(max_players):
-			get_tree().set_refuse_new_network_connections(true)
 		
 		if game_started:
 			if(str(late_hand) == "avg"):
