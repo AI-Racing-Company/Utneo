@@ -58,7 +58,7 @@ func _ready():
 
 func resized():
 	var x = get_viewport().get_visible_rect().size.x
-	
+
 	if host_started:
 		get_node("MenuButtons/Button").set_global_position(Vector2(x-250,0))
 		get_node("MenuButtons/Continue").set_global_position(Vector2(x-250,100))
@@ -68,7 +68,7 @@ func client_connect(id):
 	unverified.append(id)
 	if !unlimit_player && unverified.size() >= int(max_players):
 			get_tree().set_refuse_new_network_connections(true)
-			
+
 	rpc_id(id, "connection_established", id)
 	set_client_text()
 
@@ -77,17 +77,17 @@ master func give_key(id, key):
 		player_cards[id] = []
 		player_names[id] = key_names[key]
 		player_IDs.append(id)
-		
+
 		pir.append(id)
 		rpc_id(id, "r_t_h", r_t)
-		
+
 		if game_started:
 			if(str(late_hand) == "avg"):
 				var x = 0
 				var n = 0
 				for i in player_IDs:
 					if player_cards[i].size() > 0:
-						x += player_cards[i].size() 
+						x += player_cards[i].size()
 						n += 1
 				x = x/n
 				for _i in range(x):
@@ -99,15 +99,15 @@ master func give_key(id, key):
 					rand = rnd.randi_range(0,9)
 					player_cards[id].append(rand)
 					rpc_id(id, "master_add_card", rand)
-				
-				
+
+
 		set_client_text()
 
 func client_disconnect(id):
 	if player_IDs.has(id):
-		
+
 		var player_id = player_IDs.find(id)
-		
+
 		player_cards.erase(player_id)
 		player_names.erase(id)
 		player_IDs.erase(id)
@@ -116,7 +116,7 @@ func client_disconnect(id):
 			next_player()
 		rpc("client_disconnect", id)
 		set_client_text()
-	
+
 
 
 master func add_card(id):
@@ -125,9 +125,9 @@ master func add_card(id):
 			rand = rnd.randi_range(0,9)
 
 			player_cards[id].append(rand)
-			
+
 			rpc("set_past_calc", set_past_calc_mas(["", " drew a card", ""]))
-			
+
 			rpc_id(id, "master_add_card", rand)
 			next_player()
 		else:
@@ -136,23 +136,23 @@ master func add_card(id):
 func set_past_calc_mas(ops):
 	if past_calcs.size() >= 5:
 		past_calcs.remove(0)
-	
+
 	if ops[2] == "":
 		past_calcs.append(str(player_names[current_player]) + ": " + str(ops[1]))
 	else:
 		past_calcs.append(player_names[current_player] + ": " + str(ops[1]) + str(ops[0]) + str(ops[2]))
-	
+
 	return create_past_calc_str()
 
 func set_past_calc_fail(ops):
 	if past_calcs.size() >= 5:
 		past_calcs.remove(0)
-	
+
 	if ops[2] == "":
 		past_calcs.append(str(player_names[current_player]) + " tried " + str(ops[1]) + " = " + str(current_card))
 	else:
 		past_calcs.append(str(player_names[current_player]) + " tried " + str(ops[1]) + str(ops[0]) + str(ops[2]) + " = " + str(current_card))
-	
+
 
 	return create_past_calc_str()
 
@@ -191,7 +191,7 @@ master func cards_pushed(id, ops):
 					else:
 						if hum_play:
 							rpc("set_past_calc", set_past_calc_fail(ops))
-						
+
 			else:
 				var player_id = id
 				var op = ops[0]
@@ -243,7 +243,7 @@ master func cards_pushed(id, ops):
 func player_done(id):
 	players_ignore.append(id)
 	player_classment.append(id)
-	
+
 	rpc_id(id, "my_end")
 	rpc("player_done", player_names[id], player_classment.size())
 	set_client_text()
@@ -251,7 +251,7 @@ func player_done(id):
 	if players_ignore.size() >= player_IDs.size()-1:
 		print(str(players_ignore.size()) + "    " + str(player_IDs.size()))
 		game_end()
-	
+
 
 func game_end():
 	end_of_game = true
@@ -263,9 +263,9 @@ func set_client_winner_text():
 	var sendstr = ""
 	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
 	for i in range(player_classment.size()):
-		
+
 			sendstr = sendstr + str(i+1) + ": " + str(player_names[player_classment[i]]) + "\n"
-		
+
 	for i in player_IDs:
 		rpc_id(i, "update_player_list", sendstr)
 
@@ -285,7 +285,7 @@ func _on_Button_pressed(): # Start game
 				rand = rnd.randi_range(0,9)
 				player_cards[i].append(rand)
 				rpc_id(i, "master_add_card", rand)
-		
+
 		timer.start(r_t)
 		rpc_id(current_player, "startOfRound")
 		game_started = true
@@ -302,7 +302,7 @@ func next_player():
 			while(players_ignore.count(current_player) > 0 && c < player_IDs.size()):
 				current_player = pir[(pir.find(current_player)+1)%pir.size()]
 				c += 1
-			
+
 			rset("my_turn", false)
 			rset_id(current_player, "my_turn", true)
 			rpc_id(current_player, "startOfRound")
@@ -350,14 +350,14 @@ func _on_Contunue_pressed():
 	win[1] = true
 	if player_IDs.size() != 0:
 		player_done(player_IDs[0])
-	
+
 func _on_End_pressed():
-	
+
 	game_end()
 
 func _on_start_host_pressed():
 	settings = get_node("Settings")
-	
+
 	add_child(MenuButtons)
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	get_node("ClientConnect").text = "Connected Clients: 0"
@@ -367,7 +367,7 @@ func _on_start_host_pressed():
 	get_tree().network_peer = peer
 	nue = get_tree().connect("network_peer_connected", self, "client_connect")
 	nue = get_tree().connect("network_peer_disconnected", self, "client_disconnect")
-	
+
 	if get_node("Settings/max_play/cb").is_pressed() && get_node("Settings/max_play/ip").text != "":
 		max_players = int(get_node("Settings/max_play/ip").text)
 	if get_node("Settings/start_cards/ip").text != "":
@@ -382,17 +382,17 @@ func _on_start_host_pressed():
 		2:
 			late_hand = int(get_node("Settings/late_cards/ip").text)
 	hum_play = get_node("Settings/hum_play/cb")
-	
+
 	remove_child(get_node("Settings"))
 	host_started = true
 	resized()
 
 func _on_Disconnect_pressed():
-	
+
 	get_tree().network_peer = null
 	peer.close_connection()
 	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
-	
+
 master func register(id, name, pwd, mail):
 	db.open_db()
 	var query = "SELECT * FROM Users WHERE Name = ? OR email = ?"
