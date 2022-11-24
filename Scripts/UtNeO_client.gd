@@ -10,6 +10,10 @@ var current_card_node = null
 puppet var my_turn = false
 var nue
 
+var end_of_game = false
+
+var my_end = false
+
 var overRectAdd = 0
 
 var s_width = 0
@@ -39,7 +43,6 @@ func _ready():
 
 puppet func connection_established(id):
 	global.my_id = id
-	print("Connection succsess")
 	
 
 func resized():
@@ -67,7 +70,8 @@ func resized():
 	get_node("past Calculations").set_global_position(Vector2(10,s_height - 360))
 
 func add_card():
-	rpc_id(1, "add_card", global.my_id)
+	if !my_end:
+		rpc_id(1, "add_card", global.my_id)
 
 puppet func master_add_card(rand):
 
@@ -105,9 +109,8 @@ puppet func card_removed():
 	selected_card = 0
 
 func hand_card_pressed(card):
-	if my_turn && card.name != "":
+	if my_turn && card.name != "" && !my_end && !end_of_game:
 		var value = card.name.split("_")
-		print("c name: " + card.name)
 		if(!selected_card):
 			if(card.name != current_calc[4]):
 				current_calc[1] = value[1]
@@ -120,7 +123,6 @@ func hand_card_pressed(card):
 				selected_card = 0
 
 func serversided_disconnect():
-	print("Server disconnected")
 	get_tree().network_peer = null
 	
 	for i in my_card_nodes:
@@ -132,7 +134,7 @@ func serversided_disconnect():
 
 func button_pressed(operation):
 
-	if my_turn:
+	if my_turn && !my_end:
 		
 		match operation:
 			"Pus":
@@ -146,8 +148,8 @@ func button_pressed(operation):
 
 
 func _physics_process(_delta):
-	
-	get_node("Timer/Time").text = str(int(timer.time_left))
+	if !timer.is_stopped():
+		get_node("Timer/Time").text = str(int(timer.time_left))
 	get_node("ClientText").text = str(current_card)
 	if my_turn:
 		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
@@ -170,7 +172,7 @@ func _physics_process(_delta):
 
 puppet func r_t_h(newRT):
 	r_t = newRT
-	get_node("Timer/time").text = r_t
+	get_node("Timer/Time").text = str(r_t)
 
 puppet func endOfRound():
 	current_calc = ["","","","",""]
@@ -206,7 +208,9 @@ puppet func player_done(_p_name, _pos):
 	#get_node("WinnerMessage").text = str(p_name) + " Won"
 
 puppet func game_end():
-	pass
+	my_end = true
+	end_of_game = true
+	timer.stop()
 
 puppet func set_current_player(pname):
 	get_node("Current Player").text = pname
@@ -218,13 +222,15 @@ func disconnect_from_server():
 	peer.close_connection()
 
 puppet func set_past_calc(newText):
-	print("should give new text: \n" + newText)
 	get_node("past Calculations").text = str(newText)
 
-
+puppet func my_end():
+	my_end = true
 
 func start_hover_above_card(card):
-	card.modulate.a8 = 255
+	if !my_end:
+		card.modulate.a8 = 255
 
 func end_hover_above_card(card):
-	card.modulate.a8 = 100
+	if !my_end:
+		card.modulate.a8 = 100

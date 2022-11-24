@@ -24,7 +24,7 @@ Basically UNO, just with math
 
 
 ## Currently working on:
-- x
+- End of game working
 
 ## Current Problems:
 - nothing we are currently aware of
@@ -35,5 +35,4 @@ Basically UNO, just with math
 - Random middle card
 - Code instead of IP
 - Points are results of calculation
-- Showing oponents moves which weren't possible
 - Maximum of two failed tries per round

@@ -80,8 +80,6 @@ master func give_key(id, key):
 		
 		pir.append(id)
 		rpc_id(id, "r_t_h", r_t)
-		8
-		
 		
 		if game_started:
 			if(str(late_hand) == "avg"):
@@ -92,12 +90,12 @@ master func give_key(id, key):
 						x += player_cards[i].size() 
 						n += 1
 				x = x/n
-				for i in range(x):
+				for _i in range(x):
 					rand = rnd.randi_range(0,9)
 					player_cards[id].append(rand)
 					rpc_id(id, "master_add_card", rand)
 			else:
-				for i in range(late_hand):
+				for _i in range(late_hand):
 					rand = rnd.randi_range(0,9)
 					player_cards[id].append(rand)
 					rpc_id(id, "master_add_card", rand)
@@ -107,15 +105,15 @@ master func give_key(id, key):
 
 func client_disconnect(id):
 	if player_IDs.has(id):
-		if id == current_player:
-			next_player()
+		
 		var player_id = player_IDs.find(id)
 		
 		player_cards.erase(player_id)
 		player_names.erase(id)
 		player_IDs.erase(id)
 		pir.erase(id)
-		
+		if id == current_player:
+			next_player()
 		rpc("client_disconnect", id)
 		set_client_text()
 	
@@ -183,6 +181,8 @@ master func cards_pushed(id, ops):
 					if c1 == current_card:
 						rpc_id(id, "card_removed")
 						player_cards[id].erase(c1)
+						if(player_cards[id].size() == 0):
+							player_done(id)
 						current_card = c1
 						rpc("set_current_card", current_card)
 						set_client_text()
@@ -221,14 +221,11 @@ master func cards_pushed(id, ops):
 							res = pow(c2,float(1)/c1)
 					if int(res) == current_card:
 						rpc("set_past_calc", set_past_calc_mas(ops))
-						rpc_id(id, "card_removed")
+						rpc_id(player_id, "card_removed")
 						player_cards[player_id].erase(c1)
 						player_cards[player_id].erase(c2)
 						if(player_cards[player_id].size() == 0):
-							player_done(id)
-						var pis = players_ignore.size()
-						if(pis == pis-1 && pis > 0):
-							game_end()
+							player_done(player_id)
 						current_card = c2
 						rpc("set_current_card", current_card)
 						set_client_text()
@@ -246,13 +243,31 @@ master func cards_pushed(id, ops):
 func player_done(id):
 	players_ignore.append(id)
 	player_classment.append(id)
+	
+	rpc_id(id, "my_end")
 	rpc("player_done", player_names[id], player_classment.size())
 	set_client_text()
+	next_player()
+	if players_ignore.size() >= player_IDs.size()-1:
+		print(str(players_ignore.size()) + "    " + str(player_IDs.size()))
+		game_end()
 	
 
 func game_end():
 	end_of_game = true
 	rpc("game_end")
+	timer.stop()
+	set_client_winner_text()
+
+func set_client_winner_text():
+	var sendstr = ""
+	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
+	for i in range(player_classment.size()):
+		
+			sendstr = sendstr + str(i+1) + ": " + str(player_names[player_classment[i]]) + "\n"
+		
+	for i in player_IDs:
+		rpc_id(i, "update_player_list", sendstr)
 
 func _physics_process(_delta):
 	rand = rnd.randi()
@@ -278,22 +293,29 @@ func _on_Button_pressed(): # Start game
 		rpc("set_current_player", player_names[current_player])
 
 func next_player():
-	if player_IDs.count(current_player) > 0:
-		rpc_id(current_player, "endOfRound")
-	current_player = pir[(pir.find(current_player)+1)%pir.size()]
-	
-	rset("my_turn", false)
-	rset_id(current_player, "my_turn", true)
-	rpc_id(current_player, "startOfRound")
-	timer.start(r_t)
-	set_client_text()
-	rpc("set_current_player", player_names[current_player])
+	if !end_of_game:
+		if player_IDs.count(current_player) > 0:
+			rpc_id(current_player, "endOfRound")
+		if pir.size() > 0:
+			current_player = pir[(pir.find(current_player)+1)%pir.size()]
+			var c = 0
+			while(players_ignore.count(current_player) > 0 && c < player_IDs.size()):
+				current_player = pir[(pir.find(current_player)+1)%pir.size()]
+				c += 1
+			
+			rset("my_turn", false)
+			rset_id(current_player, "my_turn", true)
+			rpc_id(current_player, "startOfRound")
+			timer.start(r_t)
+			set_client_text()
+			rpc("set_current_player", player_names[current_player])
 
 func _on_Timer_timeout():
-	add_card_timeout(current_player)
-	rpc_id(current_player, "endOfRound")
-	rpc("set_past_calc", set_past_calc_time())
-	next_player()
+	if player_IDs.size() > 0:
+		add_card_timeout(current_player)
+		rpc_id(current_player, "endOfRound")
+		rpc("set_past_calc", set_past_calc_time())
+		next_player()
 
 func add_card_timeout(id):
 	if (!win[0] || (win[0] && win[1])) && !end_of_game:
@@ -316,7 +338,8 @@ func set_client_text():
 				sendstr = sendstr + str(player_names[i]) + ": " + str(player_cards[i].size()) + "\n"
 		else:
 			sendstr = sendstr  + str(player_names[i]) + "\n"
-	rpc("update_player_list", sendstr)
+	for i in player_IDs:
+		rpc_id(i, "update_player_list", sendstr)
 
 
 func _on_win_pressed():
@@ -325,6 +348,8 @@ func _on_win_pressed():
 
 func _on_Contunue_pressed():
 	win[1] = true
+	if player_IDs.size() != 0:
+		player_done(player_IDs[0])
 	
 func _on_End_pressed():
 	
@@ -356,7 +381,6 @@ func _on_start_host_pressed():
 			late_hand = "avg"
 		2:
 			late_hand = int(get_node("Settings/late_cards/ip").text)
-	print(late_hand)
 	hum_play = get_node("Settings/hum_play/cb")
 	
 	remove_child(get_node("Settings"))
