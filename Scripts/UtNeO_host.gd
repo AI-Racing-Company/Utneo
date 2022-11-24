@@ -79,9 +79,7 @@ master func give_key(id, key):
 		player_IDs.append(id)
 		
 		pir.append(id)
-		rpc_id(id, "r_t_h", r_t)
-		8
-		
+		rpc_id(id, "r_t_h", r_t) 
 		
 		if game_started:
 			if(str(late_hand) == "avg"):
@@ -92,12 +90,12 @@ master func give_key(id, key):
 						x += player_cards[i].size() 
 						n += 1
 				x = x/n
-				for i in range(x):
+				for _i in range(x):
 					rand = rnd.randi_range(0,9)
 					player_cards[id].append(rand)
 					rpc_id(id, "master_add_card", rand)
 			else:
-				for i in range(late_hand):
+				for _i in range(late_hand):
 					rand = rnd.randi_range(0,9)
 					player_cards[id].append(rand)
 					rpc_id(id, "master_add_card", rand)
