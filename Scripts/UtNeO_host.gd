@@ -69,7 +69,7 @@ func client_connect(id):
 	if !unlimit_player && unverified.size() >= int(max_players):
 			get_tree().set_refuse_new_network_connections(true)
 
-	rpc_id(id, "connection_established", id)
+	rpc_id(id, "connection_established_DELETE", id, player_IDs.size())
 	set_client_text()
 
 master func give_key(id, key):

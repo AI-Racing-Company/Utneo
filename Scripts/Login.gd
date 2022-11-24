@@ -33,6 +33,13 @@ puppet func connection_established(id):
 	print("Connection succsess")
 	remove_child(get_node("Overlay"))
 
+puppet func connection_established_DELETE(id, x):
+	global.my_id = id
+	print("Connection succsess")
+	remove_child(get_node("Overlay"))
+	get_node("Login/Username").text = str(x)
+	get_node("Login/Pasword").text = str(x)
+
 
 
 

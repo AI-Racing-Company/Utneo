@@ -19,7 +19,6 @@ font_data = ExtResource( 4 )
 script = ExtResource( 2 )
 
 [node name="Game" parent="." instance=ExtResource( 1 )]
-position = Vector2( 6, 17 )
 
 [node name="WinnerMessage" type="Label" parent="."]
 margin_left = 67.0
@@ -33,14 +32,6 @@ custom_fonts/font = SubResource( 1 )
 align = 1
 
 [node name="Cards" type="Node2D" parent="."]
-
-[node name="ClientText" type="Label" parent="."]
-margin_left = 5.0
-margin_top = 5.0
-margin_right = 45.0
-margin_bottom = 33.0
-rect_pivot_offset = Vector2( -928, 63 )
-custom_fonts/font = ExtResource( 3 )
 
 [node name="Player List" type="Label" parent="."]
 margin_left = 595.0
@@ -70,7 +61,6 @@ margin_right = 260.0
 margin_bottom = 400.0
 rect_pivot_offset = Vector2( -928, 63 )
 custom_fonts/font = ExtResource( 3 )
-text = "8 + 8"
 valign = 2
 
 [node name="Current Player" type="Label" parent="."]

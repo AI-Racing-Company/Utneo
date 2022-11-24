@@ -10,7 +10,9 @@ func _on_Card_pressed():
 	get_parent().get_parent().hand_card_pressed(self)
 
 func _on_Card_mouse_entered():
-	get_parent().get_parent().start_hover_above_card(self)
+	if get_parent().get_parent().start_hover_above_card(self):
+		pass
 
 func _on_Card_mouse_exited():
-	get_parent().get_parent().end_hover_above_card(self)
+	if get_parent().get_parent().end_hover_above_card(self):
+		pass

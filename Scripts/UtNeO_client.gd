@@ -34,7 +34,6 @@ var peer = null
 
 func _ready():
 	nue = get_viewport().connect("size_changed", self, "resized")
-	get_node("ClientText").text = "Connected To " + global.ip + ":" + str(global.port)
 	nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
 	timer.set_autostart(false)
 	resized()
@@ -161,9 +160,7 @@ func button_pressed(operation):
 func _physics_process(_delta):
 	if !timer.is_stopped():
 		get_node("Timer/Time").text = str(int(timer.time_left))
-	get_node("ClientText").text = str(current_card)
 	if my_turn:
-		get_node("ClientText").text = get_node("ClientText").text + " (My turn)"
 		if !timer.is_stopped():
 			timerRect.set_size(Vector2(s_width*(timer.time_left/r_t),20))
 
