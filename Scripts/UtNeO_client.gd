@@ -3,7 +3,7 @@ extends Node2D
 var my_card_num = 0
 var my_cards = []
 var my_card_nodes = []
-var current_calc = ["","","","",""] # Array for Operation, value 1, value 2, name 1 and name 2
+var current_calc = ["","","","","","",""] # Array for Operation, value 1, value 2, name 1, name 2, card_id 1 and card_id 2
 var selected_card = 0
 var current_card = -1
 var current_card_node = null
@@ -100,7 +100,7 @@ puppet func card_removed():
 		get_node("Cards").remove_child(get_node("Cards").get_node(current_calc[4]))
 		my_card_num -= 1
 	my_card_num -= 1
-	current_calc = ["","","","",""]
+	current_calc = ["","","","","","",""]
 	resized()
 	selected_card = 0
 
@@ -110,14 +110,22 @@ func hand_card_pressed(card):
 		print("c name: " + card.name)
 		if(!selected_card):
 			if(card.name != current_calc[4]):
+				if current_calc[3] != "":
+					current_calc[5].modulate.a8 = 100
+				current_calc[5] = card
 				current_calc[1] = value[1]
 				current_calc[3] = card.name
 				selected_card = 1
+				card.modulate.a8 = 255
 		else:
 			if(card.name != current_calc[3]):
+				if current_calc[4] != "":
+					current_calc[6].modulate.a8 = 100
+				current_calc[6] = card
 				current_calc[2] = value[1]
 				current_calc[4] = card.name
 				selected_card = 0
+				card.modulate.a8 = 255
 
 func serversided_disconnect():
 	print("Server disconnected")
@@ -139,8 +147,11 @@ func button_pressed(operation):
 				rpc_id(1,"cards_pushed",global.my_id,current_calc)
 				selected_card = 0
 			"clear":
-				current_calc = ["","","","",""]
+				current_calc[5].modulate.a8 = 100
+				current_calc[6].modulate.a8 = 100
+				current_calc = ["","","","","","",""]
 				selected_card = 0
+				
 			_:
 				current_calc[0] = operation
 
@@ -170,16 +181,16 @@ func _physics_process(_delta):
 
 puppet func r_t_h(newRT):
 	r_t = newRT
-	get_node("Timer/time").text = r_t
+	#get_node("Timer/time").text = r_t
 
 puppet func endOfRound():
-	current_calc = ["","","","",""]
+	current_calc = ["","","","","","",""]
 	timer.stop()
 	overRectAdd = 0
 	get_node("OverColorRect").set_global_position(Vector2(0,s_height - 100 + overRectAdd))
 
 puppet func startOfRound():
-	current_calc = ["","","","",""]
+	current_calc = ["","","","","","",""]
 	r=0
 	g=1
 	timer.start(r_t)
@@ -227,4 +238,5 @@ func start_hover_above_card(card):
 	card.modulate.a8 = 255
 
 func end_hover_above_card(card):
-	card.modulate.a8 = 100
+	if current_calc[3] != card.name && current_calc[4] != card.name:
+		card.modulate.a8 = 100
