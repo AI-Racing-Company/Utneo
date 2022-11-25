@@ -18,12 +18,6 @@ margin_right = 240.0
 margin_bottom = 25.0
 placeholder_text = "IP Adress"
 
-[node name="name" type="LineEdit" parent="Client"]
-margin_top = 25.0
-margin_right = 240.0
-margin_bottom = 50.0
-placeholder_text = "Username"
-
 [node name="Client_LH" type="CheckBox" parent="Client"]
 margin_left = 240.0
 margin_top = -25.0
@@ -50,7 +44,15 @@ margin_right = 329.0
 margin_bottom = 49.0
 text = "Localhost"
 
+[node name="Tutorial" type="Button" parent="."]
+margin_left = 40.0
+margin_top = 80.0
+margin_right = 200.0
+margin_bottom = 105.0
+text = "Tutorial"
+
 [connection signal="pressed" from="Client" to="." method="_on_Client_pressed"]
 [connection signal="pressed" from="Client/Client_LH" to="." method="_on_Client_LH_pressed"]
 [connection signal="pressed" from="Host" to="." method="_on_Host_pressed"]
 [connection signal="pressed" from="Host/Host_LH" to="." method="_on_Host_LH_pressed"]
+[connection signal="pressed" from="Tutorial" to="." method="_on_Tutorial_pressed"]

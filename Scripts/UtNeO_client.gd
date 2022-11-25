@@ -61,7 +61,7 @@ func resized():
 	get_node("WinnerMessage").set_size(Vector2(width,50))
 
 	get_node("Current Player").set_global_position(Vector2(width/2-75, 5))
-	get_node("Timer/Time").set_global_position(Vector2(width/2-75, s_height - 205))
+	get_node("Timer/Time").set_global_position(Vector2(width/2-50, s_height - 205))
 
 	get_node("OverColorRect").set_size(Vector2(width,100))
 	get_node("OverColorRect").set_global_position(Vector2(0,height - 100 + overRectAdd))
@@ -110,24 +110,19 @@ puppet func card_removed():
 func hand_card_pressed(card):
 	if my_turn && card.name != "" && !my_end && !end_of_game:
 		var value = card.name.split("_")
-		if(!selected_card):
-			if(card.name != current_calc[4]):
-				if current_calc[3] != "":
-					current_calc[5].modulate.a8 = 100
-				current_calc[5] = card
-				current_calc[1] = value[1]
-				current_calc[3] = card.name
-				selected_card = 1
-				card.modulate.a8 = 255
-		else:
-			if(card.name != current_calc[3]):
-				if current_calc[4] != "":
-					current_calc[6].modulate.a8 = 100
-				current_calc[6] = card
-				current_calc[2] = value[1]
-				current_calc[4] = card.name
-				selected_card = 0
-				card.modulate.a8 = 255
+		var add = 0
+		if selected_card:
+			add = 1
+		if(card.name != current_calc[4]):
+			if current_calc[3+add] != "":
+				current_calc[5+add].modulate.a8 = 100
+			current_calc[5+add] = card
+			current_calc[1+add] = value[1]
+			current_calc[3+add] = card.name
+			selected_card = 1-add
+			card.modulate.a8 = 255
+		
+
 
 func serversided_disconnect():
 	get_tree().network_peer = null

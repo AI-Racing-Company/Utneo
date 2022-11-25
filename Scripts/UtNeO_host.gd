@@ -82,6 +82,8 @@ master func give_key(id, key):
 		rpc_id(id, "r_t_h", r_t)
 
 		if game_started:
+			rpc("set_past_calc", set_past_calc(4, str(player_names[id])))
+			rpc("set_current_card", current_card)
 			if(str(late_hand) == "avg"):
 				var x = 0
 				var n = 0
@@ -105,17 +107,23 @@ master func give_key(id, key):
 
 func client_disconnect(id):
 	if player_IDs.has(id):
-
+		
+		rpc("set_past_calc", set_past_calc(5, str(player_names[id])))
+		
 		var player_id = player_IDs.find(id)
 
 		player_cards.erase(player_id)
 		player_names.erase(id)
+		unverified.erase(id)
 		player_IDs.erase(id)
 		pir.erase(id)
 		if id == current_player:
 			next_player()
 		rpc("client_disconnect", id)
 		set_client_text()
+		if !unlimit_player && unverified.size() < int(max_players):
+			get_tree().set_refuse_new_network_connections(false)
+		
 
 
 
@@ -126,40 +134,42 @@ master func add_card(id):
 
 			player_cards[id].append(rand)
 
-			rpc("set_past_calc", set_past_calc_mas(["", " drew a card", ""]))
+			rpc("set_past_calc", set_past_calc(3, str(player_names[current_player])))
 
 			rpc_id(id, "master_add_card", rand)
 			next_player()
 		else:
 			print("not your turn")
 
-func set_past_calc_mas(ops):
+func set_past_calc(mode, args):
 	if past_calcs.size() >= 5:
 		past_calcs.remove(0)
+	
+	match mode:
+		0: #Default
+			if args[2] == "":
+				past_calcs.append(str(player_names[current_player]) + ": " + str(args[1]))
+			else:
+				past_calcs.append(player_names[current_player] + ": " + str(args[1]) + str(args[0]) + str(args[2]))
 
-	if ops[2] == "":
-		past_calcs.append(str(player_names[current_player]) + ": " + str(ops[1]))
-	else:
-		past_calcs.append(player_names[current_player] + ": " + str(ops[1]) + str(ops[0]) + str(ops[2]))
+		1: #Fail
+			if args[2] == "":
+				past_calcs.append(str(player_names[current_player]) + " tried " + str(args[1]) + " = " + str(current_card))
+			else:
+				past_calcs.append(str(player_names[current_player]) + " tried " + str(args[1]) + str(args[0]) + str(args[2]) + " = " + str(current_card))
 
-	return create_past_calc_str()
+		2: #time
+			past_calcs.append(str(player_names[current_player]) + " ran out of time")
 
-func set_past_calc_fail(ops):
-	if past_calcs.size() >= 5:
-		past_calcs.remove(0)
+		3: #drew
+			past_calcs.append(str(args) + " drew a card")
 
-	if ops[2] == "":
-		past_calcs.append(str(player_names[current_player]) + " tried " + str(ops[1]) + " = " + str(current_card))
-	else:
-		past_calcs.append(str(player_names[current_player]) + " tried " + str(ops[1]) + str(ops[0]) + str(ops[2]) + " = " + str(current_card))
-
-
-	return create_past_calc_str()
-
-func set_past_calc_time():
-	if past_calcs.size() >= 5:
-		past_calcs.remove(0)
-	past_calcs.append(str(player_names[current_player]) + " ran out of time")
+		4: #join
+			past_calcs.append(str(args) + " joined the game")
+		
+		5: #left
+			past_calcs.append(str(args) + " left the game")
+	
 	return create_past_calc_str()
 
 func create_past_calc_str():
@@ -186,11 +196,11 @@ master func cards_pushed(id, ops):
 						current_card = c1
 						rpc("set_current_card", current_card)
 						set_client_text()
-						rpc("set_past_calc", set_past_calc_mas(ops))
+						rpc("set_past_calc", set_past_calc(0, ops))
 						next_player()
 					else:
 						if hum_play:
-							rpc("set_past_calc", set_past_calc_fail(ops))
+							rpc("set_past_calc", set_past_calc(1, ops))
 
 			else:
 				var player_id = id
@@ -220,7 +230,7 @@ master func cards_pushed(id, ops):
 						" √ ":
 							res = pow(c2,float(1)/c1)
 					if int(res) == current_card:
-						rpc("set_past_calc", set_past_calc_mas(ops))
+						rpc("set_past_calc", set_past_calc(0, ops))
 						rpc_id(player_id, "card_removed")
 						player_cards[player_id].erase(c1)
 						player_cards[player_id].erase(c2)
@@ -232,7 +242,7 @@ master func cards_pushed(id, ops):
 						next_player()
 					else:
 						if hum_play:
-							rpc("set_past_calc", set_past_calc_fail(ops))
+							rpc("set_past_calc", set_past_calc(1, ops))
 				else:
 					print("clientside cards don't match serverside cards")
 		else:
@@ -261,7 +271,7 @@ func game_end():
 
 func set_client_winner_text():
 	var sendstr = ""
-	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
+	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size() + "/" + str(max_players))
 	for i in range(player_classment.size()):
 
 			sendstr = sendstr + str(i+1) + ": " + str(player_names[player_classment[i]]) + "\n"
@@ -275,6 +285,7 @@ func _physics_process(_delta):
 
 func _on_Button_pressed(): # Start game
 	if not game_started && player_IDs.size()>0:
+		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
 		rpc("set_current_card", current_card)
 		var randplay = rnd.randi_range(0, player_IDs.size()-1)
@@ -314,7 +325,7 @@ func _on_Timer_timeout():
 	if player_IDs.size() > 0:
 		add_card_timeout(current_player)
 		rpc_id(current_player, "endOfRound")
-		rpc("set_past_calc", set_past_calc_time())
+		rpc("set_past_calc", set_past_calc(2, ""))
 		next_player()
 
 func add_card_timeout(id):
@@ -327,8 +338,8 @@ func add_card_timeout(id):
 
 
 func set_client_text():
-	var sendstr = ""
-	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size())
+	var sendstr = "Players: " + str(player_IDs.size()) + "/" + str(max_players) + "\n"
+	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size()) + "/" + str(max_players)
 	for i in player_names:
 		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i] + " (" + str(i) + ")")
 		if game_started:
@@ -360,7 +371,7 @@ func _on_start_host_pressed():
 
 	add_child(MenuButtons)
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
-	get_node("ClientConnect").text = "Connected Clients: 0"
+	get_node("ClientConnect").text = "Connected Clients: 0/"+str(max_players)
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_server(global.port, 5)
 	peer.compression_mode = NetworkedMultiplayerENet.COMPRESS_ZLIB

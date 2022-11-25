@@ -32,5 +32,8 @@ func _on_Client_LH_pressed():
 
 func _on_Host_LH_pressed():
 	global.ip = "localhost"
-	global.username = get_node("Client/name").text
 	nue = get_tree().change_scene("res://Scenes/Login-Screen.tscn")
+
+
+func _on_Tutorial_pressed():
+	nue = get_tree().change_scene("res://Scenes/Tutorial.tscn")
