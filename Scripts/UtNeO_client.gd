@@ -57,7 +57,7 @@ func resized():
 	if current_card_node != null:
 		current_card_node.set_global_position(Vector2(width/2-100,height/2-150))
 	get_node("Player List").set_global_position(Vector2(width-get_node("Player List").get_rect().size.x-5, 5))
-	get_node("WinnerMessage").set_global_position(Vector2(0,height-275))
+	get_node("WinnerMessage").set_global_position(Vector2(0,height-260))
 	get_node("WinnerMessage").set_size(Vector2(width,50))
 
 	get_node("Current Player").set_global_position(Vector2(width/2-75, 5))
@@ -76,7 +76,7 @@ puppet func master_add_card(rand):
 
 	var card = null
 
-	card = load("res://Prefabs/Cards/card_" + str(rand) + "_dev.tscn").instance()
+	card = load("res://Prefabs/Cards/Card_" + str(rand) + "_dev.tscn").instance()
 
 	card.set_name("card_"+str(rand)+"_")
 	card.set_size(Vector2(75,100))
@@ -139,10 +139,10 @@ func button_pressed(operation):
 	if my_turn && !my_end:
 
 		match operation:
-			"Pus":
+			global.btn_modes.pus:
 				rpc_id(1,"cards_pushed",global.my_id,current_calc)
 				selected_card = 0
-			"clear":
+			global.btn_modes.clr:
 				current_calc[5].modulate.a8 = 100
 				current_calc[6].modulate.a8 = 100
 				current_calc = ["","","","","","",""]
@@ -155,7 +155,7 @@ func button_pressed(operation):
 func _physics_process(_delta):
 	if !timer.is_stopped():
 		get_node("Timer/Time").text = str(int(timer.time_left))
-	if my_turn && r_t != "infinite":
+	if my_turn && str(r_t) != "infinite":
 		if !timer.is_stopped():
 			timerRect.set_size(Vector2(s_width*(timer.time_left/r_t),20))
 
@@ -187,7 +187,7 @@ puppet func startOfRound():
 	current_calc = ["","","","","","",""]
 	r=0
 	g=1
-	if r_t != "infinite":
+	if str(r_t) != "infinite":
 		timer.start(r_t)
 	overRectAdd = 150
 	get_node("OverColorRect").set_global_position(Vector2(0,s_height - 100 + overRectAdd))
@@ -218,7 +218,7 @@ puppet func game_end():
 
 puppet func set_current_player(pname):
 	get_node("Current Player").text = pname
-	if r_t != "infinite":
+	if str(r_t) != "infinite":
 		timer.start(r_t)
 
 func disconnect_from_server():
@@ -239,3 +239,6 @@ func start_hover_above_card(card):
 func end_hover_above_card(card):
 	if current_calc[3] != card.name && current_calc[4] != card.name && !my_end:
 		card.modulate.a8 = 100
+
+puppet func set_winner(win):
+	get_node("WinnerMessage").text = str(win) + " won"

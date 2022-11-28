@@ -32,33 +32,33 @@ func _on_Draw_Card_pressed():
 
 
 func _on_Add_pressed():
-	get_parent().button_pressed(" + ")
+	get_parent().button_pressed(global.btn_modes.add)
 
 
 func _on_Sub_pressed():
-	get_parent().button_pressed(" - ")
+	get_parent().button_pressed(global.btn_modes.sub)
 
 
 func _on_Mul_pressed():
-	get_parent().button_pressed(" * ")
+	get_parent().button_pressed(global.btn_modes.mul)
 
 
 func _on_Div_pressed():
-	get_parent().button_pressed(" / ")
+	get_parent().button_pressed(global.btn_modes.div)
 
 
 func _on_Pot_pressed():
-	get_parent().button_pressed(" ^ ")
+	get_parent().button_pressed(global.btn_modes.pot)
 
 func _on_Sqr_pressed():
-	get_parent().button_pressed(" √ ")
+	get_parent().button_pressed(global.btn_modes.sqr)
 
 func _on_Clear_pressed():
-	get_parent().button_pressed("clear")
+	get_parent().button_pressed(global.btn_modes.clr)
 
 
 func _on_ULTIMATE_PUSH_pressed():
-	get_parent().button_pressed("Pus")
+	get_parent().button_pressed(global.btn_modes.pus)
 
 func _on_Disconnect_pressed():
 	get_parent().disconnect_from_server()

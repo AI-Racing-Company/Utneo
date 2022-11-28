@@ -6,8 +6,8 @@
 [ext_resource path="res://Fonts/OpenSans-Regular.ttf" type="DynamicFontData" id=4]
 
 [sub_resource type="DynamicFont" id=1]
-size = 69
-outline_size = 5
+size = 40
+outline_size = 1
 font_data = ExtResource( 4 )
 
 [sub_resource type="DynamicFont" id=2]
@@ -22,14 +22,15 @@ script = ExtResource( 2 )
 
 [node name="WinnerMessage" type="Label" parent="."]
 margin_left = 67.0
-margin_top = 316.0
+margin_top = 290.0
 margin_right = 833.0
-margin_bottom = 411.0
+margin_bottom = 385.0
 rect_pivot_offset = Vector2( -928, 63 )
 custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_colors/font_outline_modulate = Color( 0, 1, 1, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_fonts/font = SubResource( 1 )
 align = 1
+valign = 2
 
 [node name="Cards" type="Node2D" parent="."]
 

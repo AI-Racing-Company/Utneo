@@ -6,7 +6,8 @@ enum PC_mode{
 	time = 2,
 	drew = 3,
 	join = 4,
-	left = 5
+	left = 5,
+	done = 6
 }
 
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
@@ -179,6 +180,9 @@ func set_past_calc(mode, args):
 		
 		5: #left
 			past_calcs.append(str(args) + " left the game")
+
+		6: #done
+			past_calcs.append(str(args) + " is on " + str(player_classment.size()) + " place")
 	
 	return create_past_calc_str()
 
@@ -263,11 +267,16 @@ master func cards_pushed(id, ops):
 		print("Someone won, waiting on host to continue or end")
 
 func player_done(id):
+	
 	players_ignore.append(id)
 	player_classment.append(id)
+	
+	rpc("set_past_calc", set_past_calc(PC_mode.done, player_names[id]))
 
 	rpc_id(id, "my_end")
 	rpc("player_done", player_names[id], player_classment.size())
+	if players_ignore.size() == 1:
+		rpc("set_winner", player_names[id])
 	set_client_text()
 	next_player()
 	if players_ignore.size() >= player_IDs.size()-1:
@@ -284,7 +293,7 @@ func game_end():
 
 func set_client_winner_text():
 	var sendstr = ""
-	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size() + "/" + str(max_players))
+	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size()) + "/" + str(max_players)
 	for i in range(player_classment.size()):
 
 			sendstr = sendstr + str(i+1) + ": " + str(player_names[player_classment[i]]) + "\n"

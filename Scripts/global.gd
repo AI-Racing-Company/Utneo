@@ -1,5 +1,17 @@
 extends Node
 
+
+const btn_modes = {
+	add = " + ",
+	sub = " - ",
+	mul = " * ",
+	div = " / ",
+	pot = " ^ ",
+	sqr = " s ",
+	clr = "",
+	pus = ""
+}
+
 var ip = ""
 var port = 7777
 
