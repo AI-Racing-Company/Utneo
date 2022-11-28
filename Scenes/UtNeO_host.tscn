@@ -114,8 +114,25 @@ margin_right = 178.0
 margin_bottom = 30.0
 placeholder_text = "7"
 
-[node name="late_cards" type="Node2D" parent="Settings"]
+[node name="allow_late" type="Node2D" parent="Settings"]
 position = Vector2( 0, 90 )
+
+[node name="mRTt" type="Label" parent="Settings/allow_late"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 50.0
+margin_bottom = 24.0
+text = "Allow late players"
+
+[node name="cb" type="CheckBox" parent="Settings/allow_late"]
+margin_left = 125.0
+margin_top = 5.0
+margin_right = 149.0
+margin_bottom = 29.0
+pressed = true
+
+[node name="late_cards" type="Node2D" parent="Settings"]
+position = Vector2( 0, 120 )
 
 [node name="mSCt" type="Label" parent="Settings/late_cards"]
 margin_left = 10.0
@@ -163,7 +180,7 @@ margin_bottom = 65.0
 placeholder_text = "7"
 
 [node name="hum_play" type="Node2D" parent="Settings"]
-position = Vector2( 0, 160 )
+position = Vector2( 0, 190 )
 
 [node name="mRTt" type="Label" parent="Settings/hum_play"]
 margin_left = 10.0
@@ -181,16 +198,16 @@ pressed = true
 
 [node name="start_host" type="Button" parent="Settings"]
 margin_left = 10.0
-margin_top = 200.0
+margin_top = 230.0
 margin_right = 310.0
-margin_bottom = 225.0
+margin_bottom = 255.0
 text = "Start hosting"
 
 [node name="back" type="Button" parent="Settings"]
-margin_left = 12.0
-margin_top = 246.0
-margin_right = 162.0
-margin_bottom = 276.0
+margin_left = 10.0
+margin_top = 280.0
+margin_right = 160.0
+margin_bottom = 310.0
 text = "Go back"
 
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

@@ -155,7 +155,7 @@ func button_pressed(operation):
 func _physics_process(_delta):
 	if !timer.is_stopped():
 		get_node("Timer/Time").text = str(int(timer.time_left))
-	if my_turn:
+	if my_turn && r_t != "infinite":
 		if !timer.is_stopped():
 			timerRect.set_size(Vector2(s_width*(timer.time_left/r_t),20))
 
@@ -187,7 +187,8 @@ puppet func startOfRound():
 	current_calc = ["","","","","","",""]
 	r=0
 	g=1
-	timer.start(r_t)
+	if r_t != "infinite":
+		timer.start(r_t)
 	overRectAdd = 150
 	get_node("OverColorRect").set_global_position(Vector2(0,s_height - 100 + overRectAdd))
 
@@ -217,7 +218,8 @@ puppet func game_end():
 
 puppet func set_current_player(pname):
 	get_node("Current Player").text = pname
-	timer.start(r_t)
+	if r_t != "infinite":
+		timer.start(r_t)
 
 func disconnect_from_server():
 	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")

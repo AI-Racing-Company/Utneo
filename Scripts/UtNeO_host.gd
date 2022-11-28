@@ -1,5 +1,14 @@
 extends Node2D
 
+enum PC_mode{
+	norm = 0,
+	fail = 1,
+	time = 2,
+	drew = 3,
+	join = 4,
+	left = 5
+}
+
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
 
@@ -28,6 +37,7 @@ var late_hand = 7
 var hum_play
 var unlimit_player = false
 var unlimit_time = false
+var alp = true
 
 var win = [false, false] # 0= Player won, 1 = Continue after player win
 
@@ -82,7 +92,7 @@ master func give_key(id, key):
 		rpc_id(id, "r_t_h", r_t)
 
 		if game_started:
-			rpc("set_past_calc", set_past_calc(4, str(player_names[id])))
+			rpc("set_past_calc", set_past_calc(PC_mode.join, str(player_names[id])))
 			rpc("set_current_card", current_card)
 			if(str(late_hand) == "avg"):
 				var x = 0
@@ -108,7 +118,7 @@ master func give_key(id, key):
 func client_disconnect(id):
 	if player_IDs.has(id):
 		
-		rpc("set_past_calc", set_past_calc(5, str(player_names[id])))
+		rpc("set_past_calc", set_past_calc(PC_mode.left, str(player_names[id])))
 		
 		var player_id = player_IDs.find(id)
 
@@ -121,7 +131,7 @@ func client_disconnect(id):
 			next_player()
 		rpc("client_disconnect", id)
 		set_client_text()
-		if !unlimit_player && unverified.size() < int(max_players):
+		if !unlimit_player && unverified.size() < int(max_players) && alp:
 			get_tree().set_refuse_new_network_connections(false)
 		
 
@@ -134,7 +144,7 @@ master func add_card(id):
 
 			player_cards[id].append(rand)
 
-			rpc("set_past_calc", set_past_calc(3, str(player_names[current_player])))
+			rpc("set_past_calc", set_past_calc(PC_mode.drew, str(player_names[current_player])))
 
 			rpc_id(id, "master_add_card", rand)
 			next_player()
@@ -196,11 +206,11 @@ master func cards_pushed(id, ops):
 						current_card = c1
 						rpc("set_current_card", current_card)
 						set_client_text()
-						rpc("set_past_calc", set_past_calc(0, ops))
+						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
 						next_player()
 					else:
 						if hum_play:
-							rpc("set_past_calc", set_past_calc(1, ops))
+							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
 
 			else:
 				var player_id = id
@@ -223,14 +233,16 @@ master func cards_pushed(id, ops):
 							res = str(int(c1)*int(c2))
 							res = res[res.length()-1]
 						" / ":
-							res = str(int(float(c1)/c2))
+							if c2 != 0:
+								res = str(int(float(c1)/c2))
 						" ^ ":
 							res = str(pow(c1,c2))
 							res = res[res.length()-1]
 						" √ ":
-							res = pow(c2,float(1)/c1)
+							if c2 != 0:
+								res = pow(c2,float(1)/c1)
 					if int(res) == current_card:
-						rpc("set_past_calc", set_past_calc(0, ops))
+						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
 						rpc_id(player_id, "card_removed")
 						player_cards[player_id].erase(c1)
 						player_cards[player_id].erase(c2)
@@ -242,7 +254,7 @@ master func cards_pushed(id, ops):
 						next_player()
 					else:
 						if hum_play:
-							rpc("set_past_calc", set_past_calc(1, ops))
+							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
 				else:
 					print("clientside cards don't match serverside cards")
 		else:
@@ -266,7 +278,8 @@ func player_done(id):
 func game_end():
 	end_of_game = true
 	rpc("game_end")
-	timer.stop()
+	if unlimit_time:
+		timer.stop()
 	set_client_winner_text()
 
 func set_client_winner_text():
@@ -285,6 +298,8 @@ func _physics_process(_delta):
 
 func _on_Button_pressed(): # Start game
 	if not game_started && player_IDs.size()>0:
+		if !alp:
+			get_tree().set_refuse_new_network_connections(true)
 		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
 		rpc("set_current_card", current_card)
@@ -296,8 +311,8 @@ func _on_Button_pressed(): # Start game
 				rand = rnd.randi_range(0,9)
 				player_cards[i].append(rand)
 				rpc_id(i, "master_add_card", rand)
-
-		timer.start(r_t)
+		if unlimit_time:
+			timer.start(r_t)
 		rpc_id(current_player, "startOfRound")
 		game_started = true
 		set_client_text()
@@ -317,7 +332,8 @@ func next_player():
 			rset("my_turn", false)
 			rset_id(current_player, "my_turn", true)
 			rpc_id(current_player, "startOfRound")
-			timer.start(r_t)
+			if unlimit_time:
+				timer.start(r_t)
 			set_client_text()
 			rpc("set_current_player", player_names[current_player])
 
@@ -325,7 +341,7 @@ func _on_Timer_timeout():
 	if player_IDs.size() > 0:
 		add_card_timeout(current_player)
 		rpc_id(current_player, "endOfRound")
-		rpc("set_past_calc", set_past_calc(2, ""))
+		rpc("set_past_calc", set_past_calc(PC_mode.time, ""))
 		next_player()
 
 func add_card_timeout(id):
@@ -385,6 +401,8 @@ func _on_start_host_pressed():
 		starting_hand = int(get_node("Settings/start_cards/ip").text)
 	if get_node("Settings/max_rt/cb").is_pressed() && get_node("Settings/max_rt/ip").text != "":
 		r_t = int(get_node("Settings/max_rt/ip").text)
+	if !get_node("Settings/max_rt/cb").is_pressed():
+		r_t = "infinite"
 	match int(get_node("Settings/late_cards/sl").value):
 		0:
 			late_hand = starting_hand
@@ -393,6 +411,7 @@ func _on_start_host_pressed():
 		2:
 			late_hand = int(get_node("Settings/late_cards/ip").text)
 	hum_play = get_node("Settings/hum_play/cb")
+	alp = get_node("Settings/allow_late/cb")
 
 	remove_child(get_node("Settings"))
 	host_started = true
