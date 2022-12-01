@@ -20,6 +20,7 @@ placeholder_text = "Username"
 [node name="Pasword" type="LineEdit" parent="Login"]
 margin_top = -25.0
 margin_right = 250.0
+secret = true
 placeholder_text = "Password"
 
 [node name="Register" type="Button" parent="."]
@@ -41,15 +42,17 @@ margin_bottom = -50.0
 placeholder_text = "E-Mail"
 
 [node name="Pasword" type="LineEdit" parent="Register"]
-margin_top = -25.0
-margin_right = 250.0
-placeholder_text = "Repeat Password"
-
-[node name="Pasword2" type="LineEdit" parent="Register"]
 margin_top = -50.0
 margin_right = 250.0
 margin_bottom = -25.0
+secret = true
 placeholder_text = "Password"
+
+[node name="Pasword2" type="LineEdit" parent="Register"]
+margin_top = -25.0
+margin_right = 250.0
+secret = true
+placeholder_text = "Repeat Password"
 
 [node name="Overlay" type="ColorRect" parent="."]
 margin_right = 250.0

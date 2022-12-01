@@ -3,15 +3,18 @@
     [
       {
         "id": 0,
-        "text": "Hello there"
+        "text": "Hello there",
+        "pos": [0,0]
       },
       {
         "id": 1,
-        "text": "I'll show you how to play this game"
+        "text": "I'll show you how to play this game",
+        "pos": [0,0]
       },
       {
         "id": 2,
-        "text": "This is your hand. Here will be your hand cards"
+        "text": "This is your hand. Here will be your hand cards",
+        "pos": [0,0]
       }
 
     ]

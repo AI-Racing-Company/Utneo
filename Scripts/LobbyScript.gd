@@ -10,7 +10,6 @@ func _on_Client_pressed():
 	global.ip = x[0]
 	if x.size() == 2:
 		global.port = int(x[1])
-	global.username = get_node("Client/name").text
 	nue = get_tree().change_scene("res://Scenes/Login-Screen.tscn")
 
 func _on_Host_pressed():
