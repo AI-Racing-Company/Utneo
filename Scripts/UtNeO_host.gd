@@ -93,8 +93,8 @@ master func give_key(id, key):
 		rpc_id(id, "r_t_h", r_t)
 
 		if game_started:
-			rpc("set_past_calc", set_past_calc(PC_mode.join, str(player_names[id])))
-			rpc("set_current_card", current_card)
+			rpc_id(id, "set_past_calc", set_past_calc(PC_mode.join, str(player_names[id])))
+			rpc_id(id, "set_current_card", current_card)
 			if(str(late_hand) == "avg"):
 				var x = 0
 				var n = 0
@@ -287,13 +287,16 @@ func player_done(id):
 func game_end():
 	end_of_game = true
 	rpc("game_end")
-	if unlimit_time:
+	if !unlimit_time:
 		timer.stop()
 	set_client_winner_text()
 
 func set_client_winner_text():
 	var sendstr = ""
-	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size()) + "/" + str(max_players)
+	if !unlimit_player:
+		get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size()) + "/" + str(max_players)
+	else:
+		get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size()) + "/ unlimited"
 	for i in range(player_classment.size()):
 
 			sendstr = sendstr + str(i+1) + ": " + str(player_names[player_classment[i]]) + "\n"
@@ -320,7 +323,7 @@ func _on_Button_pressed(): # Start game
 				rand = rnd.randi_range(0,9)
 				player_cards[i].append(rand)
 				rpc_id(i, "master_add_card", rand)
-		if unlimit_time:
+		if !unlimit_time:
 			timer.start(r_t)
 		rpc_id(current_player, "startOfRound")
 		game_started = true
@@ -341,7 +344,7 @@ func next_player():
 			rset("my_turn", false)
 			rset_id(current_player, "my_turn", true)
 			rpc_id(current_player, "startOfRound")
-			if unlimit_time:
+			if !unlimit_time:
 				timer.start(r_t)
 			set_client_text()
 			rpc("set_current_player", player_names[current_player])
@@ -363,8 +366,14 @@ func add_card_timeout(id):
 
 
 func set_client_text():
-	var sendstr = "Players: " + str(player_IDs.size()) + "/" + str(max_players) + "\n"
-	get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size()) + "/" + str(max_players)
+	var sendstr
+	if !unlimit_player:
+		sendstr = "Players: " + str(player_IDs.size()) + "/" + str(max_players) + "\n"
+		get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size()) + "/" + str(max_players)
+	else:
+		sendstr = "Players: " + str(player_IDs.size()) + "/ unlimited\n"
+		get_node("ClientConnect").text = "Connected Clients: " + str(player_IDs.size()) + "/ unlimited"
+	
 	for i in player_names:
 		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(player_names[i] + " (" + str(i) + ")")
 		if game_started:
@@ -396,7 +405,7 @@ func _on_start_host_pressed():
 
 	add_child(MenuButtons)
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
-	get_node("ClientConnect").text = "Connected Clients: 0/"+str(max_players)
+	
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_server(global.port, 5)
 	peer.compression_mode = NetworkedMultiplayerENet.COMPRESS_ZLIB
@@ -421,6 +430,15 @@ func _on_start_host_pressed():
 			late_hand = int(get_node("Settings/late_cards/ip").text)
 	hum_play = get_node("Settings/hum_play/cb")
 	alp = get_node("Settings/allow_late/cb")
+	
+	unlimit_time = !get_node("Settings/max_rt/cb").is_pressed()
+	unlimit_player = !get_node("Settings/max_play/cb").is_pressed()
+	print(unlimit_player)
+	
+	if !unlimit_player:
+		get_node("ClientConnect").text = "Connected Clients: 0/"+str(max_players)
+	else:
+		get_node("ClientConnect").text = "Connected Clients: 0/ infinite"
 
 	remove_child(get_node("Settings"))
 	host_started = true
