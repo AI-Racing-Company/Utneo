@@ -3,7 +3,7 @@ extends Node2D
 var my_card_num = 0
 var my_cards = []
 var my_card_nodes = []
-var current_calc = ["","","","","","",""] # Array for Operation, value 1, value 2, name 1, name 2, card_id 1 and card_id 2
+var current_calc = ["","","","","",null,null] # Array for Operation, value 1, value 2, name 1, name 2, card_id 1 and card_id 2
 var selected_card = 0
 var current_card = -1
 var current_card_node = null
@@ -143,9 +143,11 @@ func button_pressed(operation):
 				rpc_id(1,"cards_pushed",global.my_id,current_calc)
 				selected_card = 0
 			global.btn_modes.clr:
-				current_calc[5].modulate.a8 = 100
-				current_calc[6].modulate.a8 = 100
-				current_calc = ["","","","","","",""]
+				if str(current_calc[5]) != "" and current_calc[5] != null:
+					current_calc[5].modulate.a8 = 100
+				if str(current_calc[6]) != "" and current_calc[6] != null:
+					current_calc[6].modulate.a8 = 100
+				current_calc = ["","","","","",null,null]
 				selected_card = 0
 
 			_:

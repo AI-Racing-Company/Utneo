@@ -8,8 +8,8 @@ const btn_modes = {
 	div = " / ",
 	pot = " ^ ",
 	sqr = " s ",
-	clr = "",
-	pus = ""
+	clr = "c",
+	pus = "p"
 }
 
 var ip = ""
