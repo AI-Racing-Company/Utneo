@@ -36,3 +36,4 @@ Basically UNO, just with math
 - Code instead of IP
 - Points are results of calculation
 - Maximum of two failed tries per round
+- Player in same round can continue

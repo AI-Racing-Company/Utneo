@@ -407,7 +407,7 @@ func _on_start_host_pressed():
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	
 	peer = NetworkedMultiplayerENet.new()
-	peer.create_server(global.port, 5)
+	peer.create_server(global.port, 4095)
 	peer.compression_mode = NetworkedMultiplayerENet.COMPRESS_ZLIB
 	get_tree().network_peer = peer
 	nue = get_tree().connect("network_peer_connected", self, "client_connect")
