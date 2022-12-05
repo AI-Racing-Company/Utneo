@@ -23,6 +23,7 @@ var players_ignore = []
 var player_classment = []
 var end_of_game = false
 var unverified = []
+var last_round = false
 
 var host_started = false
 
@@ -45,6 +46,7 @@ var win = [false, false] # 0= Player won, 1 = Continue after player win
 var current_card = 0
 var game_started = false
 var current_player = 0
+var current_player_num = 0
 
 var peer = null
 
@@ -148,7 +150,10 @@ master func add_card(id):
 			rpc("set_past_calc", set_past_calc(PC_mode.drew, str(player_names[current_player])))
 
 			rpc_id(id, "master_add_card", rand)
-			next_player()
+			if(last_round):
+				game_end()
+			else:
+				next_player()
 		else:
 			print("not your turn")
 
@@ -211,7 +216,10 @@ master func cards_pushed(id, ops):
 						rpc("set_current_card", current_card)
 						set_client_text()
 						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
-						next_player()
+						if(last_round):
+							game_end()
+						else:
+							next_player()
 					else:
 						if hum_play:
 							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
@@ -255,7 +263,10 @@ master func cards_pushed(id, ops):
 						current_card = c2
 						rpc("set_current_card", current_card)
 						set_client_text()
-						next_player()
+						if(last_round):
+							game_end()
+						else:
+							next_player()
 					else:
 						if hum_play:
 							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
@@ -279,9 +290,13 @@ func player_done(id):
 		rpc("set_winner", player_names[id])
 	set_client_text()
 	next_player()
+	
 	if players_ignore.size() >= player_IDs.size()-1:
-		print(str(players_ignore.size()) + "    " + str(player_IDs.size()))
-		game_end()
+		if current_player_num == player_IDs.size()-1:
+			game_end()
+		else:
+			last_round = true
+	
 
 
 func game_end():
@@ -317,6 +332,7 @@ func _on_Button_pressed(): # Start game
 		rpc("set_current_card", current_card)
 		var randplay = rnd.randi_range(0, player_IDs.size()-1)
 		current_player = player_IDs[randplay]
+		current_player_num = pir.find(current_player)
 		rset_id(current_player, "my_turn", true)
 		for i in player_IDs:
 			for _j in range(starting_hand):
@@ -336,9 +352,11 @@ func next_player():
 			rpc_id(current_player, "endOfRound")
 		if pir.size() > 0:
 			current_player = pir[(pir.find(current_player)+1)%pir.size()]
+			current_player_num = pir.find(current_player)
 			var c = 0
 			while(players_ignore.count(current_player) > 0 && c < player_IDs.size()):
 				current_player = pir[(pir.find(current_player)+1)%pir.size()]
+				current_player_num = pir.find(current_player)
 				c += 1
 
 			rset("my_turn", false)
@@ -351,10 +369,14 @@ func next_player():
 
 func _on_Timer_timeout():
 	if player_IDs.size() > 0:
-		add_card_timeout(current_player)
+		
 		rpc_id(current_player, "endOfRound")
 		rpc("set_past_calc", set_past_calc(PC_mode.time, ""))
-		next_player()
+		if(last_round):
+			game_end()
+		else:
+			add_card_timeout(current_player)
+			next_player()
 
 func add_card_timeout(id):
 	if (!win[0] || (win[0] && win[1])) && !end_of_game:
