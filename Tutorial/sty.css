@@ -1,0 +1,24 @@
+body {
+  background-color: grey;
+}
+
+
+
+.tab{
+  table-layout: fixed;
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 20px;
+}
+
+
+.tab th:nth-child(odd){
+  text-align: left;
+}
+.tab th:nth-child(even){
+  text-align: right;
+}
+
+.tutimg{
+  width: 100%
+}
