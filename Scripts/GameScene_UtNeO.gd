@@ -10,21 +10,21 @@ func _ready():
 func resized():
 	var x = get_viewport().get_visible_rect().size.x
 	var y = get_viewport().get_visible_rect().size.y
+	get_node("back").set_size(Vector2(x,y))
 	get_node("HandPos/ColorRect").set_size(Vector2(x,100))
 	get_node("HandPos/ColorRect").set_global_position(Vector2(0,y - 100))
 	get_node("ColorRect2").set_size(Vector2(x,20))
-	get_node("ColorRect2").set_global_position(Vector2(0,y - 200))
+	get_node("ColorRect2").set_global_position(Vector2(0,y - 160))
+	get_node("SelectActionButtons").set_global_position(Vector2(0,y-140))
 	var offset = x/6
 	for i in range(len(btns)):
 		get_node("SelectActionButtons/"+str(btns[i])).set_global_position(Vector2(i*offset,y-140))
 		get_node("SelectActionButtons/"+str(btns[i])).set_size(Vector2(offset,40))
-	get_node("SelectActionButtons/ULTIMATE_PUSH").set_size(Vector2(x,40))
-	get_node("SelectActionButtons/ULTIMATE_PUSH").set_global_position(Vector2(0,y-180))
+	get_node("SelectActionButtons/ULTIMATE_PUSH").set_global_position(Vector2(x-95,y-205))
 	get_node("PutCardsHere").set_global_position(Vector2(x/2-105,y/2-155))
 	get_node("Draw_Card").set_global_position(Vector2(x/2+25,y/2-150))
 	
-	get_node("SelectActionButtons/Clear").set_size(Vector2(offset,40))
-	get_node("SelectActionButtons/Clear").set_global_position(Vector2(x-offset,y-240))
+	get_node("SelectActionButtons/Clear").set_global_position(Vector2(x-46,y-205))
 	
 
 func _on_Draw_Card_pressed():
