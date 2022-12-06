@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Scripts/GameScene_UtNeO.gd" type="Script" id=1]
 [ext_resource path="res://Styles/CalcButton_font.tres" type="DynamicFont" id=2]
-[ext_resource path="res://Assets/Img/card_back_dev.png" type="Texture" id=3]
+[ext_resource path="res://Assets/Img/betterCards/Card_back.png" type="Texture" id=3]
 [ext_resource path="res://Styles/CalcButton_hiv.tres" type="StyleBox" id=4]
 [ext_resource path="res://Styles/CalcButton_norm.tres" type="StyleBox" id=5]
 [ext_resource path="res://Assets/bin.png" type="Texture" id=6]

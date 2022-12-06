@@ -20,17 +20,20 @@ func _on_Host_pressed():
 	if global.ip == "":
 		global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
 
+
 	nue = get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
 
 
 func _on_Client_LH_pressed():
 	global.ip = "localhost"
+	global.port = int(get_node("Host/host_port").text)
 	nue = get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
 	
 
 
 func _on_Host_LH_pressed():
 	global.ip = "localhost"
+	global.port = int(get_node("Host/host_port").text)
 	nue = get_tree().change_scene("res://Scenes/Login-Screen.tscn")
 
 

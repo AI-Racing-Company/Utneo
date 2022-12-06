@@ -284,7 +284,7 @@ func player_done(id):
 	
 	rpc("set_past_calc", set_past_calc(PC_mode.done, player_names[id]))
 
-	rpc_id(id, "my_end")
+	rpc_id(id, "my_end_f")
 	rpc("player_done", player_names[id], player_classment.size())
 	if players_ignore.size() == 1:
 		rpc("set_winner", player_names[id])

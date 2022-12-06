@@ -51,7 +51,7 @@ func resized():
 	s_height = height
 	var add = width / (my_card_nodes.size()+1)
 	for i in range(len(my_card_nodes)):
-		var vec = Vector2((i+1)*add - 75/2,height-100)
+		var vec = Vector2((i+1)*add - 75/2,height-90)
 		my_card_nodes[i].set_global_position(vec)
 	get_node("Current Calculation").set_global_position(Vector2(width/2-75, height-185))
 	if current_card_node != null:
@@ -64,7 +64,7 @@ func resized():
 	get_node("Timer/Time").set_global_position(Vector2(width/2-50, s_height - 165))
 
 	get_node("OverColorRect").set_size(Vector2(width,100))
-	get_node("OverColorRect").set_global_position(Vector2(0,height - 100 + overRectAdd))
+	get_node("OverColorRect").set_global_position(Vector2(0,height - 95 + overRectAdd))
 	timerRect.set_global_position(Vector2(0,s_height - 160))
 	get_node("past Calculations").set_global_position(Vector2(10,s_height - 325))
 
@@ -76,7 +76,7 @@ puppet func master_add_card(rand):
 
 	var card = null
 
-	card = load("res://Prefabs/Cards/Card_" + str(rand) + "_dev.tscn").instance()
+	card = load("res://Prefabs/Cards/NORM/Card_" + str(rand) + ".tscn").instance()
 
 	card.set_name("card_"+str(rand)+"_")
 	card.set_size(Vector2(75,100))
@@ -198,7 +198,7 @@ puppet func set_current_card(_c):
 	if current_card_node != null:
 		remove_child(current_card_node)
 	current_card = _c
-	current_card_node = load("res://Prefabs/Cards/card_" + str(_c) + "_dev.tscn").instance()
+	current_card_node = load("res://Prefabs/Cards/NORM/Card_" + str(_c) + ".tscn").instance()
 	current_card_node.set_name("current_card")
 	current_card_node.set_size(Vector2(75,100))
 	add_child(current_card_node)
@@ -231,7 +231,7 @@ func disconnect_from_server():
 puppet func set_past_calc(newText):
 	get_node("past Calculations").text = str(newText)
 
-puppet func my_end():
+puppet func my_end_f():
 	my_end = true
 
 func start_hover_above_card(card):
