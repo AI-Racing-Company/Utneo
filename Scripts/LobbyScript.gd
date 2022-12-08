@@ -1,30 +1,57 @@
 extends Node2D
+
 var nue #no useless errors (returns a never used value)
+
+#export (NodePath) var serverListPath: NodePath
+#onready var serverList := get_node(serverListPath)
+#
+#func _on_ServerListener_new_server(serverInfo):
+#	# Create some UI for the newly found server
+#	var serverNode := Label.new()
+#	serverNode.text = "%s - %s" % [serverInfo.ip, serverInfo.name]
+#	serverList.add_child(serverNode)
+#
+#func _on_ServerListener_remove_server(serverIp):
+#	for serverNode in serverList.get_children():
+#		# Just a hacky way to identify the Node and remove it
+#		if serverNode.text.find(serverIp) > -1:
+#			serverList.remove_child(serverNode)
+#			break
 
 func _ready():
 	pass
 
 func _on_Client_pressed():
+	### Get target IP and Port
 	var input_ip = get_node("Client/target_IP").text
 	var x = input_ip.split(":")
 	global.ip = x[0]
+	### Set custom port if exists
 	if x.size() == 2:
 		global.port = int(x[1])
+	
+	### load login screen
 	nue = get_tree().change_scene("res://Scenes/Login-Screen.tscn")
 
 func _on_Host_pressed():
+	### set custom port if specified
 	global.port = int(get_node("Host/host_port").text)
+	
+	### Get hosting IP
 	for adress in IP.get_local_addresses():
+		### check if IP is in local network
 		if(adress.split(".").size() == 4 and (adress.split(".")[0] == "192" or adress.split(".")[0] == "10" )):
 			global.ip = adress
+	### alternative way to get IP
 	if global.ip == "":
 		global.ip = IP.resolve_hostname(str(OS.get_environment("COMPUTERNAME")),1)
 
-
+	### load host scene
 	nue = get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
 
 
 func _on_Client_LH_pressed():
+	### set ip and get port
 	global.ip = "localhost"
 	global.port = int(get_node("Host/host_port").text)
 	nue = get_tree().change_scene("res://Scenes/UtNeO_host.tscn")
@@ -32,10 +59,12 @@ func _on_Client_LH_pressed():
 
 
 func _on_Host_LH_pressed():
+	### set ip and get port
 	global.ip = "localhost"
 	global.port = int(get_node("Host/host_port").text)
 	nue = get_tree().change_scene("res://Scenes/Login-Screen.tscn")
 
 
 func _on_Tutorial_pressed():
-	nue = get_tree().change_scene("res://Scenes/Tutorial.tscn")
+	### open tutorial url
+	OS.shell_open("http://utneo.rf.gd/")

@@ -1,6 +1,7 @@
 # Utneo
 
-Basically UNO, just with math
+Basically UNO, just with math.<br />
+Believe me, it is more fun than it sounds
 
 ## Currently implemented
 - Handcards
@@ -14,7 +15,7 @@ Basically UNO, just with math
   - Starting card count
   - Late players starting card count
   - Max round time
-  - Players get humiliated
+  - If players get humiliated
 - Disconnect from Server
 - Get two cards when time's up
 - Handcards gray when not players turn
@@ -24,7 +25,7 @@ Basically UNO, just with math
 
 
 ## Currently working on:
-- End of game working
+- Player in same round can continue
 
 ## Current Problems:
 - nothing we are currently aware of
@@ -36,4 +37,3 @@ Basically UNO, just with math
 - Code instead of IP
 - Points are results of calculation
 - Maximum of two failed tries per round
-- Player in same round can continue

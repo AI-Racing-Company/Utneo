@@ -1,6 +1,6 @@
 extends Node2D
 
-enum PC_mode{
+enum PC_mode{ ### enum for past calculations
 	norm = 0,
 	fail = 1,
 	time = 2,
@@ -10,11 +10,16 @@ enum PC_mode{
 	done = 6
 }
 
+#export (NodePath) var advertiserPath: NodePath
+#onready var advertiser := get_node(advertiserPath)
+
+### load database
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
 
 var nue
 var settings
+
 
 var player_cards = {}
 var player_IDs = []
@@ -61,6 +66,7 @@ var r_t = 60 # round time
 onready var timer = get_node("Timer")
 
 func _ready():
+	### create basis for sql connection
 	db = SQLite.new()
 	db.path = "res://Data/UserData"
 	nue = get_viewport().connect("size_changed", self, "resized")
@@ -210,8 +216,7 @@ master func cards_pushed(id, ops):
 					if c1 == current_card:
 						rpc_id(id, "card_removed")
 						player_cards[id].erase(c1)
-						if(player_cards[id].size() == 0):
-							player_done(id)
+						
 						current_card = c1
 						rpc("set_current_card", current_card)
 						set_client_text()
@@ -219,6 +224,8 @@ master func cards_pushed(id, ops):
 						if(last_round):
 							game_end()
 						else:
+							if(player_cards[id].size() == 0):
+								player_done(id)
 							next_player()
 					else:
 						if hum_play:
@@ -258,14 +265,15 @@ master func cards_pushed(id, ops):
 						rpc_id(player_id, "card_removed")
 						player_cards[player_id].erase(c1)
 						player_cards[player_id].erase(c2)
-						if(player_cards[player_id].size() == 0):
-							player_done(player_id)
+						
 						current_card = c2
 						rpc("set_current_card", current_card)
 						set_client_text()
 						if(last_round):
 							game_end()
 						else:
+							if(player_cards[player_id].size() == 0):
+								player_done(player_id)
 							next_player()
 					else:
 						if hum_play:
@@ -429,9 +437,12 @@ func _on_start_host_pressed():
 	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
 	
 	peer = NetworkedMultiplayerENet.new()
-	peer.create_server(global.port, 4095)
+	peer.create_server(global.port)
 	peer.compression_mode = NetworkedMultiplayerENet.COMPRESS_ZLIB
 	get_tree().network_peer = peer
+	
+	
+	
 	nue = get_tree().connect("network_peer_connected", self, "client_connect")
 	nue = get_tree().connect("network_peer_disconnected", self, "client_disconnect")
 
@@ -465,6 +476,9 @@ func _on_start_host_pressed():
 	remove_child(get_node("Settings"))
 	host_started = true
 	resized()
+	
+	advertiser.serverInfo["name"] = "A great lobby"
+	advertiser.serverInfo["port"] = global.port
 
 func _on_Disconnect_pressed():
 
