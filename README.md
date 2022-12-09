@@ -22,6 +22,7 @@ Believe me, it is more fun than it sounds
 - Cards "glowing" on mouse hover
 - Account system with Database
 - Showing last calculation of oponent
+- Press enter to push cards
 
 
 ## Currently working on:
@@ -35,5 +36,6 @@ Believe me, it is more fun than it sounds
 - Lobby
 - Random middle card
 - Code instead of IP
+  - save code and IP in database, make query on clientside
 - Points are results of calculation
 - Maximum of two failed tries per round

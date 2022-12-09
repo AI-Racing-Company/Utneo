@@ -18,6 +18,8 @@
 
 int __cdecl main(int argc, char** argv)
 {
+    
+    printf("x = %s\n", argv[1]);
     argc = 2;
     WSADATA wsaData;
     SOCKET ConnectSocket = INVALID_SOCKET;
@@ -48,7 +50,7 @@ int __cdecl main(int argc, char** argv)
     hints.ai_protocol = IPPROTO_TCP;
 
     // Resolve the server address and port
-    iResult = getaddrinfo(argv[1], DEFAULT_PORT, &hints, &result);
+    iResult = getaddrinfo("10.47.223.249", DEFAULT_PORT, &hints, &result);
     if (iResult != 0) {
         printf("getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();

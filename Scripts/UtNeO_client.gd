@@ -316,3 +316,13 @@ func end_hover_above_card(card):
 
 puppet func set_winner(win):
 	get_node("WinnerMessage").text = str(win) + " won"
+
+func _input(ev):
+	if Input.is_key_pressed(KEY_ENTER):
+		button_pressed(global.btn_modes.pus)
+
+
+
+
+
+
