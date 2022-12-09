@@ -100,7 +100,7 @@ puppet func master_add_card(rand):
 	
 	### load card node
 	var card = null
-	card = load("res://Prefabs/Cards/NORM/Card_" + str(rand) + ".tscn").instance()
+	card = load("res://Prefabs/Cards/"+global.use_folder+"/Card_" + str(rand) + global.use_card_end +".tscn").instance()
 
 	### set card values
 	card.set_name("card_"+str(rand)+"_")
@@ -264,7 +264,7 @@ puppet func set_current_card(_c):
 	### set numeric value of current card
 	current_card = _c
 	### load current card prefab
-	current_card_node = load("res://Prefabs/Cards/NORM/Card_" + str(_c) + ".tscn").instance()
+	current_card_node = load("res://Prefabs/Cards/"+global.use_folder+"/Card_" + str(_c) + global.use_card_end + ".tscn").instance()
 	current_card_node.set_name("current_card")
 	current_card_node.set_size(Vector2(75,100))
 	### add current card to screen 

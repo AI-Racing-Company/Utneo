@@ -41,8 +41,6 @@ puppet func connection_established_DELETE(id, x):
 	get_node("Login/Pasword").text = str(x)
 
 
-
-
 func Login():
 	print("Login function called")
 	var username = "" + get_node("Login/Username").text

@@ -18,6 +18,8 @@ var nue #no useless errors (returns a never used value)
 #			serverList.remove_child(serverNode)
 #			break
 
+var secret = ""
+
 func _ready():
 	pass
 
@@ -68,3 +70,24 @@ func _on_Host_LH_pressed():
 func _on_Tutorial_pressed():
 	### open tutorial url
 	OS.shell_open("http://utneo.rf.gd/")
+
+
+func _input(ev):
+	if Input.is_key_pressed(KEY_D):
+		secret += "D"
+	if Input.is_key_pressed(KEY_E):
+		secret += "E"
+	if Input.is_key_pressed(KEY_V):
+		secret += "V"
+	if Input.is_key_pressed(KEY_L):
+		secret += "L"
+	if Input.is_key_pressed(KEY_O):
+		secret += "O"
+	if Input.is_key_pressed(KEY_P):
+		secret += "P"
+	if Input.is_key_pressed(KEY_R):
+		secret += "R"
+	if secret == "DEVELOPER":
+		global.use_folder = "DEV"
+		global.use_card_end = "_dev"
+		
