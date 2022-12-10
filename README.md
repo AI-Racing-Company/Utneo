@@ -26,7 +26,7 @@ Believe me, it is more fun than it sounds
 
 
 ## Currently working on:
-- Player in same round can continue
+- removing unneccesary arrays in backend
 
 ## Current Problems:
 - nothing we are currently aware of
