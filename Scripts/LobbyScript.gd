@@ -22,6 +22,16 @@ var secret = ""
 
 func _ready():
 	pass
+#	print("waiting for success respsonse")
+#	var upnp = UPNP.new()
+#	var discover_result = upnp.discover()
+#
+#
+#	if discover_result == UPNP.UPNP_RESULT_SUCCESS:
+#		print("half success")
+#		if upnp.get_gateway() and upnp.get_gateway().is_valid_gateway():
+#			print("full success")
+#	print("no success")
 
 func _on_Client_pressed():
 	### Get target IP and Port
@@ -72,7 +82,7 @@ func _on_Tutorial_pressed():
 	OS.shell_open("http://utneo.rf.gd/")
 
 
-func _input(ev):
+func _input(_ev):
 	if Input.is_key_pressed(KEY_D):
 		secret += "D"
 	if Input.is_key_pressed(KEY_E):

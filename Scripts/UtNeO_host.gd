@@ -22,7 +22,6 @@ var settings
 
 var hyper_players = {}
 
-var players_ignore = []
 var players_done = 0
 var end_of_game = false
 var unverified = []
@@ -229,7 +228,7 @@ func create_past_calc_str():
 master func cards_pushed(id, ops):
 	### check if move is allowed
 	if (!win[0] || (win[0] && win[1])) && !end_of_game:
-		if current_player == id && players_ignore.count(id) == 0:
+		if current_player == id && players_done == 0:
 			### check if one or wto cards are pushed
 			if ops[2] == "":
 				var c1 = int(ops[1])
@@ -331,8 +330,9 @@ master func cards_pushed(id, ops):
 func player_done(id):
 	
 	### add player to needed arrays
-	players_ignore.append(id)
 	players_done += 1
+	hyper_players[id]["place"] = players_done
+	
 	
 	### set texts
 	rpc("set_past_calc", set_past_calc(PC_mode.done, hyper_players[current_player]["name"]))
@@ -342,13 +342,13 @@ func player_done(id):
 	rpc("player_done", hyper_players[id]["name"], players_done)
 	
 	### set winner if first done player
-	if players_ignore.size() == 1:
+	if players_done == 1:
 		rpc("set_winner", hyper_players[id]["name"])
 	set_client_text()
 	next_player()
 	
 	### check if all players are done
-	if players_ignore.size() >= hyper_players.size()-1:
+	if players_done >= hyper_players.size()-1:
 		### end game if last player in round, else let last player finnish
 		if current_player_num == hyper_players.size()-1:
 			game_end()
@@ -441,8 +441,8 @@ func next_player():
 			current_player_num = pir.find(current_player)
 			
 			var c = 0
-			### check if player is done ( is in players_ignore)
-			while(players_ignore.count(current_player) > 0 && c < hyper_players.size()):
+			### check if player is done
+			while(hyper_players[current_player]["place"] != 0 && c < hyper_players.size()):
 				current_player = pir[(pir.find(current_player)+1)%pir.size()]
 				current_player_num = pir.find(current_player)
 				c += 1
@@ -493,12 +493,12 @@ func set_client_text():
 	for i in hyper_players:
 		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(hyper_players[i]["name"] + " (" + str(i) + ")")
 		if game_started:
-			if(players_ignore.count(i) > 0):
+			if(players_done > 0):
 				sendstr = sendstr +"(Done) "+ str(hyper_players[i]["name"]) + ": " + str(hyper_players[i]["cards"].size()) + "\n"
 			else:
 				sendstr = sendstr + str(hyper_players[i]["name"]) + ": " + str(hyper_players[i]["cards"].size()) + "\n"
 		else:
-			sendstr = sendstr  + str(hyper_players[i]) + "\n"
+			sendstr = sendstr  + str(hyper_players[i]["name"]) + "\n"
 	for i in hyper_players:
 		rpc_id(i, "update_player_list", sendstr)
 
