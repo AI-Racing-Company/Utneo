@@ -92,6 +92,11 @@ func resized():
 
 func add_card():
 	### mall master function to draw card
+	if str(current_calc[5]) != "" and current_calc[5] != null:
+		current_calc[5].modulate.a8 = 100
+	if str(current_calc[6]) != "" and current_calc[6] != null:
+		current_calc[6].modulate.a8 = 100
+	current_calc = ["","","","","",null,null]
 	if !my_end:
 		rpc_id(1, "add_card", global.my_id)
 
@@ -141,7 +146,7 @@ puppet func card_removed():
 		my_card_num -= 1
 		
 	### reset selected cards
-	current_calc = ["","","","","","",""]
+	current_calc = ["","","","","",null,null]
 	selected_card = 0
 	
 	### reload graphics
@@ -321,6 +326,19 @@ func _input(ev):
 	if Input.is_key_pressed(KEY_ENTER):
 		button_pressed(global.btn_modes.pus)
 
+puppet func continue_game():
+	my_end = false
+	end_of_game = false
+	for i in my_card_nodes:
+		get_node("Cards").remove_child(i)
+	my_cards = []
+	my_card_nodes = []
+	current_calc = ["","","","","",null,null] # Array for Operation, value 1, value 2, name 1, name 2, card_id 1 and card_id 2
+	selected_card = 0
+	current_card = -1
+	current_card_node = null
+	my_turn = false
+	get_node("WinnerMessage").text = ""
 
 
 

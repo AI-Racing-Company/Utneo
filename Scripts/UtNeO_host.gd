@@ -20,7 +20,7 @@ var db
 var nue
 var settings
 
-var hyper_players = {}
+var players = {}
 
 var players_done = 0
 var end_of_game = false
@@ -90,60 +90,60 @@ func client_connect(id):
 	if !unlimit_player && unverified.size() >= int(max_players):
 			get_tree().set_refuse_new_network_connections(true)
 	
-	rpc_id(id, "connection_established_DELETE", id, hyper_players.size())
+	rpc_id(id, "connection_established_DELETE", id, players.size())
 	set_client_text()
 
 master func give_key(id, key):
 	### check if key is valid
 	if key_names.has(key):
 		### add player to arrays
-		hyper_players[id] = {}
-		hyper_players[id]["name"] = null
-		hyper_players[id]["place"] = null
-		hyper_players[id]["cards"] = null
-		hyper_players[id]["name"] = key_names[key]
-		hyper_players[id]["place"] = -1
-		hyper_players[id]["cards"] = []
+		players[id] = {}
+		players[id]["name"] = null
+		players[id]["place"] = null
+		players[id]["cards"] = null
+		players[id]["name"] = key_names[key]
+		players[id]["place"] = -1
+		players[id]["cards"] = []
 		pir.append(id)
 
 		rpc_id(id, "r_t_h", r_t)
 
 		if game_started:
 			### if game started, give player imprtand information
-			rpc_id(id, "set_past_calc", set_past_calc(PC_mode.join, str(hyper_players[id]["name"])))
+			rpc_id(id, "set_past_calc", set_past_calc(PC_mode.join, str(players[id]["name"])))
 			rpc_id(id, "set_current_card", current_card)
 			if(str(late_hand) == "avg"):
 				### calculate average hand card number of all players
 				var x = 0
 				var n = 0
-				for i in hyper_players:
-					if hyper_players[i]["cards"].size() > 0:
-						x += hyper_players[i]["cards"].size()
+				for i in players:
+					if players[i]["cards"].size() > 0:
+						x += players[i]["cards"].size()
 						n += 1
 				x = x/n
 				### give new player average number of cards
 				for _i in range(x):
 					rand = rnd.randi_range(0,9)
-					hyper_players[id]["cards"].append(rand)
+					players[id]["cards"].append(rand)
 					rpc_id(id, "master_add_card", rand)
 			else:
 				for _i in range(late_hand):
 					rand = rnd.randi_range(0,9)
-					hyper_players[id]["cards"].append(rand)
+					players[id]["cards"].append(rand)
 					rpc_id(id, "master_add_card", rand)
 
 
 		set_client_text()
 
 func client_disconnect(id):
-	if hyper_players.has(id):
+	if players.has(id):
 		### add info to past calc
-		rpc("set_past_calc", set_past_calc(PC_mode.left, str(hyper_players[id]["name"])))
+		rpc("set_past_calc", set_past_calc(PC_mode.left, str(players[id]["name"])))
 		
 		### remove player from all arrays
 		
 		unverified.erase(id)
-		hyper_players.erase(id)
+		players.erase(id)
 		
 		### Next player if disconnected one was current one
 		if id == current_player:
@@ -165,10 +165,10 @@ master func add_card(id):
 			rand = rnd.randi_range(0,9)
 
 			### save card on server
-			hyper_players[id]["cards"].append(rand)
+			players[id]["cards"].append(rand)
 
 			### upfate past calculations
-			rpc("set_past_calc", set_past_calc(PC_mode.drew, str(hyper_players[current_player]["name"])))
+			rpc("set_past_calc", set_past_calc(PC_mode.drew, str(players[current_player]["name"])))
 
 			### give card to player
 			rpc_id(id, "master_add_card", rand)
@@ -187,18 +187,18 @@ func set_past_calc(mode, args):
 	match mode:
 		0: #Default (name: number / name: number + number)
 			if args[2] == "":
-				past_calcs.append(str(hyper_players[current_player]["name"]) + ": " + str(args[1]))
+				past_calcs.append(str(players[current_player]["name"]) + ": " + str(args[1]))
 			else:
-				past_calcs.append(hyper_players[current_player]["name"] + ": " + str(args[1]) + str(args[0]) + str(args[2]))
+				past_calcs.append(players[current_player]["name"] + ": " + str(args[1]) + str(args[0]) + str(args[2]))
 
 		1: #Fail (name tried x = y / name tried x+y = z)
 			if args[2] == "":
-				past_calcs.append(str(hyper_players[current_player]["name"]) + " tried " + str(args[1]) + " = " + str(current_card))
+				past_calcs.append(str(players[current_player]["name"]) + " tried " + str(args[1]) + " = " + str(current_card))
 			else:
-				past_calcs.append(str(hyper_players[current_player]["name"]) + " tried " + str(args[1]) + str(args[0]) + str(args[2]) + " = " + str(current_card))
+				past_calcs.append(str(players[current_player]["name"]) + " tried " + str(args[1]) + str(args[0]) + str(args[2]) + " = " + str(current_card))
 
 		2: #time (name ran out if time)
-			past_calcs.append(str(hyper_players[current_player]["name"]) + " ran out of time")
+			past_calcs.append(str(players[current_player]["name"]) + " ran out of time")
 
 		3: #drew (name drew a card)
 			past_calcs.append(str(args) + " drew a card")
@@ -233,12 +233,12 @@ master func cards_pushed(id, ops):
 			if ops[2] == "":
 				var c1 = int(ops[1])
 				### check if player has card he claims to have
-				if hyper_players[id]["cards"].find(c1) >= 0:
+				if players[id]["cards"].find(c1) >= 0:
 					### check if cards match
 					if c1 == current_card:
 						### remove card from client and server
 						rpc_id(id, "card_removed")
-						hyper_players[id]["cards"].erase(c1)
+						players[id]["cards"].erase(c1)
 						
 						### set new current card
 						current_card = c1
@@ -252,7 +252,7 @@ master func cards_pushed(id, ops):
 							game_end()
 						else:
 							### check if player is done
-							if(hyper_players[id]["cards"].size() == 0):
+							if(players[id]["cards"].size() == 0):
 								player_done(id)
 							next_player()
 					else:
@@ -265,12 +265,12 @@ master func cards_pushed(id, ops):
 				var c1 = int(ops[1])
 				var c2 = int(ops[2])
 				### check if player has cards he claims to have
-				var ex1 = hyper_players[id]["cards"].find(c1)
-				var ex2 = hyper_players[id]["cards"].find(c2)
+				var ex1 = players[id]["cards"].find(c1)
+				var ex2 = players[id]["cards"].find(c2)
 				### check if cards match
 				if ex1 >= 0 && ex2 >= 0:
 					### if both cards are the same, make sure the player has at least two of that kind
-					if c1 == c2 && hyper_players[id]["cards"].count(c1) < 2:
+					if c1 == c2 && players[id]["cards"].count(c1) < 2:
 						return null
 					var res = -1
 					### calculate result of calculation
@@ -299,8 +299,8 @@ master func cards_pushed(id, ops):
 						
 						### remove cards
 						rpc_id(id, "card_removed")
-						hyper_players[id]["cards"].erase(c1)
-						hyper_players[id]["cards"].erase(c2)
+						players[id]["cards"].erase(c1)
+						players[id]["cards"].erase(c2)
 						
 						### set new current card
 						current_card = c2
@@ -314,7 +314,7 @@ master func cards_pushed(id, ops):
 							game_end()
 						else:
 							### check if player is done
-							if(hyper_players[id]["cards"].size() == 0):
+							if(players[id]["cards"].size() == 0):
 								player_done(id)
 							next_player()
 					else:
@@ -331,26 +331,26 @@ func player_done(id):
 	
 	### add player to needed arrays
 	players_done += 1
-	hyper_players[id]["place"] = players_done
+	players[id]["place"] = players_done
 	
 	
 	### set texts
-	rpc("set_past_calc", set_past_calc(PC_mode.done, hyper_players[current_player]["name"]))
+	rpc("set_past_calc", set_past_calc(PC_mode.done, players[current_player]["name"]))
 	
 	### call player done functions
 	rpc_id(id, "my_end_f")
-	rpc("player_done", hyper_players[id]["name"], players_done)
+	rpc("player_done", players[id]["name"], players_done)
 	
 	### set winner if first done player
 	if players_done == 1:
-		rpc("set_winner", hyper_players[id]["name"])
+		rpc("set_winner", players[id]["name"])
 	set_client_text()
 	next_player()
 	
 	### check if all players are done
-	if players_done >= hyper_players.size()-1:
+	if players_done >= players.size()-1:
 		### end game if last player in round, else let last player finnish
-		if current_player_num == hyper_players.size()-1:
+		if current_player_num == players.size()-1:
 			game_end()
 		else:
 			last_round = true
@@ -371,15 +371,15 @@ func set_client_winner_text():
 	var sendstr = ""
 	### first line: x clients out of y
 	if !unlimit_player:
-		get_node("ClientConnect").text = "Connected Clients: " + str(hyper_players.size()) + "/" + str(max_players)
+		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/" + str(max_players)
 	else:
-		get_node("ClientConnect").text = "Connected Clients: " + str(hyper_players.size()) + "/ unlimited"
+		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/ unlimited"
 	### draw players in winner order
-	for i in hyper_players:
-		sendstr = sendstr + hyper_players[i]["name"] + "\n"
+	for i in players:
+		sendstr = sendstr + players[i]["name"] + "\n"
 	
 	### update list on every client
-	for i in hyper_players:
+	for i in players:
 		rpc_id(i, "update_player_list", sendstr)
 
 func _physics_process(_delta):
@@ -388,14 +388,14 @@ func _physics_process(_delta):
 
 
 func _on_Button_pressed(): # Start game
-	if not game_started && hyper_players.size()>0:
+	if not game_started && players.size()>0:
 		### if late players are forebidden, refuse new connections
 		if !alp:
 			get_tree().set_refuse_new_network_connections(true)
 		### random calculations
 		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
-		var randplay = rnd.randi_range(0, hyper_players.size()-1)
+		var randplay = rnd.randi_range(0, players.size()-1)
 		
 		
 		
@@ -406,10 +406,10 @@ func _on_Button_pressed(): # Start game
 		
 		
 		### generate hand cards for every player
-		for i in hyper_players:
+		for i in players:
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
-				hyper_players[i]["cards"].append(rand)
+				players[i]["cards"].append(rand)
 				rpc_id(i, "master_add_card", rand)
 				
 		### start timer if time is not endless
@@ -424,15 +424,52 @@ func _on_Button_pressed(): # Start game
 		rset_id(current_player, "my_turn", true)
 		rpc("set_current_card", current_card)
 		rpc_id(current_player, "startOfRound")
-		rpc("set_current_player", hyper_players[current_player]["name"])
+		rpc("set_current_player", players[current_player]["name"])
+	
+	if end_of_game:
 		
+		rpc("continue_game")
+		players_done = 0
 		
+		if !alp:
+			get_tree().set_refuse_new_network_connections(true)
+		### random calculations
+		pir.shuffle()
+		current_card = rnd.randi_range(0,9)
+		var randplay = rnd.randi_range(0, players.size()-1)
+				
+		### get current player
+		current_player = pir[randplay]
+		current_player_num = pir.find(current_player)
 		
+		### generate hand cards for every player
+		for i in players:
+			players[i]["cards"] = []
+			players[i]["place"] = 0
+			for _j in range(starting_hand):
+				rand = rnd.randi_range(0,9)
+				players[i]["cards"].append(rand)
+				rpc_id(i, "master_add_card", rand)
+				
+		### start timer if time is not endless
+		if !unlimit_time:
+			timer.start(r_t)
+		
+		### initiate game
+		game_started = true
+		set_client_text()
+		
+		### call client functions
+		rset_id(current_player, "my_turn", true)
+		rpc("set_current_card", current_card)
+		rpc_id(current_player, "startOfRound")
+		rpc("set_current_player", players[current_player]["name"])
+	
 
 func next_player():
 	if !end_of_game:
 		### check if current player exists and stop his round
-		if hyper_players.has(current_player):
+		if players.has(current_player):
 			rpc_id(current_player, "endOfRound")
 		### check if any player is left
 		if pir.size() > 0:
@@ -442,7 +479,7 @@ func next_player():
 			
 			var c = 0
 			### check if player is done
-			while(hyper_players[current_player]["place"] != 0 && c < hyper_players.size()):
+			while(players[current_player]["place"] != 0 && c < players.size()):
 				current_player = pir[(pir.find(current_player)+1)%pir.size()]
 				current_player_num = pir.find(current_player)
 				c += 1
@@ -451,7 +488,7 @@ func next_player():
 			rset("my_turn", false)
 			rset_id(current_player, "my_turn", true)
 			rpc_id(current_player, "startOfRound")
-			rpc("set_current_player", hyper_players[current_player]["name"])
+			rpc("set_current_player", players[current_player]["name"])
 			
 			### start timer for new player
 			if !unlimit_time:
@@ -461,7 +498,7 @@ func next_player():
 
 func _on_Timer_timeout():
 	### check if any player is left
-	if hyper_players.size() > 0:
+	if players.size() > 0:
 		### end players round
 		rpc_id(current_player, "endOfRound")
 		### update past calc
@@ -477,40 +514,40 @@ func add_card_timeout(id):
 		if current_player == id:
 			for _i in range(2):
 				rand = rnd.randi_range(0,9)
-				hyper_players[id]["cards"].append(rand)
+				players[id]["cards"].append(rand)
 				rpc_id(id, "master_add_card", rand)
 
 
 func set_client_text():
 	var sendstr
 	if !unlimit_player:
-		sendstr = "Players: " + str(hyper_players.size()) + "/" + str(max_players) + "\n"
-		get_node("ClientConnect").text = "Connected Clients: " + str(hyper_players.size()) + "/" + str(max_players)
+		sendstr = "Players: " + str(players.size()) + "/" + str(max_players) + "\n"
+		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/" + str(max_players)
 	else:
-		sendstr = "Players: " + str(hyper_players.size()) + "/ unlimited\n"
-		get_node("ClientConnect").text = "Connected Clients: " + str(hyper_players.size()) + "/ unlimited"
+		sendstr = "Players: " + str(players.size()) + "/ unlimited\n"
+		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/ unlimited"
 	
-	for i in hyper_players:
-		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(hyper_players[i]["name"] + " (" + str(i) + ")")
+	for i in players:
+		get_node("ClientConnect").text = str(get_node("ClientConnect").text) + "\n" + str(players[i]["name"] + " (" + str(i) + ")")
 		if game_started:
-			if(players_done > 0):
-				sendstr = sendstr +"(Done) "+ str(hyper_players[i]["name"]) + ": " + str(hyper_players[i]["cards"].size()) + "\n"
+			if(players[i]["place"] > 0):
+				sendstr = sendstr +"(Done) "+ str(players[i]["name"]) + ": " + str(players[i]["cards"].size()) + "\n"
 			else:
-				sendstr = sendstr + str(hyper_players[i]["name"]) + ": " + str(hyper_players[i]["cards"].size()) + "\n"
+				sendstr = sendstr + str(players[i]["name"]) + ": " + str(players[i]["cards"].size()) + "\n"
 		else:
-			sendstr = sendstr  + str(hyper_players[i]["name"]) + "\n"
-	for i in hyper_players:
+			sendstr = sendstr  + str(players[i]["name"]) + "\n"
+	for i in players:
 		rpc_id(i, "update_player_list", sendstr)
 
 
 func _on_win_pressed():
-	if hyper_players.size() != 0:
-		player_done(hyper_players[0])
+	if players.size() != 0:
+		player_done(players[0])
 
 func _on_Contunue_pressed():
 	win[1] = true
-	if hyper_players.size() != 0:
-		player_done(hyper_players[0])
+	if players.size() != 0:
+		player_done(players[0])
 
 func _on_End_pressed():
 
