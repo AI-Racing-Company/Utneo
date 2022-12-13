@@ -7,7 +7,7 @@ const btn_modes = {
 	mul = " * ",
 	div = " / ",
 	pot = " ^ ",
-	sqr = " s ",
+	sqr = " √ ",
 	clr = "c",
 	pus = "p"
 }

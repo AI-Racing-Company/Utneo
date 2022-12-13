@@ -275,23 +275,24 @@ master func cards_pushed(id, ops):
 					var res = -1
 					### calculate result of calculation
 					match op:
-						" + ":
+						global.btn_modes.add:
 							res = str(int(c1 + c2))
 							res = res[res.length()-1]
-						" - ":
+						global.btn_modes.sub:
 							res = c1-c2
-						" * ":
+						global.btn_modes.mul:
 							res = str(int(c1)*int(c2))
 							res = res[res.length()-1]
-						" / ":
+						global.btn_modes.div:
 							if c2 != 0:
 								res = str(int(float(c1)/c2))
-						" ^ ":
+						global.btn_modes.pot:
 							res = str(pow(c1,c2))
 							res = res[res.length()-1]
-						" √ ":
+						global.btn_modes.sqr:
 							if c2 != 0:
-								res = pow(c2,float(1)/c1)
+								res = str(int(pow(c2,float(1)/c1)))
+					print(res)
 					### check if result matches current card
 					if int(res) == current_card:
 						
@@ -479,21 +480,22 @@ func next_player():
 			
 			var c = 0
 			### check if player is done
-			while(players[current_player]["place"] != 0 && c < players.size()):
-				current_player = pir[(pir.find(current_player)+1)%pir.size()]
-				current_player_num = pir.find(current_player)
-				c += 1
+			if players.has(current_player):
+				while(players[current_player]["place"] != 0 && c < players.size()):
+					current_player = pir[(pir.find(current_player)+1)%pir.size()]
+					current_player_num = pir.find(current_player)
+					c += 1
 			
-			### call client functions
-			rset("my_turn", false)
-			rset_id(current_player, "my_turn", true)
-			rpc_id(current_player, "startOfRound")
-			rpc("set_current_player", players[current_player]["name"])
-			
-			### start timer for new player
-			if !unlimit_time:
-				timer.start(r_t)
-			set_client_text()
+				### call client functions
+				rset("my_turn", false)
+				rset_id(current_player, "my_turn", true)
+				rpc_id(current_player, "startOfRound")
+				rpc("set_current_player", players[current_player]["name"])
+				
+				### start timer for new player
+				if !unlimit_time:
+					timer.start(r_t)
+				set_client_text()
 			
 
 func _on_Timer_timeout():
