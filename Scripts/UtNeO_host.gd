@@ -29,6 +29,8 @@ var end_of_game = false
 var unverified = []
 var last_round = false
 
+var firstWinner = 0
+
 var host_started = false
 
 var pir = [] # Player position in round
@@ -348,9 +350,11 @@ func player_done(id):
 	rpc("player_done", players[id]["name"], players_done)
 	
 	### set winner if first done player
+	db.open_db()
+	
 	if players_done == 1:
 		rpc("set_winner", players[id]["name"])
-		db.open_db()
+		firstWinner = rounds
 		var query = "SELECT Won_Games FROM Users WHERE Name = ?"
 		var bindings = [players[id]["name"]]
 		db.query_with_bindings(query, bindings)
@@ -359,26 +363,16 @@ func player_done(id):
 			query = "UPDATE Users SET Won_Games = " + str(res+1) + " WHERE Name = " + players[id]["name"]
 			db.query(query)
 		
-		query = "SELECT Points FROM Users WHERE Name = ?"
-		bindings = [players[id]["name"]]
-		db.query_with_bindings(query, bindings)
-		if db.query_result.size() > 0:
-			var res = db.query_result[0]["Points"]
-			var inPoints = pow(1.5,players[id]["points"])
-			query = "UPDATE Users SET Points = " + str(inPoints) + " WHERE Name = " + players[id]["name"]
-			db.query(query)
-		db.close_db()
-	else:
-		db.open_db()
-		var query = "SELECT Points FROM Users WHERE Name = ?"
-		var bindings = [players[id]["name"]]
-		db.query_with_bindings(query, bindings)
-		if db.query_result.size() > 0:
-			var res = db.query_result[0]["Points"]
-			var inPoints = pow(players[id]["points"],1.5)
-			query = "UPDATE Users SET Points = " + str(inPoints) + " WHERE Name = " + players[id]["name"]
-			db.query(query)
-		db.close_db()
+	var query = "SELECT Points FROM Users WHERE Name = ?"
+	var bindings = [players[id]["name"]]
+	db.query_with_bindings(query, bindings)
+	if db.query_result.size() > 0:
+		var res = db.query_result[0]["Points"]
+		var inPoints = players[id]["points"] /(rounds-firstWinner+1)
+		query = "UPDATE Users SET Points = " + str(inPoints) + " WHERE Name = " + players[id]["name"]
+		db.query(query)
+	db.close_db()
+
 		
 		
 	set_client_text()

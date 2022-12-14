@@ -6,7 +6,7 @@ var nue #no useless errors (returns a never used value)
 var secret = ""
 
 func _ready():
-	pass
+	
 #	print("waiting for success respsonse")
 #	var upnp = UPNP.new()
 #	var discover_result = upnp.discover()
@@ -17,6 +17,8 @@ func _ready():
 #		if upnp.get_gateway() and upnp.get_gateway().is_valid_gateway():
 #			print("full success")
 #	print("no success")
+
+	pass
 
 func _on_Client_pressed():
 	### Get target IP and Port
