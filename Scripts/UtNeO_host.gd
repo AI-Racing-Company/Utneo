@@ -17,6 +17,8 @@ enum PC_mode{ ### enum for past calculations
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
 
+var rounds = 0
+
 var nue
 var settings
 
@@ -101,6 +103,7 @@ master func give_key(id, key):
 		players[id]["name"] = null
 		players[id]["place"] = null
 		players[id]["cards"] = null
+		players[id]["points"] = 0
 		players[id]["name"] = key_names[key]
 		players[id]["place"] = -1
 		players[id]["cards"] = []
@@ -240,6 +243,8 @@ master func cards_pushed(id, ops):
 						rpc_id(id, "card_removed")
 						players[id]["cards"].erase(c1)
 						
+						players[id]["points"] += int(c1)
+						
 						### set new current card
 						current_card = c1
 						rpc("set_current_card", current_card)
@@ -292,11 +297,11 @@ master func cards_pushed(id, ops):
 						global.btn_modes.sqr:
 							if c2 != 0:
 								res = str(int(pow(c2,float(1)/c1)))
-					print(res)
+
 					### check if result matches current card
 					if int(res) == current_card:
 						
-						
+						players[id]["points"] += int(res)
 						
 						### remove cards
 						rpc_id(id, "card_removed")
@@ -345,6 +350,37 @@ func player_done(id):
 	### set winner if first done player
 	if players_done == 1:
 		rpc("set_winner", players[id]["name"])
+		db.open_db()
+		var query = "SELECT Won_Games FROM Users WHERE Name = ?"
+		var bindings = [players[id]["name"]]
+		db.query_with_bindings(query, bindings)
+		if db.query_result.size() > 0:
+			var res = db.query_result[0]["Won_Games"]
+			query = "UPDATE Users SET Won_Games = " + str(res+1) + " WHERE Name = " + players[id]["name"]
+			db.query(query)
+		
+		query = "SELECT Points FROM Users WHERE Name = ?"
+		bindings = [players[id]["name"]]
+		db.query_with_bindings(query, bindings)
+		if db.query_result.size() > 0:
+			var res = db.query_result[0]["Points"]
+			var inPoints = pow(1.5,players[id]["points"])
+			query = "UPDATE Users SET Points = " + str(inPoints) + " WHERE Name = " + players[id]["name"]
+			db.query(query)
+		db.close_db()
+	else:
+		db.open_db()
+		var query = "SELECT Points FROM Users WHERE Name = ?"
+		var bindings = [players[id]["name"]]
+		db.query_with_bindings(query, bindings)
+		if db.query_result.size() > 0:
+			var res = db.query_result[0]["Points"]
+			var inPoints = pow(players[id]["points"],1.5)
+			query = "UPDATE Users SET Points = " + str(inPoints) + " WHERE Name = " + players[id]["name"]
+			db.query(query)
+		db.close_db()
+		
+		
 	set_client_text()
 	next_player()
 	
@@ -408,6 +444,7 @@ func _on_Button_pressed(): # Start game
 		
 		### generate hand cards for every player
 		for i in players:
+			print("i is " + str(i))
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
 				players[i]["cards"].append(rand)
@@ -426,6 +463,20 @@ func _on_Button_pressed(): # Start game
 		rpc("set_current_card", current_card)
 		rpc_id(current_player, "startOfRound")
 		rpc("set_current_player", players[current_player]["name"])
+		
+		for i in players:
+			db.open_db()
+			var query = "SELECT Played_Games FROM Users WHERE Name = ?"
+			var bindings = [players[i]["name"]]
+			db.query_with_bindings(query, bindings)
+			if db.query_result.size() > 0:
+				var res = db.query_result[0]["Played_Games"]
+				query = "UPDATE Users SET Played_Games = " + str(res+1) + " WHERE Name = " + players[i]["name"]
+				db.query(query)
+				
+			db.close_db()
+		
+		
 	
 	if end_of_game:
 		
@@ -496,6 +547,7 @@ func next_player():
 				if !unlimit_time:
 					timer.start(r_t)
 				set_client_text()
+		rounds += 1
 			
 
 func _on_Timer_timeout():
