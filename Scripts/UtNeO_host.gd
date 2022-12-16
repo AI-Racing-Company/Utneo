@@ -386,7 +386,7 @@ func player_done(id):
 		db.query(query)
 	db.close_db()
 	
-	pir.remove(id)
+	pir.erase(id)
 	
 	set_client_text()
 	next_player()

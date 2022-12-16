@@ -122,7 +122,7 @@ puppet func master_add_card(rand):
 	end_hover_above_card(card)
 
 puppet func card_removed(newPoint):
-	get_node(current_player).text = newPoint
+	get_node("Current Player").text = str(newPoint)
 	### check if card has to be removed
 	if(current_calc[3] != ""):
 		### get card
@@ -292,7 +292,7 @@ puppet func game_end():
 
 puppet func set_current_player(pname):
 	### set name and time of current player
-	get_node("Current Player").text = pname
+	#get_node("Current Player").text = pname
 	if str(r_t) != "infinite":
 		timer.start(r_t)
 
