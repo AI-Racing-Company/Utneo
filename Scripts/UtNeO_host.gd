@@ -42,7 +42,7 @@ var past_calcs = []
 var key_names = {"mty":"22"}
 
 var max_players = 6
-var starting_hand = 1
+var starting_hand = 7
 var late_hand = 7
 var hum_play
 var unlimit_player = false
@@ -130,13 +130,13 @@ master func give_key(id, key):
 				### give new player average number of cards
 				for _i in range(x):
 					rand = rnd.randi_range(0,9)
-					players[id]["cards"].append(0)
-					rpc_id(id, "master_add_card", 0)
+					players[id]["cards"].append(rand)
+					rpc_id(id, "master_add_card", rand)
 			else:
 				for _i in range(late_hand):
 					rand = rnd.randi_range(0,9)
-					players[id]["cards"].append(0)
-					rpc_id(id, "master_add_card", 0)
+					players[id]["cards"].append(rand)
+					rpc_id(id, "master_add_card", rand)
 
 
 		if !end_of_game:
@@ -171,7 +171,7 @@ master func add_card(id):
 			rand = rnd.randi_range(0,9)
 
 			### save card on server
-			players[id]["cards"].append(0)
+			players[id]["cards"].append(rand)
 
 			### upfate past calculations
 			rpc("set_past_calc", set_past_calc(PC_mode.drew, str(players[current_player]["name"])))
@@ -436,25 +436,44 @@ func set_client_winner_text():
 	
 	### draw players in winner order
 	var sendstr = ""
-	
-	var arr = []
-	for _i in range(players.size()):
-		arr.append(0)
-	var cou = 1
-	print(players.size())
-	for i in players:
-		if players[i]["place"] > 0:
-			arr[players[i]["place"]-1] = players[i]["name"]
-		else:
-			arr[players.size()-cou] = players[i]["name"]
-			cou += 1
-	for i in range(arr.size()):
-		sendstr += str(i) + ": " + arr[i] + "\n"
-	
+	if define_winner == 1:
+		
+		
+		var arr = []
+		for _i in range(players.size()):
+			arr.append(0)
+		var cou = 1
+		print(players.size())
+		for i in players:
+			if players[i]["place"] > 0:
+				arr[players[i]["place"]-1] = players[i]["name"]
+			else:
+				arr[players.size()-cou] = players[i]["name"]
+				cou += 1
+		for i in range(arr.size()):
+			sendstr += str(i) + ": " + arr[i] + "\n"
+		
 
-				
-	### update list on every client
-	sendstr = "[right]" + sendstr + "[/right]"
+					
+		### update list on every client
+		sendstr = "[right]" + sendstr + "[/right]"
+	
+	else:
+		
+		var arr = []
+		for i in players:
+			arr.append(players[i]["points"])
+
+		arr.sort()
+		var c = 0
+		for i in players:
+			for j in range(arr.size()):
+				if players[i]["points"] == arr[j]:
+					sendstr += str(c) + " " + players[i]["name"] + "("+players[i]["points"] + ")\n"
+			c+=1
+					
+		### update list on every client
+		sendstr = "[right]" + sendstr + "[/right]"
 	for i in players:
 		rpc_id(i, "update_player_list", sendstr)
 
@@ -471,7 +490,7 @@ func _on_Button_pressed(): # Start game
 		### random calculations
 		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
-		current_card = 0
+		
 		var randplay = rnd.randi_range(0, players.size()-1)
 		
 		
@@ -487,8 +506,8 @@ func _on_Button_pressed(): # Start game
 		for i in players:
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
-				players[i]["cards"].append(0)
-				rpc_id(i, "master_add_card", 0)
+				players[i]["cards"].append(rand)
+				rpc_id(i, "master_add_card", rand)
 				
 		### start timer if time is not endless
 		if !unlimit_time:
@@ -532,7 +551,7 @@ func _on_Button_pressed(): # Start game
 		
 		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
-		current_card = 0
+		
 		var randplay = rnd.randi_range(0, players.size()-1)
 				
 		### get current player
@@ -546,8 +565,8 @@ func _on_Button_pressed(): # Start game
 			players[i]["place"] = 0
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
-				players[i]["cards"].append(0)
-				rpc_id(i, "master_add_card", 0)
+				players[i]["cards"].append(rand)
+				rpc_id(i, "master_add_card", rand)
 				
 		### start timer if time is not endless
 		if !unlimit_time:
@@ -615,8 +634,8 @@ func add_card_timeout(id):
 		if current_player == id:
 			for _i in range(2):
 				rand = rnd.randi_range(0,9)
-				players[id]["cards"].append(0)
-				rpc_id(id, "master_add_card", 0)
+				players[id]["cards"].append(rand)
+				rpc_id(id, "master_add_card", rand)
 
 
 func set_client_text():

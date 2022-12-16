@@ -16,6 +16,9 @@ Believe me, it is more fun than it sounds
   - Late players starting card count
   - Max round time
   - If players get humiliated
+  - Define winner by
+    - Earliest empty hand
+    - Most points
 - Disconnect from Server
 - Get two cards when time's up
 - Handcards gray when not players turn
