@@ -34,15 +34,16 @@ valign = 2
 
 [node name="Cards" type="Node2D" parent="."]
 
-[node name="Player List" type="Label" parent="."]
+[node name="Player List" type="RichTextLabel" parent="."]
 margin_left = 595.0
 margin_top = 5.0
 margin_right = 895.0
-margin_bottom = 45.0
+margin_bottom = 390.0
 grow_horizontal = 0
 rect_pivot_offset = Vector2( -928, 63 )
-custom_fonts/font = ExtResource( 3 )
-align = 2
+custom_fonts/normal_font = ExtResource( 3 )
+bbcode_enabled = true
+scroll_active = false
 
 [node name="Current Calculation" type="Label" parent="."]
 margin_left = 375.0

@@ -66,7 +66,7 @@ func _on_Host_LH_pressed():
 
 func _on_Tutorial_pressed():
 	### open tutorial url
-	OS.shell_open("http://utneo.rf.gd/")
+	nue = OS.shell_open("http://utneo.rf.gd/")
 
 
 func _input(_ev):

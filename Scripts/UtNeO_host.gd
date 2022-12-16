@@ -178,6 +178,7 @@ master func add_card(id):
 			### give card to player
 			rpc_id(id, "master_add_card", rand)
 			if(last_round):
+				
 				game_end()
 			else:
 				next_player()
@@ -246,6 +247,7 @@ master func cards_pushed(id, ops):
 						players[id]["cards"].erase(c1)
 						
 						players[id]["points"] += int(c1)
+						print(players[id]["name"] + ": " +  str(players[id]["points"]))
 						
 						### set new current card
 						current_card = c1
@@ -256,12 +258,14 @@ master func cards_pushed(id, ops):
 						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
 						
 						if(last_round):
+							
 							game_end()
 						else:
 							### check if player is done
 							if(players[id]["cards"].size() == 0):
 								player_done(id)
-							next_player()
+							else:
+								next_player()
 					else:
 						if hum_play:
 							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
@@ -280,30 +284,35 @@ master func cards_pushed(id, ops):
 					if c1 == c2 && players[id]["cards"].count(c1) < 2:
 						return null
 					var res = -1
+					var trueRes = -1
 					### calculate result of calculation
 					match op:
 						global.btn_modes.add:
-							res = str(int(c1 + c2))
-							res = res[res.length()-1]
+							trueRes = int(c1 + c2)
+							res = str(trueRes)[str(trueRes).length()-1]
 						global.btn_modes.sub:
-							res = c1-c2
+							trueRes = c1-c2
+							res = str(trueRes)
 						global.btn_modes.mul:
-							res = str(int(c1)*int(c2))
-							res = res[res.length()-1]
+							trueRes = int(c1)*int(c2)
+							res = str(trueRes)[str(trueRes).length()-1]
 						global.btn_modes.div:
 							if c2 != 0:
-								res = str(int(float(c1)/c2))
+								trueRes = int(float(c1)/c2)
+								res = str(trueRes)[str(trueRes).length()-1]
 						global.btn_modes.pot:
-							res = str(pow(c1,c2))
-							res = res[res.length()-1]
+							trueRes = pow(c1,c2)
+							res = str(trueRes)[str(trueRes).length()-1]
 						global.btn_modes.sqr:
 							if c2 != 0:
-								res = str(int(pow(c2,float(1)/c1)))
+								trueRes = int(pow(c2,float(1)/c1))
+								res = str(trueRes)[str(trueRes).length()-1]
 
 					### check if result matches current card
 					if int(res) == current_card:
 						
-						players[id]["points"] += int(res)
+						players[id]["points"] += int(trueRes)
+						print(players[id]["name"] + ": " +  str(players[id]["points"]))
 						
 						### remove cards
 						rpc_id(id, "card_removed")
@@ -319,12 +328,14 @@ master func cards_pushed(id, ops):
 						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
 						
 						if(last_round):
+							
 							game_end()
 						else:
 							### check if player is done
 							if(players[id]["cards"].size() == 0):
 								player_done(id)
-							next_player()
+							else:
+								next_player()
 					else:
 						if hum_play:
 							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
@@ -368,13 +379,13 @@ func player_done(id):
 	db.query_with_bindings(query, bindings)
 	if db.query_result.size() > 0:
 		var res = db.query_result[0]["Points"]
-		var inPoints = players[id]["points"] /(rounds-firstWinner+1)
-		query = "UPDATE Users SET Points = " + str(inPoints) + " WHERE Name = " + players[id]["name"]
+		var inPoints = players[id]["points"] /(1+0.05*players_done*rounds)
+		query = "UPDATE Users SET Points = " + str(inPoints+res) + " WHERE Name = " + players[id]["name"]
 		db.query(query)
 	db.close_db()
-
-		
-		
+	
+	pir.remove(id)
+	
 	set_client_text()
 	next_player()
 	
@@ -384,6 +395,7 @@ func player_done(id):
 		if current_player_num == players.size()-1:
 			game_end()
 		else:
+			pass
 			last_round = true
 	
 
@@ -526,7 +538,7 @@ func next_player():
 			var c = 0
 			### check if player is done
 			if players.has(current_player):
-				while(players[current_player]["place"] != 0 && c < players.size()):
+				while(players[current_player]["place"] != 0 && c < players.size()+1):
 					current_player = pir[(pir.find(current_player)+1)%pir.size()]
 					current_player_num = pir.find(current_player)
 					c += 1
@@ -567,12 +579,12 @@ func add_card_timeout(id):
 
 
 func set_client_text():
-	var sendstr
+	var sendstr = "[right]"
 	if !unlimit_player:
-		sendstr = "Players: " + str(players.size()) + "/" + str(max_players) + "\n"
+		sendstr += "Players: " + str(players.size()) + "/" + str(max_players) + "\n"
 		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/" + str(max_players)
 	else:
-		sendstr = "Players: " + str(players.size()) + "/ unlimited\n"
+		sendstr += "Players: " + str(players.size()) + "/ unlimited\n"
 		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/ unlimited"
 	
 	for i in players:
@@ -580,10 +592,13 @@ func set_client_text():
 		if game_started:
 			if(players[i]["place"] > 0):
 				sendstr = sendstr +"(Done) "+ str(players[i]["name"]) + ": " + str(players[i]["cards"].size()) + "\n"
+			elif i == current_player:
+				sendstr = sendstr + "[color=black]" + str(players[i]["name"]) + ": " + str(players[i]["cards"].size()) + "[/color]\n"
 			else:
 				sendstr = sendstr + str(players[i]["name"]) + ": " + str(players[i]["cards"].size()) + "\n"
 		else:
 			sendstr = sendstr  + str(players[i]["name"]) + "\n"
+	sendstr += "[/right]"
 	for i in players:
 		rpc_id(i, "update_player_list", sendstr)
 
