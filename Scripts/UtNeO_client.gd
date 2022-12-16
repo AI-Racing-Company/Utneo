@@ -121,8 +121,8 @@ puppet func master_add_card(rand):
 	resized()
 	end_hover_above_card(card)
 
-puppet func card_removed():
-	
+puppet func card_removed(newPoint):
+	get_node(current_player).text = newPoint
 	### check if card has to be removed
 	if(current_calc[3] != ""):
 		### get card

@@ -242,12 +242,14 @@ master func cards_pushed(id, ops):
 				if players[id]["cards"].find(c1) >= 0:
 					### check if cards match
 					if c1 == current_card:
-						### remove card from client and server
-						rpc_id(id, "card_removed")
-						players[id]["cards"].erase(c1)
+						
 						
 						players[id]["points"] += int(c1)
 						print(players[id]["name"] + ": " +  str(players[id]["points"]))
+						
+						### remove card from client and server
+						rpc_id(id, "card_removed", players[id]["points"])
+						players[id]["cards"].erase(c1)
 						
 						### set new current card
 						current_card = c1
@@ -315,7 +317,7 @@ master func cards_pushed(id, ops):
 						print(players[id]["name"] + ": " +  str(players[id]["points"]))
 						
 						### remove cards
-						rpc_id(id, "card_removed")
+						rpc_id(id, "card_removed", players[id]["points"])
 						players[id]["cards"].erase(c1)
 						players[id]["cards"].erase(c2)
 						
