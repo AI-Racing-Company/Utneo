@@ -415,17 +415,23 @@ func game_end():
 	set_client_winner_text()
 
 func set_client_winner_text():
-	var sendstr = ""
+	var sendstr = "[right]"
 	### first line: x clients out of y
 	if !unlimit_player:
 		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/" + str(max_players)
 	else:
 		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/ unlimited"
-	### draw players in winner order
-	for i in players:
-		sendstr = sendstr + players[i]["name"] + "\n"
 	
+	
+	### draw players in winner order
+	
+	for i in players:
+		for j in len(players):
+			if(players[i]["place"] == j):
+				sendstr = sendstr + players[i]["name"] + "\n"
+				
 	### update list on every client
+	sendstr += "[/right]"
 	for i in players:
 		rpc_id(i, "update_player_list", sendstr)
 
