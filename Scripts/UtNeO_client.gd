@@ -172,10 +172,9 @@ func hand_card_pressed(card):
 			card.modulate.a8 = 255
 		
 
-
 func serversided_disconnect():
 	### remove server connection
-	get_tree().network_peer = null
+	#get_tree().network_peer = null
 
 	### clear hand cards from program and screen
 	for i in my_card_nodes:
@@ -290,7 +289,7 @@ puppet func game_end():
 	end_of_game = true
 	timer.stop()
 
-puppet func set_current_player(pname):
+puppet func set_current_player(_pname):
 	### set name and time of current player
 	#get_node("Current Player").text = pname
 	if str(r_t) != "infinite":
@@ -322,7 +321,7 @@ func end_hover_above_card(card):
 puppet func set_winner(win):
 	get_node("WinnerMessage").text = str(win) + " won"
 
-func _input(ev):
+func _input(_ev):
 	if Input.is_key_pressed(KEY_ENTER):
 		button_pressed(global.btn_modes.pus)
 
