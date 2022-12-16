@@ -155,7 +155,6 @@ func client_disconnect(id):
 		### Next player if disconnected one was current one
 		if id == current_player:
 			next_player()
-		rpc("client_disconnect", id)
 		set_client_text()
 		### Allow new players to join if lobby was full
 		if !unlimit_player && unverified.size() < int(max_players) && alp:
