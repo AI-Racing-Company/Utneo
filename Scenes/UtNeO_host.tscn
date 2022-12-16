@@ -196,18 +196,54 @@ margin_right = 149.0
 margin_bottom = 29.0
 pressed = true
 
+[node name="order_by" type="Node2D" parent="Settings"]
+position = Vector2( 0, 220 )
+
+[node name="mSCt" type="Label" parent="Settings/order_by"]
+margin_left = 10.0
+margin_top = 10.0
+margin_right = 50.0
+margin_bottom = 24.0
+text = "Define winner by;"
+
+[node name="mSCt2" type="Label" parent="Settings/order_by"]
+margin_left = 50.0
+margin_top = 65.0
+margin_right = 100.0
+margin_bottom = 79.0
+text = "Points"
+align = 1
+
+[node name="mSCt3" type="Label" parent="Settings/order_by"]
+margin_left = 50.0
+margin_top = 35.0
+margin_right = 100.0
+margin_bottom = 49.0
+text = "Rounds"
+align = 1
+
+[node name="sl" type="HSlider" parent="Settings/order_by"]
+margin_left = 30.0
+margin_top = 80.0
+margin_right = 80.0
+margin_bottom = 96.0
+rect_rotation = -90.0
+max_value = 1.0
+value = 1.0
+scrollable = false
+
 [node name="start_host" type="Button" parent="Settings"]
 margin_left = 10.0
-margin_top = 230.0
+margin_top = 310.0
 margin_right = 310.0
-margin_bottom = 255.0
+margin_bottom = 335.0
 text = "Start hosting"
 
 [node name="back" type="Button" parent="Settings"]
 margin_left = 10.0
-margin_top = 280.0
+margin_top = 350.0
 margin_right = 160.0
-margin_bottom = 310.0
+margin_bottom = 380.0
 text = "Go back"
 
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]

@@ -23,10 +23,8 @@ Believe me, it is more fun than it sounds
 - Account system with Database
 - Showing last calculation of oponent
 - Press enter to push cards
+- Points are results of calculation
 
-
-## Currently working on:
-- removing unneccesary arrays in backend
 
 ## Current Problems:
 - nothing we are currently aware of
@@ -37,5 +35,4 @@ Believe me, it is more fun than it sounds
 - Random middle card
 - Code instead of IP
   - save code and IP in database, make query on clientside
-- Points are results of calculation
 - Maximum of two failed tries per round

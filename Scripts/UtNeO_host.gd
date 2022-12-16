@@ -22,6 +22,8 @@ var rounds = 0
 var nue
 var settings
 
+var first_player
+
 var players = {}
 
 var players_done = 0
@@ -46,8 +48,7 @@ var hum_play
 var unlimit_player = false
 var unlimit_time = false
 var alp = true
-
-var win = [false, false] # 0= Player won, 1 = Continue after player win
+var define_winner = 1
 
 var current_card = 0
 var game_started = false
@@ -164,7 +165,7 @@ func client_disconnect(id):
 
 master func add_card(id):
 	### check if move is allowed by player
-	if (!win[0] || (win[0] && win[1])) && !end_of_game:
+	if !end_of_game:
 		if current_player == id:
 			### create card
 			rand = rnd.randi_range(0,9)
@@ -233,8 +234,8 @@ func create_past_calc_str():
 
 master func cards_pushed(id, ops):
 	### check if move is allowed
-	if (!win[0] || (win[0] && win[1])) && !end_of_game:
-		if current_player == id && players_done == 0:
+	if !end_of_game:
+		if current_player == id:
 			### check if one or wto cards are pushed
 			if ops[2] == "":
 				var c1 = int(ops[1])
@@ -388,17 +389,18 @@ func player_done(id):
 	
 	pir.erase(id)
 	
-	set_client_text()
-	next_player()
+	
 	
 	### check if all players are done
 	if players_done >= players.size()-1:
 		### end game if last player in round, else let last player finnish
-		if current_player_num == players.size()-1:
+		if current_player != first_player:
 			game_end()
 		else:
-			pass
 			last_round = true
+	
+	set_client_text()
+	next_player()
 	
 
 
@@ -447,6 +449,7 @@ func _on_Button_pressed(): # Start game
 		### get current player
 		current_player = pir[randplay]
 		current_player_num = pir.find(current_player)
+		first_player = current_player
 		
 		
 		
@@ -494,6 +497,10 @@ func _on_Button_pressed(): # Start game
 		if !alp:
 			get_tree().set_refuse_new_network_connections(true)
 		### random calculations
+		pir.clear()
+		for i in players:
+			pir.append(i)
+		
 		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
 		var randplay = rnd.randi_range(0, players.size()-1)
@@ -501,6 +508,7 @@ func _on_Button_pressed(): # Start game
 		### get current player
 		current_player = pir[randplay]
 		current_player_num = pir.find(current_player)
+		first_player = current_player
 		
 		### generate hand cards for every player
 		for i in players:
@@ -540,7 +548,7 @@ func next_player():
 			var c = 0
 			### check if player is done
 			if players.has(current_player):
-				while(players[current_player]["place"] != 0 && c < players.size()+1):
+				while(players[current_player]["place"] != 0 && c < players.size()):
 					current_player = pir[(pir.find(current_player)+1)%pir.size()]
 					current_player_num = pir.find(current_player)
 					c += 1
@@ -572,7 +580,7 @@ func _on_Timer_timeout():
 			next_player()
 
 func add_card_timeout(id):
-	if (!win[0] || (win[0] && win[1])) && !end_of_game:
+	if !end_of_game:
 		if current_player == id:
 			for _i in range(2):
 				rand = rnd.randi_range(0,9)
@@ -610,9 +618,8 @@ func _on_win_pressed():
 		player_done(players[0])
 
 func _on_Contunue_pressed():
-	win[1] = true
 	if players.size() != 0:
-		player_done(players[0])
+		player_done(current_player)
 
 func _on_End_pressed():
 
@@ -651,6 +658,7 @@ func _on_start_host_pressed():
 			late_hand = int(get_node("Settings/late_cards/ip").text)
 	hum_play = get_node("Settings/hum_play/cb")
 	alp = get_node("Settings/allow_late/cb")
+	define_winner = get_node("Settings/order_by/sl").value
 	
 	unlimit_time = !get_node("Settings/max_rt/cb").is_pressed()
 	unlimit_player = !get_node("Settings/max_play/cb").is_pressed()
