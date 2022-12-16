@@ -42,7 +42,7 @@ var past_calcs = []
 var key_names = {"mty":"22"}
 
 var max_players = 6
-var starting_hand = 7
+var starting_hand = 1
 var late_hand = 7
 var hum_play
 var unlimit_player = false
@@ -130,16 +130,17 @@ master func give_key(id, key):
 				### give new player average number of cards
 				for _i in range(x):
 					rand = rnd.randi_range(0,9)
-					players[id]["cards"].append(rand)
-					rpc_id(id, "master_add_card", rand)
+					players[id]["cards"].append(0)
+					rpc_id(id, "master_add_card", 0)
 			else:
 				for _i in range(late_hand):
 					rand = rnd.randi_range(0,9)
-					players[id]["cards"].append(rand)
-					rpc_id(id, "master_add_card", rand)
+					players[id]["cards"].append(0)
+					rpc_id(id, "master_add_card", 0)
 
 
-		set_client_text()
+		if !end_of_game:
+			set_client_text()
 
 func client_disconnect(id):
 	if players.has(id):
@@ -171,7 +172,7 @@ master func add_card(id):
 			rand = rnd.randi_range(0,9)
 
 			### save card on server
-			players[id]["cards"].append(rand)
+			players[id]["cards"].append(0)
 
 			### upfate past calculations
 			rpc("set_past_calc", set_past_calc(PC_mode.drew, str(players[current_player]["name"])))
@@ -257,12 +258,16 @@ master func cards_pushed(id, ops):
 						rpc("set_current_card", current_card)
 						
 						### set texts
-						set_client_text()
+						if !end_of_game:
+							set_client_text()
 						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
-						
+
 						if(last_round):
-							
-							game_end()
+							### check if player is done
+							if(players[id]["cards"].size() == 0):
+								player_done(id)
+							if !end_of_game:
+								game_end()
 						else:
 							### check if player is done
 							if(players[id]["cards"].size() == 0):
@@ -327,12 +332,16 @@ master func cards_pushed(id, ops):
 						rpc("set_current_card", current_card)
 						
 						### set texts
-						set_client_text()
+						if !end_of_game:
+							set_client_text()
 						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
 						
 						if(last_round):
-							
-							game_end()
+							### check if player is done
+							if(players[id]["cards"].size() == 0):
+								player_done(id)
+							if !end_of_game:
+								game_end()
 						else:
 							### check if player is done
 							if(players[id]["cards"].size() == 0):
@@ -394,20 +403,23 @@ func player_done(id):
 	### check if all players are done
 	if players_done >= players.size()-1:
 		### end game if last player in round, else let last player finnish
-		if current_player != first_player:
+		if players.size() > 2 and current_player == first_player:
 			game_end()
 		else:
 			last_round = true
 	
-	set_client_text()
+	if !end_of_game:
+		set_client_text()
 	next_player()
 	
 
 
 func game_end():
+	print("##################################")
 	### call game end
 	end_of_game = true
-	rpc("game_end")
+	for i in players:
+		rpc_id(i,"game_end")
 	### stop timer
 	if !unlimit_time:
 		timer.stop()
@@ -415,7 +427,7 @@ func game_end():
 	set_client_winner_text()
 
 func set_client_winner_text():
-	var sendstr = "[right]"
+	
 	### first line: x clients out of y
 	if !unlimit_player:
 		get_node("ClientConnect").text = "Connected Clients: " + str(players.size()) + "/" + str(max_players)
@@ -424,14 +436,26 @@ func set_client_winner_text():
 	
 	
 	### draw players in winner order
+	var sendstr = ""
 	
+	var arr = []
+	for _i in range(players.size()):
+		arr.append(0)
+	var cou = 1
+	print(players.size())
 	for i in players:
-		for j in len(players):
-			if(players[i]["place"] == j):
-				sendstr = sendstr + players[i]["name"] + "\n"
+		if players[i]["place"] > 0:
+			arr[players[i]["place"]-1] = players[i]["name"]
+		else:
+			arr[players.size()-cou] = players[i]["name"]
+			cou += 1
+	for i in range(arr.size()):
+		sendstr += str(i) + ": " + arr[i] + "\n"
+	
+
 				
 	### update list on every client
-	sendstr += "[/right]"
+	sendstr = "[right]" + sendstr + "[/right]"
 	for i in players:
 		rpc_id(i, "update_player_list", sendstr)
 
@@ -448,6 +472,7 @@ func _on_Button_pressed(): # Start game
 		### random calculations
 		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
+		current_card = 0
 		var randplay = rnd.randi_range(0, players.size()-1)
 		
 		
@@ -461,11 +486,10 @@ func _on_Button_pressed(): # Start game
 		
 		### generate hand cards for every player
 		for i in players:
-			print("i is " + str(i))
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
-				players[i]["cards"].append(rand)
-				rpc_id(i, "master_add_card", rand)
+				players[i]["cards"].append(0)
+				rpc_id(i, "master_add_card", 0)
 				
 		### start timer if time is not endless
 		if !unlimit_time:
@@ -509,6 +533,7 @@ func _on_Button_pressed(): # Start game
 		
 		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
+		current_card = 0
 		var randplay = rnd.randi_range(0, players.size()-1)
 				
 		### get current player
@@ -522,8 +547,8 @@ func _on_Button_pressed(): # Start game
 			players[i]["place"] = 0
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
-				players[i]["cards"].append(rand)
-				rpc_id(i, "master_add_card", rand)
+				players[i]["cards"].append(0)
+				rpc_id(i, "master_add_card", 0)
 				
 		### start timer if time is not endless
 		if !unlimit_time:
@@ -568,7 +593,8 @@ func next_player():
 				### start timer for new player
 				if !unlimit_time:
 					timer.start(r_t)
-				set_client_text()
+				if !end_of_game:
+					set_client_text()
 		rounds += 1
 			
 
@@ -590,8 +616,8 @@ func add_card_timeout(id):
 		if current_player == id:
 			for _i in range(2):
 				rand = rnd.randi_range(0,9)
-				players[id]["cards"].append(rand)
-				rpc_id(id, "master_add_card", rand)
+				players[id]["cards"].append(0)
+				rpc_id(id, "master_add_card", 0)
 
 
 func set_client_text():
@@ -628,8 +654,7 @@ func _on_Contunue_pressed():
 		player_done(current_player)
 
 func _on_End_pressed():
-
-	game_end()
+	pass
 
 func _on_start_host_pressed():
 	settings = get_node("Settings")
@@ -668,7 +693,7 @@ func _on_start_host_pressed():
 	
 	unlimit_time = !get_node("Settings/max_rt/cb").is_pressed()
 	unlimit_player = !get_node("Settings/max_play/cb").is_pressed()
-	print(unlimit_player)
+
 	
 	if !unlimit_player:
 		get_node("ClientConnect").text = "Connected Clients: 0/"+str(max_players)
