@@ -414,22 +414,11 @@ func player_done(id):
 
 
 func game_end():
+	print("##################################")
 	### call game end
 	end_of_game = true
 	for i in players:
 		rpc_id(i,"game_end")
-		if players[i]["place"] == -1:
-			db.open_db()
-			var query = "SELECT Points FROM Users WHERE Name = ?"
-			var bindings = [players[i]["name"]]
-			db.query_with_bindings(query, bindings)
-			if db.query_result.size() > 0:
-				var res = db.query_result[0]["Points"]
-				var inPoints = players[i]["points"] /(1+0.05*players_done*rounds)
-				query = "UPDATE Users SET Points = " + str(inPoints+res) + " WHERE Name = " + players[i]["name"]
-				db.query(query)
-			db.close_db()
-		
 	### stop timer
 	if !unlimit_time:
 		timer.stop()
