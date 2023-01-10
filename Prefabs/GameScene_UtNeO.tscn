@@ -102,14 +102,6 @@ size_flags_horizontal = 5
 size_flags_vertical = 5
 texture_normal = ExtResource( 6 )
 
-[node name="Draw_Card" type="TextureButton" parent="."]
-margin_left = 428.0
-margin_top = 204.0
-margin_right = 502.0
-margin_bottom = 304.0
-texture_normal = ExtResource( 3 )
-expand = true
-
 [node name="ColorRect2" type="ColorRect" parent="."]
 margin_top = 440.0
 margin_right = 900.0
@@ -123,6 +115,14 @@ margin_right = 46.0
 margin_bottom = 45.0
 texture_normal = ExtResource( 8 )
 
+[node name="Draw_Card" type="TextureButton" parent="."]
+margin_left = 567.0
+margin_top = 215.0
+margin_right = 641.0
+margin_bottom = 315.0
+texture_normal = ExtResource( 3 )
+expand = true
+
 [connection signal="pressed" from="SelectActionButtons/Add" to="." method="_on_Add_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Sub" to="." method="_on_Sub_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Mul" to="." method="_on_Mul_pressed"]
@@ -131,5 +131,5 @@ texture_normal = ExtResource( 8 )
 [connection signal="pressed" from="SelectActionButtons/Sqr" to="." method="_on_Sqr_pressed"]
 [connection signal="pressed" from="SelectActionButtons/ULTIMATE_PUSH" to="." method="_on_ULTIMATE_PUSH_pressed"]
 [connection signal="pressed" from="SelectActionButtons/Clear" to="." method="_on_Clear_pressed"]
-[connection signal="pressed" from="Draw_Card" to="." method="_on_Draw_Card_pressed"]
 [connection signal="pressed" from="Disconnect" to="." method="_on_Disconnect_pressed"]
+[connection signal="pressed" from="Draw_Card" to="." method="_on_Draw_Card_pressed"]
