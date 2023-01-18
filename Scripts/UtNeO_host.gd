@@ -98,6 +98,9 @@ func client_connect(id):
 	rpc_id(id, "connection_established_DELETE", id, players.size())
 	set_client_text()
 
+master func bot_connected(name):
+	pass
+
 master func give_key(id, key):
 	### check if key is valid
 	if key_names.has(key):
