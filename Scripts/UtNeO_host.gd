@@ -95,14 +95,14 @@ func client_connect(id):
 	if !unlimit_player && unverified.size() >= int(max_players):
 			get_tree().set_refuse_new_network_connections(true)
 	
-	rpc_id(id, "connection_established_DELETE", id, players.size())
+	rpc_id(id, "connection_established", id)
 	set_client_text()
 
-master func bot_connected(name):
-	pass
 
 master func give_key(id, key):
 	### check if key is valid
+	print(key)
+	print(key_names)
 	if key_names.has(key):
 		### add player to arrays
 		players[id] = {}
@@ -237,6 +237,8 @@ func create_past_calc_str():
 
 master func cards_pushed(id, ops):
 	### check if move is allowed
+	print(players[id]["name"])
+	print(ops)
 	if !end_of_game:
 		if current_player == id:
 			### check if one or wto cards are pushed
@@ -246,8 +248,6 @@ master func cards_pushed(id, ops):
 				if players[id]["cards"].find(c1) >= 0:
 					### check if cards match
 					if c1 == current_card:
-						
-						
 						players[id]["points"] += int(c1)
 						print(players[id]["name"] + ": " +  str(players[id]["points"]))
 						
@@ -292,6 +292,7 @@ master func cards_pushed(id, ops):
 				if ex1 >= 0 && ex2 >= 0:
 					### if both cards are the same, make sure the player has at least two of that kind
 					if c1 == c2 && players[id]["cards"].count(c1) < 2:
+						print("same kard not twice")
 						return null
 					var res = -1
 					var trueRes = -1
@@ -317,7 +318,7 @@ master func cards_pushed(id, ops):
 							if c2 != 0:
 								trueRes = int(pow(c2,float(1)/c1))
 								res = str(trueRes)[str(trueRes).length()-1]
-
+					print(res)
 					### check if result matches current card
 					if int(res) == current_card:
 						
@@ -353,6 +354,7 @@ master func cards_pushed(id, ops):
 					else:
 						if hum_play:
 							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
+						print("not the right solution")
 				else:
 					print("clientside cards don't match serverside cards")
 		else:
@@ -761,6 +763,12 @@ master func register(id, name, pwd, mail):
 	db.close_db()
 
 master func login(id, name, pwd, time):
+	print(name)
+	if pwd == time and time == -1:
+		var key = PoolStringArray(OS.get_time().values()).join("").sha256_text()
+		key_names[key] = name
+		rpc_id(id, "bot_init", key, name)
+		pass
 	db.open_db()
 	var query = "SELECT pwd FROM Users WHERE Name = ?"
 	var bindings = [name]
