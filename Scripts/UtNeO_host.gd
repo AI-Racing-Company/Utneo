@@ -94,7 +94,7 @@ func client_connect(id):
 	### if max player count is reached refuse new logins
 	if !unlimit_player && unverified.size() >= int(max_players):
 			get_tree().set_refuse_new_network_connections(true)
-	
+	yield(get_tree().create_timer(0.1), "timeout")
 	rpc_id(id, "connection_established", id)
 	set_client_text()
 
@@ -498,14 +498,10 @@ func _on_Button_pressed(): # Start game
 		
 		var randplay = rnd.randi_range(0, players.size()-1)
 		
-		
-		
 		### get current player
 		current_player = pir[randplay]
 		current_player_num = pir.find(current_player)
 		first_player = current_player
-		
-		
 		
 		### generate hand cards for every player
 		for i in players:
@@ -606,18 +602,18 @@ func next_player():
 					current_player = pir[(pir.find(current_player)+1)%pir.size()]
 					current_player_num = pir.find(current_player)
 					c += 1
-			
-				### call client functions
-				rset("my_turn", false)
-				rset_id(current_player, "my_turn", true)
-				rpc_id(current_player, "startOfRound")
-				rpc("set_current_player", players[current_player]["name"])
-				
-				### start timer for new player
-				if !unlimit_time:
-					timer.start(r_t)
-				if !end_of_game:
-					set_client_text()
+				if players.has(current_player):
+					### call client functions
+					rset("my_turn", false)
+					rset_id(current_player, "my_turn", true)
+					rpc_id(current_player, "startOfRound")
+					rpc("set_current_player", players[current_player]["name"])
+					
+					### start timer for new player
+					if !unlimit_time:
+						timer.start(r_t)
+					if !end_of_game:
+						set_client_text()
 		rounds += 1
 			
 

@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/Bot_Desicion.gd" type="Script" id=1]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="SelBot" type="Button" parent="."]
+margin_top = 200.0
+margin_right = 250.0
+margin_bottom = 225.0
+text = "Register"
+
+[node name="IP" type="LineEdit" parent="SelBot"]
+margin_top = -100.0
+margin_right = 250.0
+margin_bottom = -75.0
+placeholder_text = "IP"
+
+[node name="name" type="LineEdit" parent="SelBot"]
+margin_top = -75.0
+margin_right = 250.0
+margin_bottom = -50.0
+placeholder_text = "Name"
+
+[node name="Bots" type="OptionButton" parent="SelBot"]
+margin_top = -50.0
+margin_right = 250.0
+margin_bottom = -25.0
+text = "Bot"
+
+[connection signal="pressed" from="SelBot" to="." method="_on_SelBot_pressed"]

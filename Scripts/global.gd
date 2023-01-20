@@ -23,3 +23,5 @@ var my_id
 
 var use_folder = "NORM"
 var use_card_end = ""
+
+var bot = ""

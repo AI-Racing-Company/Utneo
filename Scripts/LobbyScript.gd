@@ -91,12 +91,5 @@ func _input(_ev):
 
 
 func _on_Bot_pressed():
-	var input_ip = get_node("Client/target_IP").text
-	var x = input_ip.split(":")
-	global.ip = x[0]
-	### Set custom port if exists
-	if x.size() == 2:
-		global.port = int(x[1])
 	
-	### load login screen
-	nue = get_tree().change_scene("res://Scenes/Bot.tscn")
+	nue = get_tree().change_scene("res://Scenes/Bot_Desicion.tscn")

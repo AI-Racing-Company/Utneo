@@ -364,7 +364,7 @@ func calc_possible():
 				if sols[k] >= 0:
 					possible_solutions[str(sols[k])].append([c1,c2,k])
 	var end_time = OS.get_ticks_usec()
-	
+	print(possible_solutions)
 	print("took ", end_time - start_time)
 
 

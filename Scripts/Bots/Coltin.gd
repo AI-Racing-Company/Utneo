@@ -4,7 +4,7 @@ var nue
 var login_key
 puppet var my_turn = false
 var my_cards = []
-var my_id = 0
+var my_id
 
 var calc_types = [global.btn_modes.add, global.btn_modes.sub, global.btn_modes.mul, global.btn_modes.div, global.btn_modes.pot, global.btn_modes.sqr]
 
@@ -15,9 +15,12 @@ var possible_solutions = {"0":[], "1":[], "2":[], "3":[], "4":[], "5":[], "6":[]
 var current_card
 
 func _ready():
-	global.ip = "10.47.223.249"
+	print("I am Coltin, the first ever Utneo Bot")
 	print(global.ip, ":", global.port)
 	peer = NetworkedMultiplayerENet.new()
+	
+	
+	
 	var error : int = peer.create_client(global.ip, global.port)
 	
 	if error == 0: #if no errors...
@@ -26,8 +29,13 @@ func _ready():
 		print(peer.is_connected("peer_connected", peer, "login"))
 		
 		print(get_tree().network_peer)
-		nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
-		yield(get_tree().create_timer(2), "timeout")
+		get_tree().connect("server_disconnected", self, "serversided_disconnect")
+		yield(get_tree().create_timer(1), "timeout")
+		print(peer.is_connected("peer_connected", peer, "login"))
+		
+		set_network_master(1)
+		rpc_config("connection_established", 1)
+		
 		rpc_id(1, "login", my_id, "coltin", -1, -1)
 		print("afterRPC")
 	else: #if an error occurred while trying to join a hosted session...
@@ -44,7 +52,7 @@ puppet func connection_established(id):
 	my_id = id
 
 puppet func startOfRound():
-	yield(get_tree().create_timer(2), "timeout")
+	#yield(get_tree().create_timer(2), "timeout")
 	print(my_cards)
 	current_calc = ["","",""]
 	calc_possible()
