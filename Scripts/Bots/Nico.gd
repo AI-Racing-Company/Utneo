@@ -19,20 +19,15 @@ var possible_solutions = []
 var current_card
 
 func _ready():
-	print(global.ip, ":", global.port)
 	peer = NetworkedMultiplayerENet.new()
 	var error : int = peer.create_client(global.ip, global.port)
 	
 	if error == 0: #if no errors...
-		print("err:",error)
 		get_tree().network_peer = peer
-		print(peer.is_connected("peer_connected", peer, "login"))
-		
-		print(get_tree().network_peer)
 		nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
 		yield(get_tree().create_timer(2), "timeout")
 		rpc_id(1, "login", my_id, global.username, -1, -1)
-		print("afterRPC")
+		print("Connected")
 	else: #if an error occurred while trying to join a hosted session...
 		print("ERROR while executing create_client(), error code: ", error);
 	
@@ -48,24 +43,20 @@ puppet func connection_established(id):
 
 puppet func startOfRound():
 	#yield(get_tree().create_timer(2), "timeout")
-	print(my_cards)
+	print("My current cards: ", my_cards)
 	current_calc = ["","",""]
 	possible_solutions = []
 	calc_possible(my_cards, current_card, 0)
-	print("done calculating")
-	if use_calc != []:
-		print("can push")
-		
+	if use_calc != []:		
 		current_calc = [calc_types[use_calc[2]], str(use_calc[0]), str(use_calc[1])]
 		print("pushing ", current_calc)
 		rpc_id(1,"cards_pushed",my_id,current_calc)
-		possible_solutions = []
-		calc_possible(my_cards, current_card, 0)
 		print("pushed")
 	else:
 		if my_cards.count(current_card) > 0:
 			current_calc = ["", str(current_card), ""]
-			print("pushed 1 card")
+			rpc_id(1,"cards_pushed",my_id,current_calc)
+			print("pushed 1 card: " + str(current_card))
 		else:
 			print("drew")
 			rpc_id(1, "add_card", my_id)

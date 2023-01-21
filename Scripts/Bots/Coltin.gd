@@ -68,6 +68,7 @@ puppet func startOfRound():
 	else:
 		if my_cards.count(current_card) > 0:
 			current_calc = ["", str(current_card), ""]
+			rpc_id(1,"cards_pushed",my_id,current_calc)
 			print("pushed 1 card")
 		else:
 			print("drew")
