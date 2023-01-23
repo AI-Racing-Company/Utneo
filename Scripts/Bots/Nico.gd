@@ -55,18 +55,20 @@ puppet func startOfRound():
 	else:
 		if my_cards.count(current_card) > 0:
 			current_calc = ["", str(current_card), ""]
-			rpc_id(1,"cards_pushed",my_id,current_calc)
+			rpc_id(1,"cards_pushed", my_id, current_calc)
 			print("pushed 1 card: " + str(current_card))
 		else:
 			print("drew")
 			rpc_id(1, "add_card", my_id)
 
 func calc_possible(cards_left, goal, depth):
-	
+	print(OS.get_ticks_msec())
+	if depth <= 7:
+		return
 	use_calc = []
 	
 	var card_amounts = [0,0,0,0,0,0,0,0,0,0]
-	for i in range(9):
+	for i in range(10):
 		card_amounts[i] = cards_left.count(i)
 	
 	for i in range(card_amounts.size()):
@@ -74,6 +76,7 @@ func calc_possible(cards_left, goal, depth):
 			continue
 		var c1 = i
 		for j in range(i, card_amounts.size()):
+
 			var c2 = j
 			if (j == i and card_amounts[i] < 2) or card_amounts[j] == 0:
 				continue
