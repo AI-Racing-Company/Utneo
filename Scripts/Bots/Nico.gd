@@ -23,7 +23,7 @@ var current_card
 func _ready():
 	peer = NetworkedMultiplayerENet.new()
 	var error : int = peer.create_client(global.ip, global.port)
-	
+
 	if error == 0: #if no errors...
 		get_tree().network_peer = peer
 		nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
@@ -32,8 +32,8 @@ func _ready():
 		print("Connected")
 	else: #if an error occurred while trying to join a hosted session...
 		print("ERROR while executing create_client(), error code: ", error);
-	
-	
+
+
 
 puppet func bot_init(key, name):
 	login_key = key
@@ -45,7 +45,7 @@ puppet func connection_established(id):
 
 puppet func startOfRound():
 	#yield(get_tree().create_timer(2), "timeout")
-	
+
 	print(my_cards)
 	print("My current cards: ", my_cards.size())
 	current_calc = ["","",""]
@@ -56,7 +56,7 @@ puppet func startOfRound():
 	var total_time = OS.get_ticks_msec() - time_before
 	print("Time taken: " + str(total_time))
 	print("Diffrent possibilities: ", possible_solutions.size())
-	if use_calc != []:		
+	if use_calc != []:
 		current_calc = [calc_types[use_calc[2]], str(use_calc[0]), str(use_calc[1])]
 		print("pushing ", current_calc)
 		rpc_id(1,"cards_pushed",my_id,current_calc)
@@ -64,7 +64,7 @@ puppet func startOfRound():
 	else:
 		if my_cards.count(current_card) > 0:
 			current_calc = ["", str(current_card), ""]
-			rpc_id(1,"cards_pushed",my_id,current_calc)
+			rpc_id(1,"cards_pushed", my_id, current_calc)
 			print("pushed 1 card: " + str(current_card))
 		else:
 			print("drew")
@@ -72,17 +72,18 @@ puppet func startOfRound():
 
 func calc_possible(cards_left, goal, depth):
 	use_calc = []
-	
+
 	var card_amounts = [0,0,0,0,0,0,0,0,0,0]
 	for i in range(10):
 		card_amounts[i] = cards_left.count(i)
-	
+
 	for i in range(card_amounts.size()):
 		if card_amounts[i] == 0:
 			continue
 		var c1 = i
-			
+
 		for j in range(i, card_amounts.size()):
+
 			var c2 = j
 			if (j == i and card_amounts[i] < 2) or card_amounts[j] == 0:
 				continue
@@ -99,7 +100,7 @@ func calc_possible(cards_left, goal, depth):
 			sols[5] = -1
 			if c1 != 0:
 				sols[5] = int(pow(c2,float(1)/c1))
-				
+
 			for k in range(sols.size()):
 				if sols[k] == goal:
 					if depth == 0:
@@ -114,7 +115,7 @@ func calc_possible(cards_left, goal, depth):
 					ncc.erase(c2)
 					if depth < max_recursion_depth:
 						calc_possible(ncc, c2, depth+1)
-		
+
 	if(depth == 0):
 		var highest = [-1,-1]
 		for i in range(possible_solutions.size()):
@@ -128,7 +129,7 @@ puppet func master_add_card(rand):
 	my_cards.append_array(rand)
 
 puppet func card_removed(_newPoint):
-	
+
 	if(current_calc[1] != ""):
 		my_cards.erase(int(current_calc[1]))
 
@@ -146,7 +147,7 @@ puppet func endOfRound():
 
 puppet func set_current_card(c):
 	current_card = c
-	
+
 puppet func update_player_list(_sendstr):
 	pass
 
@@ -174,5 +175,3 @@ puppet func continue_game():
 func serversided_disconnect():
 	print("Byebye")
 	pass
-
-

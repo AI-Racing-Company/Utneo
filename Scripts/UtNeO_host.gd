@@ -237,8 +237,8 @@ func create_past_calc_str():
 
 master func cards_pushed(id, ops):
 	### check if move is allowed
-	print(players[id]["name"])
-	print(ops)
+	print(current_card)
+	print(players[id]["name"], " ", players[id]["cards"], " ", ops)
 	if !end_of_game:
 		if current_player == id:
 			### check if one or wto cards are pushed
@@ -249,7 +249,6 @@ master func cards_pushed(id, ops):
 					### check if cards match
 					if c1 == current_card:
 						players[id]["points"] += int(c1)
-						print(players[id]["name"] + ": " +  str(players[id]["points"]))
 						
 						### remove card from client and server
 						rpc_id(id, "card_removed", players[id]["points"])
@@ -292,7 +291,6 @@ master func cards_pushed(id, ops):
 				if ex1 >= 0 && ex2 >= 0:
 					### if both cards are the same, make sure the player has at least two of that kind
 					if c1 == c2 && players[id]["cards"].count(c1) < 2:
-						print("same kard not twice")
 						return null
 					var res = -1
 					var trueRes = -1
@@ -318,12 +316,10 @@ master func cards_pushed(id, ops):
 							if c2 != 0:
 								trueRes = int(pow(c2,float(1)/c1))
 								res = str(trueRes)[str(trueRes).length()-1]
-					print(res)
 					### check if result matches current card
 					if int(res) == current_card:
 						
 						players[id]["points"] += int(trueRes)
-						print(players[id]["name"] + ": " +  str(players[id]["points"]))
 						
 						### remove cards
 						rpc_id(id, "card_removed", players[id]["points"])
@@ -363,7 +359,7 @@ master func cards_pushed(id, ops):
 		print("Someone won, waiting on host to continue or end")
 
 func player_done(id):
-	
+	print(players[id]["name"], " won")
 	### add player to needed arrays
 	players_done += 1
 	players[id]["place"] = players_done
@@ -772,7 +768,7 @@ master func login(id, name, pwd, time):
 	db.query_with_bindings(query, bindings)
 	if db.query_result.size() > 0:
 		var db_pwd = db.query_result[0]["pwd"]
-		var local_pwd = (db_pwd+time).sha256_text()
+		var local_pwd = str(db_pwd+time).sha256_text()
 		if local_pwd == pwd:
 			var key = PoolStringArray(OS.get_time().values()).join("")
 			key = (key + name).sha256_text()
