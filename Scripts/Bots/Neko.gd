@@ -99,8 +99,7 @@ func calc_possible():
 
 
 puppet func master_add_card(rand):
-	my_cards.append(rand)
-	calc_possible()
+	my_cards.append_array(rand)
 
 puppet func card_removed(_newPoint):
 	

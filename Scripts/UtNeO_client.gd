@@ -102,24 +102,25 @@ func add_card():
 
 puppet func master_add_card(rand):
 	### return from function "add_card"
-	
-	### load card node
-	var card = null
-	card = load("res://Prefabs/Cards/"+global.use_folder+"/Card_" + str(rand) + global.use_card_end +".tscn").instance()
+	for ran in rand:
+		### load card node
+		var card = null
+		card = load("res://Prefabs/Cards/"+global.use_folder+"/Card_" + str(ran) + global.use_card_end +".tscn").instance()
 
-	### set card values
-	card.set_name("card_"+str(rand)+"_")
-	card.set_size(Vector2(75,100))
+		### set card values
+		card.set_name("card_"+str(ran)+"_")
+		card.set_size(Vector2(75,100))
 
-	### add card to screen and hand
-	my_card_num += 1
-	get_node("Cards").add_child(card)
-	my_card_nodes.append(card)
-	my_cards.append(rand)
-	
-	### call functions for visualazation
+		### add card to screen and hand
+		my_card_num += 1
+		get_node("Cards").add_child(card)
+		my_card_nodes.append(card)
+		my_cards.append(rand)
+		
+		### call functions for visualazation
+		
+		end_hover_above_card(card)
 	resized()
-	end_hover_above_card(card)
 
 puppet func card_removed(newPoint):
 	get_node("Current Player").text = str(newPoint)

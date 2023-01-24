@@ -134,12 +134,12 @@ master func give_key(id, key):
 				for _i in range(x):
 					rand = rnd.randi_range(0,9)
 					players[id]["cards"].append(rand)
-					rpc_id(id, "master_add_card", rand)
+				rpc_id(id, "master_add_card", players[id]["cards"])
 			else:
 				for _i in range(late_hand):
 					rand = rnd.randi_range(0,9)
 					players[id]["cards"].append(rand)
-					rpc_id(id, "master_add_card", rand)
+				rpc_id(id, "master_add_card", players[id]["cards"])
 
 
 		if !end_of_game:
@@ -180,7 +180,7 @@ master func add_card(id):
 			rpc("set_past_calc", set_past_calc(PC_mode.drew, str(players[current_player]["name"])))
 
 			### give card to player
-			rpc_id(id, "master_add_card", rand)
+			rpc_id(id, "master_add_card", [rand])
 			if(last_round):
 				
 				game_end()
@@ -508,7 +508,7 @@ func _on_Button_pressed(): # Start game
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
 				players[i]["cards"].append(rand)
-				rpc_id(i, "master_add_card", rand)
+			rpc_id(i, "master_add_card", players[i]["cards"])
 				
 		### start timer if time is not endless
 		if !unlimit_time:
@@ -567,7 +567,8 @@ func _on_Button_pressed(): # Start game
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
 				players[i]["cards"].append(rand)
-				rpc_id(i, "master_add_card", rand)
+			rpc_id(i, "master_add_card", players[i]["cards"])
+				
 				
 		### start timer if time is not endless
 		if !unlimit_time:
@@ -636,7 +637,7 @@ func add_card_timeout(id):
 			for _i in range(2):
 				rand = rnd.randi_range(0,9)
 				players[id]["cards"].append(rand)
-				rpc_id(id, "master_add_card", rand)
+				rpc_id(id, "master_add_card", [rand])
 
 
 func set_client_text():

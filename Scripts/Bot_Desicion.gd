@@ -1,6 +1,6 @@
 extends Node2D
 
-var bots = ["Coltin", "Neko", "Nico"]
+var bots = ["Coltin", "Neko", "Nico", "Timmothy"]
 
 # Declare member variables here. Examples:
 # var a = 2

@@ -1,7 +1,5 @@
 extends Node2D
 
-var max_recursion_depth = 10
-
 var nue
 var login_key
 puppet var my_turn = false
@@ -45,22 +43,18 @@ puppet func connection_established(id):
 
 puppet func startOfRound():
 	#yield(get_tree().create_timer(2), "timeout")
-	
-	print(my_cards)
-	print("My current cards: ", my_cards.size())
+	print("My current cards: ", my_cards)
 	current_calc = ["","",""]
 	possible_solutions = []
 	print("card to reach: ", current_card)
-	var time_before = OS.get_ticks_msec()
 	calc_possible(my_cards, current_card, 0)
-	var total_time = OS.get_ticks_msec() - time_before
-	print("Time taken: " + str(total_time))
-	print("Diffrent possibilities: ", possible_solutions.size())
-	if use_calc != []:		
-		current_calc = [calc_types[use_calc[2]], str(use_calc[0]), str(use_calc[1])]
+	print(possible_solutions)
+	if use_calc != []:
+		current_calc = [calc_types[use_calc[2] if use_calc[2] != "" else ""], str(use_calc[0]), str(use_calc[1])]
 		print("pushing ", current_calc)
 		rpc_id(1,"cards_pushed",my_id,current_calc)
 		print("pushed")
+		yield(get_tree().create_timer(2), "timeout")
 	else:
 		if my_cards.count(current_card) > 0:
 			current_calc = ["", str(current_card), ""]
@@ -71,6 +65,10 @@ puppet func startOfRound():
 			rpc_id(1, "add_card", my_id)
 
 func calc_possible(cards_left, goal, depth):
+	
+	if depth > 3:
+		return
+	
 	use_calc = []
 	
 	var card_amounts = [0,0,0,0,0,0,0,0,0,0]
@@ -81,6 +79,19 @@ func calc_possible(cards_left, goal, depth):
 		if card_amounts[i] == 0:
 			continue
 		var c1 = i
+		
+		
+		if c1 == goal:
+			if depth == 0:
+				current_index_array = [c1, "", "",depth]
+				possible_solutions.append(current_index_array)
+				current_index = possible_solutions.find(current_index_array)
+			else:
+				current_index_array[3] = depth
+				possible_solutions.append(current_index_array)
+			var ncc = cards_left.duplicate()
+			ncc.erase(c1)
+			calc_possible(ncc, c1, depth+1)
 			
 		for j in range(i, card_amounts.size()):
 			var c2 = j
@@ -112,8 +123,7 @@ func calc_possible(cards_left, goal, depth):
 					var ncc = cards_left.duplicate()
 					ncc.erase(c1)
 					ncc.erase(c2)
-					if depth < max_recursion_depth:
-						calc_possible(ncc, c2, depth+1)
+					calc_possible(ncc, c2, depth+1)
 		
 	if(depth == 0):
 		var highest = [-1,-1]
