@@ -324,7 +324,7 @@ puppet func set_winner(win):
 
 func _input(_ev):
 	if Input.is_key_pressed(KEY_ENTER):
-		calc_possible()
+		button_pressed(global.btn_modes.pus)
 
 puppet func continue_game():
 	my_end = false
@@ -340,33 +340,7 @@ puppet func continue_game():
 	my_turn = false
 	get_node("WinnerMessage").text = ""
 
-func calc_possible():
-	var possible_solutions = {"0":[], "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[],"8":[],"9":[]}
-	print(my_cards)
-	var start_time = OS.get_ticks_usec()
-	for i in range(my_cards.size()):
-		var c1 = my_cards[i]
-		for j in range(i, my_cards.size()):
-			var sols = [-1,-1,-1,-1,-1,-1]
-			var c2 = my_cards[j]
-			sols[0] = (c1+c2)%10
-			sols[1] = -1
-			if c1>=c2:
-				sols[1] = c1-c2
-			sols[2] = (c1*c2)%10
-			sols[3] = -1
-			if c2 != 0:
-				sols[3] = int(c1/c2)
-			sols[4] = int(pow(c1,c2))%10
-			sols[5] = -1
-			if c1 != 0:
-				sols[5] = int(pow(c2,float(1)/c1))
-			for k in range(sols.size()):
-				if sols[k] >= 0:
-					possible_solutions[str(sols[k])].append([c1,c2,k])
-	var end_time = OS.get_ticks_usec()
-	print(possible_solutions)
-	print("took ", end_time - start_time)
+
 
 
 

@@ -1,5 +1,7 @@
 extends Node2D
 
+var max_recursion_depth = 10
+
 var nue
 var login_key
 puppet var my_turn = false
@@ -21,7 +23,7 @@ var current_card
 func _ready():
 	peer = NetworkedMultiplayerENet.new()
 	var error : int = peer.create_client(global.ip, global.port)
-	
+
 	if error == 0: #if no errors...
 		get_tree().network_peer = peer
 		nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
@@ -30,8 +32,8 @@ func _ready():
 		print("Connected")
 	else: #if an error occurred while trying to join a hosted session...
 		print("ERROR while executing create_client(), error code: ", error);
-	
-	
+
+
 
 puppet func bot_init(key, name):
 	login_key = key
@@ -43,47 +45,46 @@ puppet func connection_established(id):
 
 puppet func startOfRound():
 	#yield(get_tree().create_timer(2), "timeout")
-	print("My current cards: ", my_cards)
+
+	print(my_cards)
+	print("My current cards: ", my_cards.size())
 	current_calc = ["","",""]
 	possible_solutions = []
 	print("card to reach: ", current_card)
+	var time_before = OS.get_ticks_msec()
 	calc_possible(my_cards, current_card, 0)
-	print(possible_solutions)
+	var total_time = OS.get_ticks_msec() - time_before
+	print("Time taken: " + str(total_time))
+	print("Diffrent possibilities: ", possible_solutions.size())
 	if use_calc != []:
-		current_calc = [calc_types[use_calc[2] if use_calc[2] != "" else ""], str(use_calc[0]), str(use_calc[1])]
+		current_calc = [calc_types[use_calc[2]] if str(use_calc[2]) != "" else "", str(use_calc[0]), str(use_calc[1])]
 		print("pushing ", current_calc)
 		rpc_id(1,"cards_pushed",my_id,current_calc)
 		print("pushed")
-		yield(get_tree().create_timer(2), "timeout")
 	else:
 		if my_cards.count(current_card) > 0:
 			current_calc = ["", str(current_card), ""]
-			rpc_id(1,"cards_pushed",my_id,current_calc)
+			rpc_id(1,"cards_pushed", my_id, current_calc)
 			print("pushed 1 card: " + str(current_card))
 		else:
 			print("drew")
 			rpc_id(1, "add_card", my_id)
 
 func calc_possible(cards_left, goal, depth):
-	
-	if depth > 3:
-		return
-	
 	use_calc = []
-	
+
 	var card_amounts = [0,0,0,0,0,0,0,0,0,0]
 	for i in range(10):
 		card_amounts[i] = cards_left.count(i)
-	
+
 	for i in range(card_amounts.size()):
 		if card_amounts[i] == 0:
 			continue
 		var c1 = i
 		
-		
 		if c1 == goal:
 			if depth == 0:
-				current_index_array = [c1, "", "",depth]
+				current_index_array = [c1,"","",depth]
 				possible_solutions.append(current_index_array)
 				current_index = possible_solutions.find(current_index_array)
 			else:
@@ -91,9 +92,12 @@ func calc_possible(cards_left, goal, depth):
 				possible_solutions.append(current_index_array)
 			var ncc = cards_left.duplicate()
 			ncc.erase(c1)
-			calc_possible(ncc, c1, depth+1)
-			
+			if depth < max_recursion_depth:
+				calc_possible(ncc, c1, depth+1)
+
 		for j in range(i, card_amounts.size()):
+			
+
 			var c2 = j
 			if (j == i and card_amounts[i] < 2) or card_amounts[j] == 0:
 				continue
@@ -110,7 +114,7 @@ func calc_possible(cards_left, goal, depth):
 			sols[5] = -1
 			if c1 != 0:
 				sols[5] = int(pow(c2,float(1)/c1))
-				
+
 			for k in range(sols.size()):
 				if sols[k] == goal:
 					if depth == 0:
@@ -123,8 +127,9 @@ func calc_possible(cards_left, goal, depth):
 					var ncc = cards_left.duplicate()
 					ncc.erase(c1)
 					ncc.erase(c2)
-					calc_possible(ncc, c2, depth+1)
-		
+					if depth < max_recursion_depth:
+						calc_possible(ncc, c2, depth+1)
+
 	if(depth == 0):
 		var highest = [-1,-1]
 		for i in range(possible_solutions.size()):
@@ -136,9 +141,10 @@ func calc_possible(cards_left, goal, depth):
 
 puppet func master_add_card(rand):
 	my_cards.append_array(rand)
+	print("got cards")
 
 puppet func card_removed(_newPoint):
-	
+
 	if(current_calc[1] != ""):
 		my_cards.erase(int(current_calc[1]))
 
@@ -156,7 +162,7 @@ puppet func endOfRound():
 
 puppet func set_current_card(c):
 	current_card = c
-	
+
 puppet func update_player_list(_sendstr):
 	pass
 
@@ -184,5 +190,3 @@ puppet func continue_game():
 func serversided_disconnect():
 	print("Byebye")
 	pass
-
-
