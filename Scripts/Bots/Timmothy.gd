@@ -1,11 +1,11 @@
 extends Node2D
 
-var max_recursion_depth = 10
+var max_recursion_depth = 5
 
 var nue
 var login_key
 puppet var my_turn = false
-var my_cards = []
+var my_cards = [0,0,0,0,0,0,0,0,0,0]
 var my_id = 0
 
 var current_index = -1
@@ -44,6 +44,7 @@ puppet func connection_established(id):
 	my_id = id
 
 puppet func startOfRound():
+	print("Strating new round")
 	#yield(get_tree().create_timer(2), "timeout")
 
 	print(my_cards)
@@ -71,14 +72,11 @@ puppet func startOfRound():
 			rpc_id(1, "add_card", my_id)
 
 func calc_possible(cards_left, goal, depth):
+	
 	use_calc = []
 
-	var card_amounts = [0,0,0,0,0,0,0,0,0,0]
-	for i in range(10):
-		card_amounts[i] = cards_left.count(i)
-
-	for i in range(card_amounts.size()):
-		if card_amounts[i] == 0:
+	for i in range(cards_left.size()):
+		if cards_left[i] == 0:
 			continue
 		var c1 = i
 		
@@ -89,17 +87,17 @@ func calc_possible(cards_left, goal, depth):
 				current_index = possible_solutions.find(current_index_array)
 			else:
 				current_index_array[3] = depth
-				possible_solutions.append(current_index_array)
+				possible_solutions[possible_solutions.size() - 1] = current_index_array
 			var ncc = cards_left.duplicate()
-			ncc.erase(c1)
+			ncc[c1] = ncc[c1]-1;
 			if depth < max_recursion_depth:
 				calc_possible(ncc, c1, depth+1)
 
-		for j in range(i, card_amounts.size()):
+		for j in range(i, cards_left.size()):
 			
 
 			var c2 = j
-			if (j == i and card_amounts[i] < 2) or card_amounts[j] == 0:
+			if (j == i and cards_left[i] < 2) or cards_left[j] == 0:
 				continue
 			var sols = [-1,-1,-1,-1,-1,-1]
 			sols[0] = (c1+c2)%10
@@ -123,10 +121,11 @@ func calc_possible(cards_left, goal, depth):
 						current_index = possible_solutions.find(current_index_array)
 					else:
 						current_index_array[3] = depth
-						possible_solutions.append(current_index_array)
+						possible_solutions[possible_solutions.size() - 1] = current_index_array
 					var ncc = cards_left.duplicate()
-					ncc.erase(c1)
-					ncc.erase(c2)
+					ncc[c1] = ncc[c1]-1;
+					ncc[c2] = ncc[c2]-1;
+					print("depth: ", depth)
 					if depth < max_recursion_depth:
 						calc_possible(ncc, c2, depth+1)
 
@@ -140,16 +139,17 @@ func calc_possible(cards_left, goal, depth):
 
 
 puppet func master_add_card(rand):
-	my_cards.append_array(rand)
+	for i in range(10):
+		my_cards[i] += rand.count(i)
 	print("got cards")
 
 puppet func card_removed(_newPoint):
 
 	if(current_calc[1] != ""):
-		my_cards.erase(int(current_calc[1]))
+		my_cards[int(current_calc[1])] -= 1
 
 	if(current_calc[2] != ""):
-		my_cards.erase(int(current_calc[2]))
+		my_cards[int(current_calc[2])] -= 1
 
 	current_calc = ["","",""]
 
