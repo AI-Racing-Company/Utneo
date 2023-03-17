@@ -513,7 +513,7 @@ func _on_Button_pressed(): # Start game
 		### initiate game
 		game_started = true
 		set_client_text()
-		
+		yield(get_tree().create_timer(2), "timeout")
 		### call client functions
 		rset_id(current_player, "my_turn", true)
 		rpc("set_current_card", current_card)
@@ -783,3 +783,24 @@ master func login(id, name, pwd, time):
 
 func _on_Button2_pressed():
 	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
+
+func _input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_WHEEL_DOWN and event.pressed:
+			scrolled(-5)
+		if event.button_index == BUTTON_WHEEL_UP and event.pressed:
+			scrolled(5)
+
+func scrolled(move):#
+	
+	var node = get_node("Settings")
+	var screen = get_viewport().get_visible_rect().size.y
+	
+	node.set_global_position(Vector2(0,node.get_global_position().y + move))
+	if(node.get_global_position().y > 0):
+		node.set_global_position(Vector2(0,0))
+	if node.get_global_position().y+400 < screen:
+		if(screen > 400):
+			node.set_global_position(Vector2(0,0))
+		else:
+			node.set_global_position(Vector2(0,screen-400))

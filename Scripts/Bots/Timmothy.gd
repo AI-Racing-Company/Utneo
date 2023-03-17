@@ -2,6 +2,8 @@ extends Node2D
 
 var max_recursion_depth = 5
 
+var rounds = 0;
+
 var nue
 var login_key
 puppet var my_turn = false
@@ -44,32 +46,34 @@ puppet func connection_established(id):
 	my_id = id
 
 puppet func startOfRound():
-	print("Strating new round")
+	rounds += 1
+	#print("Strating new round")
 	#yield(get_tree().create_timer(2), "timeout")
 
-	print(my_cards)
-	print("My current cards: ", my_cards.size())
+	#print(my_cards)
+	#print("My current cards: ", my_cards.size())
 	current_calc = ["","",""]
 	possible_solutions = []
-	print("card to reach: ", current_card)
+	#print("card to reach: ", current_card)
 	var time_before = OS.get_ticks_msec()
 	calc_possible(my_cards, current_card, 0)
 	var total_time = OS.get_ticks_msec() - time_before
-	print("Time taken: " + str(total_time))
-	print("Diffrent possibilities: ", possible_solutions.size())
+	#print("Time taken: " + str(total_time))
+	#print("Diffrent possibilities: ", possible_solutions.size())
 	if use_calc != []:
 		current_calc = [calc_types[use_calc[2]] if str(use_calc[2]) != "" else "", str(use_calc[0]), str(use_calc[1])]
-		print("pushing ", current_calc)
+		#print("pushing ", current_calc)
 		rpc_id(1,"cards_pushed",my_id,current_calc)
-		print("pushed")
+		#print("pushed")
 	else:
-		if my_cards.count(current_card) > 0:
+		if my_cards[current_card] > 0:
 			current_calc = ["", str(current_card), ""]
 			rpc_id(1,"cards_pushed", my_id, current_calc)
-			print("pushed 1 card: " + str(current_card))
+			#print("pushed 1 card: " + str(current_card))
 		else:
-			print("drew")
+			#print("drew")
 			rpc_id(1, "add_card", my_id)
+	print("rounds: ", rounds)
 
 func calc_possible(cards_left, goal, depth):
 	

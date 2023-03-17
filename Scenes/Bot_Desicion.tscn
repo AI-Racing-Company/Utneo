@@ -29,4 +29,10 @@ margin_right = 250.0
 margin_bottom = -25.0
 text = "Bot"
 
+[node name="IPDEC" type="OptionButton" parent="SelBot"]
+margin_top = -101.0
+margin_right = 250.0
+margin_bottom = -76.0
+text = "IP"
+
 [connection signal="pressed" from="SelBot" to="." method="_on_SelBot_pressed"]

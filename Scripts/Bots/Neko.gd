@@ -12,23 +12,25 @@ var peer = null
 var current_calc = ["","",""] # Array for Operation, value 1, value 2, name 1, name 2, card_id 1 and card_id 2
 var possible_solutions = {"0":[], "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[],"8":[],"9":[]}
 
+var rounds = 0;
+
 var current_card
 
 func _ready():
-	print(global.ip, ":", global.port)
+	#print(global.ip, ":", global.port)
 	peer = NetworkedMultiplayerENet.new()
 	var error : int = peer.create_client(global.ip, global.port)
 	
 	if error == 0: #if no errors...
-		print("err:",error)
+		#print("err:",error)
 		get_tree().network_peer = peer
-		print(peer.is_connected("peer_connected", peer, "login"))
+		#print(peer.is_connected("peer_connected", peer, "login"))
 		
-		print(get_tree().network_peer)
+		#print(get_tree().network_peer)
 		nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
 		yield(get_tree().create_timer(2), "timeout")
 		rpc_id(1, "login", my_id, global.username, -1, -1)
-		print("afterRPC")
+		#print("afterRPC")
 	else: #if an error occurred while trying to join a hosted session...
 		print("ERROR while executing create_client(), error code: ", error);
 	
@@ -43,33 +45,35 @@ puppet func connection_established(id):
 	my_id = id
 
 puppet func startOfRound():
+	rounds += 1;
 	#yield(get_tree().create_timer(2), "timeout")
-	print(my_cards)
+	#print(my_cards)
 	current_calc = ["","",""]
 	calc_possible()
-	print("done calculating")
+	#print("done calculating")
 	if possible_solutions[str(current_card)].size() > 0:
-		print("can push")
+		#print("can push")
 		var pc0 = possible_solutions[str(current_card)][0]
 		current_calc = [calc_types[pc0[2]], str(pc0[0]), str(pc0[1])]
-		print("pushing ", current_calc)
+		#print("pushing ", current_calc)
 		rpc_id(1,"cards_pushed",my_id,current_calc)
 		calc_possible()
-		print("pushed")
+		#print("pushed")
 	else:
 		if my_cards.count(current_card) > 0:
 			current_calc = ["", str(current_card), ""]
 			rpc_id(1,"cards_pushed",my_id,current_calc)
-			print("pushed 1 card")
+			#print("pushed 1 card")
 		else:
-			print("drew")
+			#print("drew")
 			rpc_id(1, "add_card", my_id)
+	print("rounds: ", rounds)
 
 func calc_possible():
 	possible_solutions = {"0":[], "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[],"8":[],"9":[]}
 	
 	var card_amounts = [0,0,0,0,0,0,0,0,0,0]
-	for i in range(9):
+	for i in range(10):
 		card_amounts[i] = my_cards.count(i)
 	
 	for i in range(card_amounts.size()):

@@ -6,6 +6,8 @@ puppet var my_turn = false
 var my_cards = []
 var my_id
 
+var rounds = 0;
+
 var calc_types = [global.btn_modes.add, global.btn_modes.sub, global.btn_modes.mul, global.btn_modes.div, global.btn_modes.pot, global.btn_modes.sqr]
 
 var peer = null
@@ -52,6 +54,7 @@ puppet func connection_established(id):
 	my_id = id
 
 puppet func startOfRound():
+	rounds += 1;
 	#yield(get_tree().create_timer(2), "timeout")
 	print(my_cards)
 	current_calc = ["","",""]
@@ -73,6 +76,7 @@ puppet func startOfRound():
 		else:
 			print("drew")
 			rpc_id(1, "add_card", my_id)
+	print("rounds: ", rounds)
 
 func calc_possible():
 	possible_solutions = {"0":[], "1":[], "2":[], "3":[], "4":[], "5":[], "6":[], "7":[],"8":[],"9":[]}
