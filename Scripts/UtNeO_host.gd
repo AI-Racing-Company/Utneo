@@ -12,6 +12,8 @@ enum PC_mode{ ### enum for past calculations
 	done = 6
 }
 
+var DELETE_LATER_RANDOM_OVERRIDE = 0
+
 var bot_functions = [
 	"set_current_card",
 	"master_add_card",
@@ -153,12 +155,14 @@ master func give_key(id, key):
 				x = x/n
 				### give new player average number of cards
 				for _i in range(x):
-					rand = rnd.randi_range(0,9)
+					rand = DELETE_LATER_RANDOM_OVERRIDE
+					DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 					players[id]["cards"].append(rand)
 				rpc_one(id, "master_add_card", [players[id]["cards"]])
 			else:
 				for _i in range(late_hand):
-					rand = rnd.randi_range(0,9)
+					rand = DELETE_LATER_RANDOM_OVERRIDE
+					DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 					players[id]["cards"].append(rand)
 				rpc_one(id, "master_add_card", [players[id]["cards"]])
 
@@ -189,12 +193,12 @@ func client_disconnect(id):
 
 master func add_card(id):
 	### check if move is allowed by player
-	print("I drew a card")
+	#print("I drew a card")
 	if !end_of_game:
 		if current_player == id:
 			### create card
-			rand = rnd.randi_range(0,9)
-
+			rand = DELETE_LATER_RANDOM_OVERRIDE
+			DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 			### save card on server
 			players[id]["cards"].append(rand)
 
@@ -202,7 +206,8 @@ master func add_card(id):
 			rpc_all("set_past_calc", set_past_calc(PC_mode.drew, str(players[current_player]["name"])))
 
 			### give card to player
-			print("gave card: ", rand)
+			
+			#print("gave card: ", rand)
 			rpc_one(id, "master_add_card", [[rand]])
 			if(last_round):
 				game_end()
@@ -507,7 +512,8 @@ func _on_Button_pressed(): # Start game
 			get_tree().set_refuse_new_network_connections(true)
 		### random calculations
 		pir.shuffle()
-		current_card = rnd.randi_range(0,9)
+		current_card = DELETE_LATER_RANDOM_OVERRIDE
+		DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 		
 		var randplay = rnd.randi_range(0, players.size()-1)
 		
@@ -519,7 +525,8 @@ func _on_Button_pressed(): # Start game
 		### generate hand cards for every player
 		for i in players:
 			for _j in range(starting_hand):
-				rand = rnd.randi_range(0,9)
+				rand = DELETE_LATER_RANDOM_OVERRIDE
+				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 				players[i]["cards"].append(rand)
 			rpc_one(i, "master_add_card", [players[i]["cards"]])
 				
@@ -564,7 +571,8 @@ func _on_Button_pressed(): # Start game
 			pir.append(i[0])
 		
 		pir.shuffle()
-		current_card = rnd.randi_range(0,9)
+		current_card = DELETE_LATER_RANDOM_OVERRIDE
+		DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 		
 		var randplay = rnd.randi_range(0, players.size()-1)
 				
@@ -578,7 +586,8 @@ func _on_Button_pressed(): # Start game
 			players[i]["cards"] = []
 			players[i]["place"] = 0
 			for _j in range(starting_hand):
-				rand = rnd.randi_range(0,9)
+				rand = DELETE_LATER_RANDOM_OVERRIDE
+				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 				players[i]["cards"].append(rand)
 			rpc_one(i, "master_add_card", [players[i]["cards"]])
 				
@@ -648,7 +657,8 @@ func add_card_timeout(id):
 	if !end_of_game:
 		if current_player == id:
 			for _i in range(2):
-				rand = rnd.randi_range(0,9)
+				rand = DELETE_LATER_RANDOM_OVERRIDE
+				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 				players[id]["cards"].append(rand)
 				rpc_one(id, "master_add_card", [[rand]])
 
@@ -939,12 +949,14 @@ func _on_SelBot_pressed():
 			x = x/n
 			### give new player average number of cards
 			for _i in range(x):
-				rand = rnd.randi_range(0,9)
+				rand = DELETE_LATER_RANDOM_OVERRIDE
+				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 				players[bot_ids]["cards"].append(rand)
 			rpc_one(bot_ids, "master_add_card", [players[bot_ids]["cards"]])
 		else:
 			for _i in range(late_hand):
-				rand = rnd.randi_range(0,9)
+				rand = DELETE_LATER_RANDOM_OVERRIDE
+				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
 				players[bot_ids]["cards"].append(rand)
 			rpc_one(bot_ids, "master_add_card", [players[bot_ids]["cards"]])
 
