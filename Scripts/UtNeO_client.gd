@@ -52,7 +52,7 @@ func _ready():
 
 
 puppet func connection_established(id):
-	global.my_id = id
+	global.my_id = id[0]
 
 
 func resized():
@@ -280,7 +280,7 @@ puppet func update_player_list(sendstr):
 	### update player list
 	get_node("Player List").bbcode_text = sendstr
 
-puppet func player_done(_p_name, _pos):
+puppet func player_done(_p_name):
 	pass
 	#get_node("WinnerMessage").text = str(p_name) + " Won"
 
@@ -339,8 +339,6 @@ puppet func continue_game():
 	current_card_node = null
 	my_turn = false
 	get_node("WinnerMessage").text = ""
-
-
 
 
 

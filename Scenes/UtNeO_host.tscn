@@ -19,9 +19,9 @@ custom_fonts/font = SubResource( 1 )
 
 [node name="ClientConnect" type="Label" parent="."]
 margin_left = 5.0
-margin_top = 38.0
+margin_top = 65.0
 margin_right = 45.0
-margin_bottom = 66.0
+margin_bottom = 93.0
 custom_fonts/font = SubResource( 1 )
 
 [node name="Timer" type="Timer" parent="."]
@@ -246,9 +246,27 @@ margin_right = 160.0
 margin_bottom = 380.0
 text = "Go back"
 
+[node name="SelBot" type="Button" parent="."]
+margin_left = 320.0
+margin_top = 75.0
+margin_right = 570.0
+margin_bottom = 100.0
+text = "Add Bot"
+
+[node name="name" type="LineEdit" parent="SelBot"]
+margin_top = -50.0
+margin_right = 250.0
+margin_bottom = -25.0
+placeholder_text = "Name"
+
+[node name="Bots" type="OptionButton" parent="SelBot"]
+margin_top = -25.0
+margin_right = 250.0
+
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
 [connection signal="pressed" from="MenuButtons/Disconnect" to="." method="_on_Disconnect_pressed"]
 [connection signal="pressed" from="MenuButtons/Continue" to="." method="_on_Contunue_pressed"]
 [connection signal="pressed" from="MenuButtons/Button" to="." method="_on_Button_pressed"]
 [connection signal="pressed" from="Settings/start_host" to="." method="_on_start_host_pressed"]
 [connection signal="pressed" from="Settings/back" to="." method="_on_Button2_pressed"]
+[connection signal="pressed" from="SelBot" to="." method="_on_SelBot_pressed"]

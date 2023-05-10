@@ -33,8 +33,7 @@ func _ready():
 		#print("afterRPC")
 	else: #if an error occurred while trying to join a hosted session...
 		print("ERROR while executing create_client(), error code: ", error);
-	
-	
+
 
 puppet func bot_init(key, name):
 	login_key = key

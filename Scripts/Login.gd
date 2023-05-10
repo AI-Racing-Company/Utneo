@@ -29,7 +29,7 @@ func serversided_disconnect():
 	nue = get_tree().change_scene("res://Scenes/LobbyScene.tscn")
 
 puppet func connection_established(id):
-	global.my_id = id
+	global.my_id = id[0]
 	print("Connection succsess")
 	remove_child(get_node("Overlay"))
 

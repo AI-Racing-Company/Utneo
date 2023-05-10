@@ -1,4 +1,4 @@
-extends Node2D
+extends Node
 
 var max_recursion_depth = 3
 
@@ -23,7 +23,6 @@ var use_calc = []
 
 var calc_types = [global.btn_modes.add, global.btn_modes.sub, global.btn_modes.mul, global.btn_modes.div, global.btn_modes.pot, global.btn_modes.sqr]
 
-var peer = null
 var current_calc = ["","",""] # Array for Operation, value 1, value 2, name 1, name 2, card_id 1 and card_id 2
 var possible_solutions = []
 
@@ -39,36 +38,16 @@ var card_amount = 0
 
 func _ready():
 	mutex = Mutex.new()
-	peer = NetworkedMultiplayerENet.new()
-	var error : int = peer.create_client(global.ip, global.port)
-
-	if error == 0: #if no errors...
-		get_tree().network_peer = peer
-		nue = get_tree().connect("server_disconnected", self, "serversided_disconnect")
-		yield(get_tree().create_timer(2), "timeout")
-		rpc_id(1, "login", my_id, global.username, -1, -1)
-		print("Connected")
-	else: #if an error occurred while trying to join a hosted session...
-		print("ERROR while executing create_client(), error code: ", error);
 
 
-
-puppet func bot_init(key, name):
-	login_key = key
-	rpc_id(1, "give_key", my_id, login_key)
-	get_node("Label").text = "Hello, I am " + name
-
-puppet func connection_established(id):
+func give_id(id):
 	my_id = id
 
-puppet func startOfRound():
+func startOfRound():
 	rounds += 1;
 	print("\n\n")
 	print("Strating new round")
 	printcounter = 0
-	#yield(get_tree().create_timer(2), "timeout")
-
-	print("my cards ", my_cards)
 	print("card amount: ", card_amount )
 	current_calc = ["","",""]
 	possible_solutions = []
@@ -82,7 +61,7 @@ puppet func startOfRound():
 	exit_thread = true
 	thread_for_calc.start(self, "calc_possible")
 	var total_time = OS.get_ticks_msec() - time_before
-	yield(get_tree().create_timer(0.1), "timeout")
+	yield(get_tree().create_timer(0.5), "timeout")
 	thread_for_calc.wait_to_finish()
 	if(thread_for_calc.is_active()):
 		thread_for_calc.kill()
@@ -95,15 +74,15 @@ puppet func startOfRound():
 		calc_use_calc()
 		current_calc = [calc_types[use_calc[2]] if str(use_calc[2]) != "" else "", str(use_calc[0]), str(use_calc[1])]
 		print("pushing ", current_calc)
-		rpc_id(1,"cards_pushed",my_id,current_calc)
+		get_parent().cards_pushed(my_id,current_calc)
 	else:
 		if my_cards[current_card] > 0:
 			current_calc = ["", str(current_card), ""]
-			rpc_id(1,"cards_pushed", my_id, current_calc)
+			get_parent().cards_pushed(my_id, current_calc)
 			print("pushed 1 card: " + str(current_card))
 		else:
 			print("drew")
-			rpc_id(1, "add_card", my_id)
+			get_parent().add_card(my_id)
 	print("this was round ", rounds)
 
 func calc_use_calc():
@@ -176,13 +155,13 @@ func get_number_of_cards(cards):
 	return num
 
 
-puppet func master_add_card(rand):
+func master_add_card(rand):
 	for i in range(10):
 		my_cards[i] += rand.count(i)
 		card_amount += rand.count(i)
 	print("got cards")
 
-puppet func card_removed(_newPoint):
+func card_removed(_newPoint):
 
 	if(current_calc[1] != ""):
 		my_cards[int(current_calc[1])] -= 1
@@ -194,39 +173,8 @@ puppet func card_removed(_newPoint):
 
 	current_calc = ["","",""]
 
-
-puppet func r_t_h(_newRT):
-	pass
-
-puppet func endOfRound():
-	pass
-
-puppet func set_current_card(c):
+func set_current_card(c):
 	current_card = c
-
-puppet func update_player_list(_sendstr):
-	pass
-
-puppet func player_done(_p_name, _pos):
-	pass
-
-puppet func game_end():
-	pass
-
-puppet func set_current_player(_pname):
-	pass
-
-puppet func set_past_calc(_newText):
-	pass
-
-puppet func my_end_f():
-	pass
-
-puppet func set_winner(_win):
-	pass
-
-puppet func continue_game():
-	pass
 
 func serversided_disconnect():
 	print("Byebye")
@@ -234,4 +182,11 @@ func serversided_disconnect():
 
 func _exit_tree():
 	print("exiting")
-	thread_for_calc.wait_to_finish()
+	if thread_for_calc.is_active():
+		thread_for_calc.wait_to_finish()
+
+func set_variable(variable, val):
+	print(variable)
+	match variable:
+		"my_turn":
+			my_turn = val

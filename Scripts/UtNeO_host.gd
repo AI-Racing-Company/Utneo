@@ -1,5 +1,7 @@
 extends Node2D
 
+
+
 enum PC_mode{ ### enum for past calculations
 	norm = 0,
 	fail = 1,
@@ -10,12 +12,23 @@ enum PC_mode{ ### enum for past calculations
 	done = 6
 }
 
+var bot_functions = [
+	"set_current_card",
+	"master_add_card",
+	"card_removed",
+	"startOfRound"
+]
+
+var bots = ["Timmothy.gd",  "Nico.gd", "Neko.gd", "Coltin.gd", "Elton.gd"]
+
 #export (NodePath) var advertiserPath: NodePath
 #onready var advertiser := get_node(advertiserPath)
 
 ### load database
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
+
+var bot_ids = 100
 
 var rounds = 0
 
@@ -63,17 +76,23 @@ var MenuButtons
 var rnd = RandomNumberGenerator.new()
 var rand = 0
 
+var ipstring = ""
+
 var r_t = 60 # round time
 
 onready var timer = get_node("Timer")
 
 func _ready():
+	
 	### create basis for sql connection
 	db = SQLite.new()
 	db.path = "res://Data/UserData"
 	
 	### connect system functions to self implemented ones
 	nue = get_viewport().connect("size_changed", self, "resized")
+	
+	for i in range(bots.size()):
+		get_node("SelBot/Bots").add_item(bots[i], i)
 	
 	### save MenuButtons for later, not needed at start of program
 	MenuButtons = get_node("MenuButtons")
@@ -92,18 +111,17 @@ func resized():
 func client_connect(id):
 	unverified.append(id)
 	### if max player count is reached refuse new logins
-	if !unlimit_player && unverified.size() >= int(max_players):
+	if !unlimit_player && unverified.size() + players.size() >= int(max_players):
 			get_tree().set_refuse_new_network_connections(true)
 	yield(get_tree().create_timer(0.1), "timeout")
-	rpc_id(id, "connection_established", id)
+	rpc_id(id, "connection_established", [id])
 	set_client_text()
 
 
 master func give_key(id, key):
 	### check if key is valid
-	print(key)
-	print(key_names)
 	if key_names.has(key):
+		unverified.erase(id)
 		### add player to arrays
 		players[id] = {}
 		players[id]["name"] = null
@@ -113,14 +131,17 @@ master func give_key(id, key):
 		players[id]["name"] = key_names[key]
 		players[id]["place"] = -1
 		players[id]["cards"] = []
+		players[id]["type"] = "human"
 		pir.append(id)
+		
+		yield(get_tree().create_timer(0.5), "timeout")
 
-		rpc_id(id, "r_t_h", r_t)
+		rpc_one(id, "r_t_h", [r_t])
 
 		if game_started:
 			### if game started, give player imprtand information
-			rpc_id(id, "set_past_calc", set_past_calc(PC_mode.join, str(players[id]["name"])))
-			rpc_id(id, "set_current_card", current_card)
+			rpc_one(id, "set_past_calc", [set_past_calc(PC_mode.join, str(players[id]["name"]))])
+			rpc_one(id, "set_current_card", [current_card])
 			if(str(late_hand) == "avg"):
 				### calculate average hand card number of all players
 				var x = 0
@@ -134,12 +155,12 @@ master func give_key(id, key):
 				for _i in range(x):
 					rand = rnd.randi_range(0,9)
 					players[id]["cards"].append(rand)
-				rpc_id(id, "master_add_card", players[id]["cards"])
+				rpc_one(id, "master_add_card", [players[id]["cards"]])
 			else:
 				for _i in range(late_hand):
 					rand = rnd.randi_range(0,9)
 					players[id]["cards"].append(rand)
-				rpc_id(id, "master_add_card", players[id]["cards"])
+				rpc_one(id, "master_add_card", [players[id]["cards"]])
 
 
 		if !end_of_game:
@@ -147,13 +168,13 @@ master func give_key(id, key):
 
 func client_disconnect(id):
 	if players.has(id):
-		### add info to past calc
-		rpc("set_past_calc", set_past_calc(PC_mode.left, str(players[id]["name"])))
-		
 		### remove player from all arrays
 		
 		unverified.erase(id)
 		players.erase(id)
+		
+		### add info to past calc
+		rpc_all("set_past_calc", set_past_calc(PC_mode.left, str(players[id]["name"])))
 		
 		### Next player if disconnected one was current one
 		if id == current_player:
@@ -168,6 +189,7 @@ func client_disconnect(id):
 
 master func add_card(id):
 	### check if move is allowed by player
+	print("I drew a card")
 	if !end_of_game:
 		if current_player == id:
 			### create card
@@ -177,12 +199,12 @@ master func add_card(id):
 			players[id]["cards"].append(rand)
 
 			### upfate past calculations
-			rpc("set_past_calc", set_past_calc(PC_mode.drew, str(players[current_player]["name"])))
+			rpc_all("set_past_calc", set_past_calc(PC_mode.drew, str(players[current_player]["name"])))
 
 			### give card to player
-			rpc_id(id, "master_add_card", [rand])
+			print("gave card: ", rand)
+			rpc_one(id, "master_add_card", [[rand]])
 			if(last_round):
-				
 				game_end()
 			else:
 				next_player()
@@ -237,11 +259,9 @@ func create_past_calc_str():
 
 master func cards_pushed(id, ops):
 	### check if move is allowed
-	print(current_card)
-	print(players[id]["name"], " ", players[id]["cards"], " ", ops)
 	if !end_of_game:
 		if current_player == id:
-			### check if one or wto cards are pushed
+			### check if one or two cards are pushed
 			if ops[2] == "":
 				var c1 = int(ops[1])
 				### check if player has card he claims to have
@@ -251,17 +271,17 @@ master func cards_pushed(id, ops):
 						players[id]["points"] += int(c1)
 						
 						### remove card from client and server
-						rpc_id(id, "card_removed", players[id]["points"])
+						rpc_one(id, "card_removed", [players[id]["points"]])
 						players[id]["cards"].erase(c1)
 						
 						### set new current card
 						current_card = c1
-						rpc("set_current_card", current_card)
+						rpc_all("set_current_card", current_card)
 						
 						### set texts
 						if !end_of_game:
 							set_client_text()
-						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
+						rpc_all("set_past_calc", set_past_calc(PC_mode.norm, ops))
 
 						if(last_round):
 							### check if player is done
@@ -277,7 +297,7 @@ master func cards_pushed(id, ops):
 								next_player()
 					else:
 						if hum_play:
-							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
+							rpc_all("set_past_calc", set_past_calc(PC_mode.fail, ops))
 
 			else:
 				### get cards
@@ -322,18 +342,18 @@ master func cards_pushed(id, ops):
 						players[id]["points"] += int(trueRes)
 						
 						### remove cards
-						rpc_id(id, "card_removed", players[id]["points"])
+						rpc_one(id, "card_removed", [players[id]["points"]])
 						players[id]["cards"].erase(c1)
 						players[id]["cards"].erase(c2)
 						
 						### set new current card
 						current_card = c2
-						rpc("set_current_card", current_card)
+						rpc_all("set_current_card", current_card)
 						
 						### set texts
 						if !end_of_game:
 							set_client_text()
-						rpc("set_past_calc", set_past_calc(PC_mode.norm, ops))
+						rpc_all("set_past_calc", set_past_calc(PC_mode.norm, ops))
 						
 						if(last_round):
 							### check if player is done
@@ -349,7 +369,7 @@ master func cards_pushed(id, ops):
 								next_player()
 					else:
 						if hum_play:
-							rpc("set_past_calc", set_past_calc(PC_mode.fail, ops))
+							rpc_all("set_past_calc", set_past_calc(PC_mode.fail, ops))
 						print("not the right solution")
 				else:
 					print("clientside cards don't match serverside cards")
@@ -366,17 +386,17 @@ func player_done(id):
 	
 	
 	### set texts
-	rpc("set_past_calc", set_past_calc(PC_mode.done, players[current_player]["name"]))
+	rpc_all("set_past_calc", set_past_calc(PC_mode.done, players[current_player]["name"]))
 	
 	### call player done functions
-	rpc_id(id, "my_end_f")
-	rpc("player_done", players[id]["name"], players_done)
+	rpc_one(id, "my_end_f", null)
+	rpc_all("player_done", players[id]["name"])
 	
 	### set winner if first done player
 	db.open_db()
 	
 	if players_done == 1:
-		rpc("set_winner", players[id]["name"])
+		rpc_all("set_winner", players[id]["name"])
 		firstWinner = rounds
 		var query = "SELECT Won_Games FROM Users WHERE Name = ?"
 		var bindings = [players[id]["name"]]
@@ -415,11 +435,10 @@ func player_done(id):
 
 
 func game_end():
-	print("##################################")
 	### call game end
 	end_of_game = true
 	for i in players:
-		rpc_id(i,"game_end")
+		rpc_one(i,"game_end", null)
 	### stop timer
 	if !unlimit_time:
 		timer.stop()
@@ -444,7 +463,6 @@ func set_client_winner_text():
 		for _i in range(players.size()):
 			arr.append(0)
 		var cou = 1
-		print(players.size())
 		for i in players:
 			if players[i]["place"] > 0:
 				arr[players[i]["place"]-1] = players[i]["name"]
@@ -475,8 +493,7 @@ func set_client_winner_text():
 					
 		### update list on every client
 		sendstr = "[right]" + sendstr + "[/right]"
-	for i in players:
-		rpc_id(i, "update_player_list", sendstr)
+	rpc_all("update_player_list", [sendstr])
 
 func _physics_process(_delta):
 	### for "true randomness" calculate random number every tick
@@ -504,7 +521,7 @@ func _on_Button_pressed(): # Start game
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
 				players[i]["cards"].append(rand)
-			rpc_id(i, "master_add_card", players[i]["cards"])
+			rpc_one(i, "master_add_card", [players[i]["cards"]])
 				
 		### start timer if time is not endless
 		if !unlimit_time:
@@ -515,10 +532,10 @@ func _on_Button_pressed(): # Start game
 		set_client_text()
 		yield(get_tree().create_timer(2), "timeout")
 		### call client functions
-		rset_id(current_player, "my_turn", true)
-		rpc("set_current_card", current_card)
-		rpc_id(current_player, "startOfRound")
-		rpc("set_current_player", players[current_player]["name"])
+		rset_one(current_player, "my_turn", true)
+		rpc_all("set_current_card", current_card)
+		rpc_one(current_player, "startOfRound", null)
+		rpc_all("set_current_player", players[current_player]["name"])
 		
 		for i in players:
 			db.open_db()
@@ -536,7 +553,7 @@ func _on_Button_pressed(): # Start game
 	
 	if end_of_game:
 		
-		rpc("continue_game")
+		rpc_all("continue_game", null)
 		players_done = 0
 		
 		if !alp:
@@ -544,7 +561,7 @@ func _on_Button_pressed(): # Start game
 		### random calculations
 		pir.clear()
 		for i in players:
-			pir.append(i)
+			pir.append(i[0])
 		
 		pir.shuffle()
 		current_card = rnd.randi_range(0,9)
@@ -563,7 +580,7 @@ func _on_Button_pressed(): # Start game
 			for _j in range(starting_hand):
 				rand = rnd.randi_range(0,9)
 				players[i]["cards"].append(rand)
-			rpc_id(i, "master_add_card", players[i]["cards"])
+			rpc_one(i, "master_add_card", [players[i]["cards"]])
 				
 				
 		### start timer if time is not endless
@@ -575,17 +592,17 @@ func _on_Button_pressed(): # Start game
 		set_client_text()
 		
 		### call client functions
-		rset_id(current_player, "my_turn", true)
-		rpc("set_current_card", current_card)
-		rpc_id(current_player, "startOfRound")
-		rpc("set_current_player", players[current_player]["name"])
+		rset_one(current_player, "my_turn", true)
+		rpc_all("set_current_card", current_card)
+		rpc_one(current_player, "startOfRound", null)
+		rpc_all("set_current_player", players[current_player]["name"])
 	
 
 func next_player():
 	if !end_of_game:
 		### check if current player exists and stop his round
 		if players.has(current_player):
-			rpc_id(current_player, "endOfRound")
+			rpc_one(current_player, "endOfRound", null)
 		### check if any player is left
 		if pir.size() > 0:
 			### next player in round, after last comes first
@@ -602,9 +619,9 @@ func next_player():
 				if players.has(current_player):
 					### call client functions
 					rset("my_turn", false)
-					rset_id(current_player, "my_turn", true)
-					rpc_id(current_player, "startOfRound")
-					rpc("set_current_player", players[current_player]["name"])
+					rset_one(current_player, "my_turn", true)
+					rpc_one(current_player, "startOfRound", null)
+					rpc_all("set_current_player", [players[current_player]["name"]])
 					
 					### start timer for new player
 					if !unlimit_time:
@@ -618,9 +635,9 @@ func _on_Timer_timeout():
 	### check if any player is left
 	if players.size() > 0:
 		### end players round
-		rpc_id(current_player, "endOfRound")
+		rpc_one(current_player, "endOfRound", null)
 		### update past calc
-		rpc("set_past_calc", set_past_calc(PC_mode.time, ""))
+		rpc_all("set_past_calc", set_past_calc(PC_mode.time, ""))
 		if(last_round):
 			game_end()
 		else:
@@ -633,7 +650,7 @@ func add_card_timeout(id):
 			for _i in range(2):
 				rand = rnd.randi_range(0,9)
 				players[id]["cards"].append(rand)
-				rpc_id(id, "master_add_card", [rand])
+				rpc_one(id, "master_add_card", [[rand]])
 
 
 func set_client_text():
@@ -657,8 +674,7 @@ func set_client_text():
 		else:
 			sendstr = sendstr  + str(players[i]["name"]) + "\n"
 	sendstr += "[/right]"
-	for i in players:
-		rpc_id(i, "update_player_list", sendstr)
+	rpc_all("update_player_list", [sendstr])
 
 
 func _on_win_pressed():
@@ -676,7 +692,11 @@ func _on_start_host_pressed():
 	settings = get_node("Settings")
 
 	add_child(MenuButtons)
-	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port)
+	
+	ipstring = encode_ip(global.ip)
+	
+	get_node("HostText").text = "Hosting on " + global.ip + ":" + str(global.port) + "\nLobby-Code: " + ipstring
+	
 	
 	peer = NetworkedMultiplayerENet.new()
 	peer.create_server(global.port)
@@ -750,18 +770,12 @@ master func register(id, name, pwd, mail):
 		var key = PoolStringArray(OS.get_time().values()).join("")
 		key = (key + name).sha256_text()
 		key_names[key] = name
-		rpc_id(id, "Register_return", true, key)
+		rpc_one(id, "Register_return", [true, key])
 	else:
-		rpc_id(id, "Register_return", false, "")
+		rpc_one(id, "Register_return", [false, ""])
 	db.close_db()
 
 master func login(id, name, pwd, time):
-	print(name)
-	if pwd == time and time == -1:
-		var key = PoolStringArray(OS.get_time().values()).join("").sha256_text()
-		key_names[key] = name
-		rpc_id(id, "bot_init", key, name)
-		pass
 	db.open_db()
 	var query = "SELECT pwd FROM Users WHERE Name = ?"
 	var bindings = [name]
@@ -775,7 +789,7 @@ master func login(id, name, pwd, time):
 			key_names[key] = name
 			rpc_id(id, "Login_return", true, key)
 		else:
-			rpc_id(id, "Login_return", false, "")
+			rpc_id(id, "Login_return", false, 0)
 	db.close_db()
 	set_client_text()
 
@@ -792,15 +806,169 @@ func _input(event):
 			scrolled(5)
 
 func scrolled(move):#
-	
-	var node = get_node("Settings")
-	var screen = get_viewport().get_visible_rect().size.y
-	
-	node.set_global_position(Vector2(0,node.get_global_position().y + move))
-	if(node.get_global_position().y > 0):
-		node.set_global_position(Vector2(0,0))
-	if node.get_global_position().y+400 < screen:
-		if(screen > 400):
+	if(!host_started):
+		var node = get_node("Settings")
+		var screen = get_viewport().get_visible_rect().size.y
+		
+		node.set_global_position(Vector2(0,node.get_global_position().y + move))
+		if(node.get_global_position().y > 0):
 			node.set_global_position(Vector2(0,0))
+		if node.get_global_position().y+400 < screen:
+			if(screen > 400):
+				node.set_global_position(Vector2(0,0))
+			else:
+				node.set_global_position(Vector2(0,screen-400))
+
+func dec2bin(var decimal_value): 
+	var binary_string = "" 
+	var temp 
+	var count = 7 # Checking up to 32 bits 
+ 
+	while(count >= 0): 
+		temp = decimal_value >> count 
+		if(temp & 1): 
+			binary_string = binary_string + "1" 
+		else: 
+			binary_string = binary_string + "0" 
+		count -= 1 
+
+	return binary_string
+
+func bin2dec(var binary_value): 
+	var decimal_value = 0 
+	var count = 0 
+	var temp 
+ 
+	while(binary_value != 0): 
+		temp = binary_value % 10 
+		binary_value /= 10 
+		decimal_value += temp * pow(2, count) 
+		count += 1 
+ 
+	return decimal_value
+
+
+func rpc_all(function, values):
+
+	for id in players:
+		if players[id]["type"] == "bot" && function == "set_current_card":
+			if bot_functions.has(function):		
+				match bot_functions.find(function):
+					0:
+						get_node(str(id)).set_current_card(values)
+					1:
+						get_node(str(id)).master_add_card(values)
+					2:
+						get_node(str(id)).card_removed(values)
+					3:
+						get_node(str(id)).startOfRound()
+		elif players[id]["type"] != "bot":
+			if values != null:
+				rpc_id(id, function, values)
+			else:
+				rpc_id(id, function)
+
+func rpc_one(id, function, values):
+	if players[id]["type"] != "bot":
+		if values != null:
+			if values.size() > 1:
+				rpc_id(id, function, values[0], values[1])
+			else:
+				rpc_id(id, function, values[0])
 		else:
-			node.set_global_position(Vector2(0,screen-400))
+			rpc_id(id, function)
+		return
+	
+	if bot_functions.has(function):		
+		match bot_functions.find(function):
+			0:
+				get_node(str(id)).set_current_card(values[0])
+			1:
+				get_node(str(id)).master_add_card(values[0])
+			2:
+				get_node(str(id)).card_removed(values[0])
+			3:
+				get_node(str(id)).startOfRound()
+
+
+func rset_one(id, variable, value):
+	if players[id]["type"] != "bot":
+		rset_id(id, variable, value)
+		return
+	get_node(str(id)).set_variable(variable, value)
+	
+	
+
+
+
+func _on_SelBot_pressed():
+	bot_ids += 1
+
+	players[bot_ids] = {}
+	players[bot_ids]["name"] = null
+	players[bot_ids]["place"] = null
+	players[bot_ids]["cards"] = null
+	players[bot_ids]["points"] = 0
+	players[bot_ids]["name"] = get_node("SelBot/name").text
+	players[bot_ids]["place"] = -1
+	players[bot_ids]["cards"] = []
+	players[bot_ids]["type"] = "bot"
+	pir.append(bot_ids)
+	
+	var bot = Node.new()
+	
+	bot.name = str(bot_ids);
+	bot.set_script(load("res://Scripts/Bots/"+bots[get_node("SelBot/Bots").selected]))
+	
+	self.add_child(bot)
+	
+	get_node(str(bot_ids)).give_id(bot_ids)
+
+
+	if game_started:
+		### if game started, give player imprtand information
+		rpc_one(bot_ids, "set_current_card", [current_card])
+		if(str(late_hand) == "avg"):
+			### calculate average hand card number of all players
+			var x = 0
+			var n = 0
+			for i in players:
+				if players[i]["cards"].size() > 0:
+					x += players[i]["cards"].size()
+					n += 1
+			x = x/n
+			### give new player average number of cards
+			for _i in range(x):
+				rand = rnd.randi_range(0,9)
+				players[bot_ids]["cards"].append(rand)
+			rpc_one(bot_ids, "master_add_card", [players[bot_ids]["cards"]])
+		else:
+			for _i in range(late_hand):
+				rand = rnd.randi_range(0,9)
+				players[bot_ids]["cards"].append(rand)
+			rpc_one(bot_ids, "master_add_card", [players[bot_ids]["cards"]])
+
+
+	if !end_of_game:
+		set_client_text()
+
+func encode_ip(ip):
+	var letters = ["Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Y", "X", "C", "V", "B", "N", "M", "a", "b", "g", "h", "r", "c"]
+	var binip = ""
+	
+	for octet in ip.split("."):
+		binip += dec2bin(int(octet))
+	
+	var out = ""
+	
+	for i in range(7):
+		var start = i * 5
+		var end = start + 5
+		var bits = binip.substr(i,5)
+		out += letters[bin2dec(int(bits))]
+	
+	return out
+
+
+
+
