@@ -48,6 +48,23 @@ margin_right = 900.0
 margin_bottom = 50.0
 text = "Start/restart Gamme"
 
+[node name="SelBot" type="Button" parent="MenuButtons"]
+margin_left = 320.0
+margin_top = 75.0
+margin_right = 570.0
+margin_bottom = 100.0
+text = "Add Bot"
+
+[node name="name" type="LineEdit" parent="MenuButtons/SelBot"]
+margin_top = -50.0
+margin_right = 250.0
+margin_bottom = -25.0
+placeholder_text = "Name"
+
+[node name="Bots" type="OptionButton" parent="MenuButtons/SelBot"]
+margin_top = -25.0
+margin_right = 250.0
+
 [node name="Settings" type="Node2D" parent="."]
 
 [node name="max_play" type="Node2D" parent="Settings"]
@@ -246,27 +263,10 @@ margin_right = 160.0
 margin_bottom = 380.0
 text = "Go back"
 
-[node name="SelBot" type="Button" parent="."]
-margin_left = 320.0
-margin_top = 75.0
-margin_right = 570.0
-margin_bottom = 100.0
-text = "Add Bot"
-
-[node name="name" type="LineEdit" parent="SelBot"]
-margin_top = -50.0
-margin_right = 250.0
-margin_bottom = -25.0
-placeholder_text = "Name"
-
-[node name="Bots" type="OptionButton" parent="SelBot"]
-margin_top = -25.0
-margin_right = 250.0
-
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
 [connection signal="pressed" from="MenuButtons/Disconnect" to="." method="_on_Disconnect_pressed"]
 [connection signal="pressed" from="MenuButtons/Continue" to="." method="_on_Contunue_pressed"]
 [connection signal="pressed" from="MenuButtons/Button" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="MenuButtons/SelBot" to="." method="_on_SelBot_pressed"]
 [connection signal="pressed" from="Settings/start_host" to="." method="_on_start_host_pressed"]
 [connection signal="pressed" from="Settings/back" to="." method="_on_Button2_pressed"]
-[connection signal="pressed" from="SelBot" to="." method="_on_SelBot_pressed"]

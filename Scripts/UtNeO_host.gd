@@ -12,7 +12,6 @@ enum PC_mode{ ### enum for past calculations
 	done = 6
 }
 
-var DELETE_LATER_RANDOM_OVERRIDE = 0
 
 var bot_functions = [
 	"set_current_card",
@@ -21,7 +20,7 @@ var bot_functions = [
 	"startOfRound"
 ]
 
-var bots = ["Timmothy.gd",  "Nico.gd", "Neko.gd", "Coltin.gd", "Elton.gd"]
+var bots = ["Elton.gd", "Timmothy.gd"]
 
 #export (NodePath) var advertiserPath: NodePath
 #onready var advertiser := get_node(advertiserPath)
@@ -93,8 +92,7 @@ func _ready():
 	### connect system functions to self implemented ones
 	nue = get_viewport().connect("size_changed", self, "resized")
 	
-	for i in range(bots.size()):
-		get_node("SelBot/Bots").add_item(bots[i], i)
+	
 	
 	### save MenuButtons for later, not needed at start of program
 	MenuButtons = get_node("MenuButtons")
@@ -155,14 +153,13 @@ master func give_key(id, key):
 				x = x/n
 				### give new player average number of cards
 				for _i in range(x):
-					rand = DELETE_LATER_RANDOM_OVERRIDE
-					DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+					rand = rnd.randi_range(0,9)
 					players[id]["cards"].append(rand)
 				rpc_one(id, "master_add_card", [players[id]["cards"]])
 			else:
 				for _i in range(late_hand):
-					rand = DELETE_LATER_RANDOM_OVERRIDE
-					DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+					rand = rnd.randi_range(0,9)
+					
 					players[id]["cards"].append(rand)
 				rpc_one(id, "master_add_card", [players[id]["cards"]])
 
@@ -197,8 +194,7 @@ master func add_card(id):
 	if !end_of_game:
 		if current_player == id:
 			### create card
-			rand = DELETE_LATER_RANDOM_OVERRIDE
-			DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+			rand = rnd.randi_range(0,9)
 			### save card on server
 			players[id]["cards"].append(rand)
 
@@ -512,8 +508,8 @@ func _on_Button_pressed(): # Start game
 			get_tree().set_refuse_new_network_connections(true)
 		### random calculations
 		pir.shuffle()
-		current_card = DELETE_LATER_RANDOM_OVERRIDE
-		DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+		current_card = rnd.randi_range(0,9)
+		
 		
 		var randplay = rnd.randi_range(0, players.size()-1)
 		
@@ -525,8 +521,8 @@ func _on_Button_pressed(): # Start game
 		### generate hand cards for every player
 		for i in players:
 			for _j in range(starting_hand):
-				rand = DELETE_LATER_RANDOM_OVERRIDE
-				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+				rand = rnd.randi_range(0,9)
+				
 				players[i]["cards"].append(rand)
 			rpc_one(i, "master_add_card", [players[i]["cards"]])
 				
@@ -571,8 +567,8 @@ func _on_Button_pressed(): # Start game
 			pir.append(i[0])
 		
 		pir.shuffle()
-		current_card = DELETE_LATER_RANDOM_OVERRIDE
-		DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+		current_card = rnd.randi_range(0,9)
+		
 		
 		var randplay = rnd.randi_range(0, players.size()-1)
 				
@@ -586,8 +582,8 @@ func _on_Button_pressed(): # Start game
 			players[i]["cards"] = []
 			players[i]["place"] = 0
 			for _j in range(starting_hand):
-				rand = DELETE_LATER_RANDOM_OVERRIDE
-				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+				rand = rnd.randi_range(0,9)
+				
 				players[i]["cards"].append(rand)
 			rpc_one(i, "master_add_card", [players[i]["cards"]])
 				
@@ -657,8 +653,8 @@ func add_card_timeout(id):
 	if !end_of_game:
 		if current_player == id:
 			for _i in range(2):
-				rand = DELETE_LATER_RANDOM_OVERRIDE
-				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+				rand = rnd.randi_range(0,9)
+				
 				players[id]["cards"].append(rand)
 				rpc_one(id, "master_add_card", [[rand]])
 
@@ -702,6 +698,8 @@ func _on_start_host_pressed():
 	settings = get_node("Settings")
 
 	add_child(MenuButtons)
+	for i in range(bots.size()):
+		get_node("MenuButtons/SelBot/Bots").add_item(bots[i], i)
 	
 	ipstring = encode_ip(global.ip)
 	
@@ -919,7 +917,7 @@ func _on_SelBot_pressed():
 	players[bot_ids]["place"] = null
 	players[bot_ids]["cards"] = null
 	players[bot_ids]["points"] = 0
-	players[bot_ids]["name"] = get_node("SelBot/name").text
+	players[bot_ids]["name"] = get_node("MenuButtons/SelBot/name").text
 	players[bot_ids]["place"] = -1
 	players[bot_ids]["cards"] = []
 	players[bot_ids]["type"] = "bot"
@@ -928,7 +926,7 @@ func _on_SelBot_pressed():
 	var bot = Node.new()
 	
 	bot.name = str(bot_ids);
-	bot.set_script(load("res://Scripts/Bots/"+bots[get_node("SelBot/Bots").selected]))
+	bot.set_script(load("res://Scripts/Bots/"+bots[get_node("MenuButtons/SelBot/Bots").selected]))
 	
 	self.add_child(bot)
 	
@@ -949,14 +947,14 @@ func _on_SelBot_pressed():
 			x = x/n
 			### give new player average number of cards
 			for _i in range(x):
-				rand = DELETE_LATER_RANDOM_OVERRIDE
-				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+				rand = rnd.randi_range(0,9)
+				
 				players[bot_ids]["cards"].append(rand)
 			rpc_one(bot_ids, "master_add_card", [players[bot_ids]["cards"]])
 		else:
 			for _i in range(late_hand):
-				rand = DELETE_LATER_RANDOM_OVERRIDE
-				DELETE_LATER_RANDOM_OVERRIDE = (DELETE_LATER_RANDOM_OVERRIDE+1)%10
+				rand = rnd.randi_range(0,9)
+				
 				players[bot_ids]["cards"].append(rand)
 			rpc_one(bot_ids, "master_add_card", [players[bot_ids]["cards"]])
 
