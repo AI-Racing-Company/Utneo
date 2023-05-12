@@ -1,6 +1,6 @@
 extends Node
 
-var max_recursion_depth = 3
+var max_recursion_depth = 4
 
 var rounds = 0;
 
@@ -34,7 +34,7 @@ var depth = 0
 var cards_left = []
 var current_goal = 0
 var card_amount = 0
-
+var calced = []
 
 func _ready():
 	mutex = Mutex.new()
@@ -44,6 +44,7 @@ func give_id(id):
 	my_id = id
 
 func startOfRound():
+	calced = []
 	rounds += 1;
 	print("\n\n")
 	print("Strating new round")
@@ -137,9 +138,10 @@ func calc_possible(_userdata) -> void:
 					cards_left = my_cards_left.duplicate()
 					cards_left[c1] -= 1;
 					cards_left[c2] -= 1;
-					if my_depth < max_recursion_depth:
+					if my_depth < max_recursion_depth and calced.find(cards_left) == -1:
 						current_goal = c2
 						depth = my_depth+1
+						calced.append(cards_left)
 						calc_possible(_userdata)
 
 	if depth == 0:

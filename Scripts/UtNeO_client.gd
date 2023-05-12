@@ -278,7 +278,7 @@ puppet func set_current_card(_c):
 
 puppet func update_player_list(sendstr):
 	### update player list
-	get_node("Player List").bbcode_text = sendstr
+	get_node("Player List").bbcode_text = sendstr[0]
 
 puppet func player_done(_p_name):
 	pass
